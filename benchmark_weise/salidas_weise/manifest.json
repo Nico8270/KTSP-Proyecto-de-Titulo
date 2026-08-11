@@ -1,0 +1,37 @@
+{
+  "descripcion": "Benchmarking anytime (Weise et al. 2014) para el k-TSP",
+  "fuente_instancias": "SINTÉTICAS deterministas (sin red)",
+  "instancias": [
+    "burma14(n=14)",
+    "ulysses22(n=22)",
+    "att48(n=48)",
+    "eil51(n=51)",
+    "berlin52(n=52)",
+    "st70(n=70)",
+    "eil76(n=76)",
+    "kroA100(n=100)"
+  ],
+  "cuartiles": [
+    1,
+    2,
+    3
+  ],
+  "corridas_estocasticas": 12,
+  "goal_errors": [
+    0.1,
+    0.05,
+    0.02,
+    0.01,
+    0.0
+  ],
+  "eje_tiempo": "DE = evaluaciones de distancia (machine-independent, escalado por n^2 al agregar)",
+  "referencia_error": "BKS oficial si TSPLIB real+tabulada; si no, best-found",
+  "salidas": [
+    "resumen_gaps.csv",
+    "ert_por_instancia.csv",
+    "ranking_global.csv",
+    "runs.pkl",
+    "figuras/"
+  ],
+  "segundos": 37.2
+}

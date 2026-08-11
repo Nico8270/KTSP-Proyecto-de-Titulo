@@ -1,0 +1,5 @@
+Metodo,rank_global_mediano,puesto,AUC_ECDF,AUC_progreso,ERT@20%,GAP_final
+Greedy,2.0,1,2.5,1.0,2.5,1.5
+DCIH,2.25,2,2.5,2.0,2.5,2.0
+GRASP,2.875,3,2.5,3.0,2.75,3.0
+GA,3.5,4,3.0,4.0,3.0,4.0
