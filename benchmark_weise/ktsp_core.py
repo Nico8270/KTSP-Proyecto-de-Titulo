@@ -328,10 +328,195 @@ def nbr_ktsp(D, n, k, home=HOME, cand_window=0,
             "source": "DCIH_deterministic"}
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Heuristicas adicionales (estandares clasicas de construccion + metaheuristica)
+#   Anaden log points anytime y conteo de DE, con la misma firma que las demas.
+# ─────────────────────────────────────────────────────────────────────────────
+def nn_ktsp(D, n, k, home=HOME,
+            log: Optional[LogFn] = None, budget_de: Optional[int] = None):
+    """Nearest Neighbor: desde la ciudad-hogar avanza siempre al nodo mas
+    cercano no visitado hasta reunir k nodos; refina con busqueda local.
+    Determinista (empates por menor indice)."""
+    t0 = time.perf_counter(); emit = _mk_logger(log, t0)
+    inset = np.zeros(n, dtype=bool); inset[home] = True
+    tour = [home]; current = home
+    while len(tour) < k:
+        outside = np.where(~inset)[0]
+        if outside.size == 0:
+            break
+        d = D[current, outside]; EVAL.add(outside.size)
+        node = int(outside[int(np.argmin(d))])
+        tour.append(node); inset[node] = True; current = node
+    emit(tour_length(tour, D))                  # punto anytime: construido
+    tour = local_search_ktsp(tour, D, n, home)
+    L = tour_length(tour, D); emit(L)           # punto anytime: tras LS
+    return {"tour": tour, "length": L, "source": "nearest_neighbor+LS"}
+
+
+def _insertion_build(D, n, k, home, selection: str, rng=None):
+    """Construccion por insercion generica para el k-TSP.
+
+    selection:
+      'nearest'  -> Nearest Insertion  (inserta el nodo mas cercano al tour)
+      'farthest' -> Farthest Insertion (inserta el nodo mas lejano al tour)
+      'random'   -> Random Insertion   (inserta un nodo al azar)
+    En todos los casos el nodo elegido se coloca en la posicion de MINIMO
+    costo de insercion. Arranca en [home, nodo mas cercano al hogar]."""
+    inset = np.zeros(n, dtype=bool); inset[home] = True
+    order = np.argsort(D[home]); EVAL.add(n)
+    second = next(int(v) for v in order if v != home)
+    tour = [home, second]; inset[second] = True
+    while len(tour) < k:
+        outside = np.where(~inset)[0]
+        if outside.size == 0:
+            break
+        Dsub = D[np.ix_(outside, tour)]; EVAL.add(outside.size * len(tour))
+        nearest = Dsub.min(axis=1)
+        if selection == "nearest":
+            pick = int(np.argmin(nearest))
+        elif selection == "farthest":
+            pick = int(np.argmax(nearest))
+        else:  # random
+            pick = rng.randrange(outside.size)
+        node = int(outside[pick])
+        arr = np.asarray(tour); nxt = np.roll(arr, -1)
+        delta = D[node, arr] + D[node, nxt] - D[arr, nxt]
+        EVAL.add(3 * len(tour))
+        pos = int(np.argmin(delta)) + 1
+        tour.insert(pos, node); inset[node] = True
+    return tour
+
+
+def ni_ktsp(D, n, k, home=HOME,
+            log: Optional[LogFn] = None, budget_de: Optional[int] = None):
+    """Nearest Insertion + busqueda local. Determinista."""
+    t0 = time.perf_counter(); emit = _mk_logger(log, t0)
+    tour = _insertion_build(D, n, k, home, "nearest")
+    emit(tour_length(tour, D))
+    tour = local_search_ktsp(tour, D, n, home)
+    L = tour_length(tour, D); emit(L)
+    return {"tour": tour, "length": L, "source": "nearest_insertion+LS"}
+
+
+def fi_ktsp(D, n, k, home=HOME,
+            log: Optional[LogFn] = None, budget_de: Optional[int] = None):
+    """Farthest Insertion + busqueda local. Determinista."""
+    t0 = time.perf_counter(); emit = _mk_logger(log, t0)
+    tour = _insertion_build(D, n, k, home, "farthest")
+    emit(tour_length(tour, D))
+    tour = local_search_ktsp(tour, D, n, home)
+    L = tour_length(tour, D); emit(L)
+    return {"tour": tour, "length": L, "source": "farthest_insertion+LS"}
+
+
+def ri_ktsp(D, n, k, home=HOME, seed=42, time_limit=1e9,
+            log: Optional[LogFn] = None, budget_de: Optional[int] = None,
+            max_iters: int = 10_000):
+    """Random Insertion multi-arranque + busqueda local. Estocastico (semilla)."""
+    t0 = time.perf_counter(); emit = _mk_logger(log, t0)
+    rng = random.Random(seed + 7)
+    best_tour, best_len = None, float("inf")
+    it = 0
+    while it < max_iters:
+        it += 1
+        tour = _insertion_build(D, n, k, home, "random", rng)
+        tour = local_search_ktsp(tour, D, n, home)
+        L = tour_length(tour, D)
+        if L < best_len:
+            best_tour, best_len = tour, L
+        emit(L)                                 # punto anytime por arranque
+        stop_time = (time.perf_counter() - t0) >= time_limit
+        stop_de = budget_de is not None and EVAL.de >= budget_de
+        if stop_time or stop_de:
+            break
+    if best_tour is None:
+        best_tour = _insertion_build(D, n, k, home, "random", rng)
+        best_len = tour_length(best_tour, D); emit(best_len)
+    return {"tour": best_tour, "length": best_len, "source": "random_insertion+LS"}
+
+
+def sa_ktsp(D, n, k, home=HOME, seed=42, time_limit=1e9, alpha=0.9995,
+            log: Optional[LogFn] = None, budget_de: Optional[int] = None,
+            max_iters: int = 2_000_000):
+    """Simulated Annealing sobre el espacio (subconjunto + orden) del k-TSP.
+
+    Parte de una construccion Nearest Insertion y explora dos vecindarios:
+      (i) reverso de segmento (movimiento 2-opt) que reordena el tour, y
+     (ii) intercambio dentro/fuera que cambia el subconjunto seleccionado.
+    Acepta empeoramientos con probabilidad de Metropolis exp(-delta/T) y
+    enfria T geometricamente. Estocastico (semilla)."""
+    t0 = time.perf_counter(); emit = _mk_logger(log, t0)
+    rng = random.Random(seed + 9)
+
+    cur = _insertion_build(D, n, k, home, "nearest")
+    cur = two_opt_cycle(cur, D)
+    cur_len = tour_length(cur, D)
+    best, best_len = list(cur), cur_len
+    emit(best_len)
+
+    inset = np.zeros(n, dtype=bool); inset[np.asarray(cur)] = True
+    outside = [int(v) for v in range(n) if not inset[v]]
+
+    # temperatura inicial ~ escala tipica de una arista
+    pos = np.asarray(cur); nxtp = np.roll(pos, -1)
+    T = max(1e-9, float(np.mean(D[pos, nxtp])) * 0.5); EVAL.add(len(cur))
+
+    m = len(cur)
+    it = 0
+    while it < max_iters and m >= 4:
+        it += 1
+        if outside and rng.random() < 0.35:
+            # movimiento (ii): intercambio dentro/fuera
+            p = rng.randrange(1, m)                 # nunca la posicion del hogar
+            a = cur[p - 1]; b = cur[(p + 1) % m]; old = cur[p]
+            new = outside[rng.randrange(len(outside))]
+            delta = (D[a, new] + D[new, b]) - (D[a, old] + D[old, b])
+            EVAL.add(4)
+            if delta < 0 or rng.random() < np.exp(-delta / T):
+                cur[p] = new
+                inset[old] = False; inset[new] = True
+                outside.remove(new); outside.append(old)
+                cur_len += delta
+        else:
+            # movimiento (i): reverso de segmento (2-opt)
+            i = rng.randrange(1, m - 1)
+            j = rng.randrange(i + 1, m)
+            a = cur[i - 1]; ti = cur[i]; tj = cur[j]; b = cur[(j + 1) % m]
+            if a == tj or ti == b:
+                pass
+            else:
+                delta = (D[a, tj] + D[ti, b]) - (D[a, ti] + D[tj, b])
+                EVAL.add(4)
+                if delta < 0 or rng.random() < np.exp(-delta / T):
+                    cur[i:j + 1] = cur[i:j + 1][::-1]
+                    cur_len += delta
+        if cur_len < best_len - 1e-9:
+            best_len = cur_len; best = list(cur); emit(best_len)
+        T *= alpha
+        if T < 1e-6:
+            T = max(1e-9, float(np.mean(D[np.asarray(cur), np.roll(cur, -1)])) * 0.1)
+        stop_time = (time.perf_counter() - t0) >= time_limit
+        stop_de = budget_de is not None and EVAL.de >= budget_de
+        if stop_time or stop_de:
+            break
+
+    best = local_search_ktsp(best, D, n, home)
+    L = tour_length(best, D)
+    if L < best_len:
+        best_len = L
+    emit(best_len)
+    return {"tour": best, "length": tour_length(best, D), "source": "simulated_annealing"}
+
+
 # Registro de metodos (nombre visible -> (fn, es_estocastico))
 METHODS = {
     "Greedy": (greedy_ktsp, True),
     "GRASP":  (grasp_ktsp,  True),
     "GA":     (ga_ktsp,     True),
+    "NN":     (nn_ktsp,     False),  # Nearest Neighbor (construccion determinista)
+    "NI":     (ni_ktsp,     False),  # Nearest Insertion (determinista)
+    "FI":     (fi_ktsp,     False),  # Farthest Insertion (determinista)
+    "RI":     (ri_ktsp,     True),   # Random Insertion multi-arranque
+    "SA":     (sa_ktsp,     True),   # Simulated Annealing (metaheuristica)
     "DCIH":   (nbr_ktsp,    False),  # heuristica determinista propuesta (paper: DCIH)
 }

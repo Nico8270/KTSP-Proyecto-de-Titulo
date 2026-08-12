@@ -90,9 +90,15 @@ def run_once(method_name: str, fn, D, n, k, quartile, run_id, budget_de) -> Run:
         res = fn(D, n, k, time_limit=1e9, seed=seed, max_iters=10_000, **kwargs)
     elif method_name == "GA":
         res = fn(D, n, k, time_limit=1e9, seed=seed, max_gens=100_000, **kwargs)
-    else:  # DCIH determinista
+    elif method_name == "RI":
+        res = fn(D, n, k, time_limit=1e9, seed=seed, max_iters=10_000, **kwargs)
+    elif method_name == "SA":
+        res = fn(D, n, k, time_limit=1e9, seed=seed, **kwargs)
+    elif method_name == "DCIH":
         win = 0 if n <= 200 else min(n - 1, max(120, k + 20))
         res = fn(D, n, k, cand_window=win, **kwargs)
+    else:  # NN, NI, FI: construcciones deterministas
+        res = fn(D, n, k, **kwargs)
 
     de = np.array(trace_de, dtype=float)
     ln = np.array(trace_len, dtype=float)
@@ -237,7 +243,11 @@ def compute_tables(all_runs, refs, method_names):
 
 
 # ─────────────────────────────── figuras ────────────────────────────────────
-COLORS = {"Greedy": "#1f77b4", "GRASP": "#ff7f0e", "GA": "#2ca02c", "DCIH": "#d62728"}
+COLORS = {
+    "Greedy": "#1f77b4", "GRASP": "#ff7f0e", "GA": "#2ca02c",
+    "NN": "#9467bd", "NI": "#8c564b", "FI": "#e377c2",
+    "RI": "#7f7f7f", "SA": "#bcbd22", "DCIH": "#d62728",
+}
 
 
 def make_all_figures(all_runs, refs, method_names):
