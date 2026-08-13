@@ -698,8 +698,9 @@ Across the full range of $k$, the greedy cheapest-insertion baseline is the stro
 \section{Anytime Evaluation of the Heuristics}\label{sec:anytime}
 
 The end-of-run comparison (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3})
-reports a single value per method. However, the greedy cheapest-insertion
-baseline, GRASP and the genetic algorithm are \emph{anytime} algorithms: they
+reports a single value per method. However, most of the methods (the greedy
+cheapest-insertion baseline, GRASP, the genetic algorithm, Random Insertion and
+Simulated Annealing) are \emph{anytime} algorithms: they
 keep a feasible incumbent that improves with more computation, so the stopping
 point is an arbitrary choice of the experimenter and a single snapshot can hide
 which method is preferable under a given budget~\cite{weise2014benchmarking}. To
@@ -721,8 +722,9 @@ F \;=\; \frac{\text{length}}{\text{BKS}} \;-\; 1 ,
 \end{equation}
 so $F=0$ is the LKH-3 best-known value and, e.g., $F=0.20$ a tour $20\%$ longer.
 To aggregate across instances of different size $n$, the DE axis is scaled by
-$n^2$, as suggested in~\cite{weise2014benchmarking}. Each stochastic method is run
-$10$ times per instance and quartile; DCIH is deterministic (a single run). All
+$n^2$, as suggested in~\cite{weise2014benchmarking}. Each stochastic method
+(Greedy, GRASP, GA, RI, SA) is run $10$ times per instance and quartile; the
+deterministic methods (NN, NI, FI, DCIH) are run once. All
 methods share the same budget of $15\,n^2$ distance evaluations.
 
 \subsection{Progress curves, ERT and ECDF}
@@ -744,10 +746,11 @@ under it (AUC) on the logarithmic DE axis.
     \caption{Anytime \textbf{progress curves} aggregated over the 38 TSPLIB
     instances and the three quartiles of $k$: median best-so-far error $F$ (\%)
     versus the machine-independent time (distance evaluations scaled by $n^2$).
-    Lower and earlier is better. The greedy cheapest-insertion baseline dominates
-    at every budget, DCIH follows closely and deterministically, and the genetic
-    algorithm starts far worse and is still descending at the end of the budget,
-    indicating it has not yet converged.}
+    Lower and earlier is better. Nearest Neighbor reaches a good tour with the
+    fewest distance evaluations, while the greedy cheapest-insertion baseline and
+    Simulated Annealing attain the lowest errors as the budget grows; Farthest
+    Insertion stays well above the rest, and the genetic algorithm is still
+    descending at the end of the budget, indicating it has not yet converged.}
     \label{fig:anytime_progress}
 \end{figure}
 
@@ -757,8 +760,9 @@ under it (AUC) on the logarithmic DE axis.
     \caption{Aggregated \textbf{ECDF} for the target error $F_t=20\%$: fraction of
     runs (over instances, quartiles and repetitions) that reach a tour within
     $20\%$ of the LKH-3 reference as a function of the scaled distance evaluations.
-    Greedy attains the target in the largest fraction of runs ($\approx59\%$),
-    followed by DCIH ($\approx48\%$), GRASP ($\approx32\%$) and GA ($\approx23\%$).}
+    Nearest Neighbor reaches the target in the largest fraction of runs and the
+    earliest, followed by Greedy and Simulated Annealing; Farthest Insertion
+    reaches it least often.}
     \label{fig:anytime_ecdf}
 \end{figure}
 
@@ -767,8 +771,9 @@ under it (AUC) on the logarithmic DE axis.
     \includegraphics[width=\linewidth]{03_ert_vs_meta.png}
     \caption{Median \textbf{ERT} (scaled distance evaluations, $\mathrm{DE}/n^2$)
     to reach each target error $F_t$ (from $35\%$ down to $15\%$; more demanding to
-    the right). Greedy and DCIH reach a given quality with the least computation,
-    while the genetic algorithm needs about an order of magnitude more.}
+    the right). Nearest Neighbor and Greedy reach a given quality with the least
+    computation, while the genetic algorithm and Farthest Insertion need about an
+    order of magnitude more.}
     \label{fig:anytime_ert}
 \end{figure}
 
@@ -777,15 +782,20 @@ To condense the views into a single conclusion, on every instance/quartile we ra
 the methods by four criteria --- final error, AUC of the progress curve, AUC of the
 ECDF, and $\mathrm{ERT}$ at $F_t=20\%$ --- and aggregate by the median rank,
 obtaining the global ranking of Table~\ref{tab:anytime_ranking}~\cite{weise2014benchmarking}.
-The anytime view is consistent with the end-of-run results
+The anytime view refines the end-of-run results
 (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}): under a fixed
-machine-independent budget the greedy cheapest-insertion heuristic is the most
-robust method, DCIH provides a competitive \emph{deterministic} trajectory (no
-variance across runs), GRASP follows, and the population-based genetic algorithm
-converges most slowly and ranks last within this budget. This does not contradict
-the advantage of the GA for large $k$: its median error decreases fastest late in
-the run (Fig.~\ref{fig:anytime_progress}) and, at the largest quartile Q3, it
-approaches the greedy baseline, in agreement with the end-of-run comparison.
+machine-independent budget, Nearest Neighbor ranks first because it reaches a good
+tour with far fewer distance evaluations than any other method, so it dominates the
+ERT and ECDF criteria; the greedy cheapest-insertion baseline and Simulated
+Annealing follow, and DCIH provides a competitive \emph{deterministic} trajectory
+(no variance across runs). Farthest Insertion ranks last, and the population-based
+genetic algorithm also ranks low within this budget because it converges slowly.
+This does not contradict the advantage of the GA for large $k$: its median error
+decreases fastest late in the run (Fig.~\ref{fig:anytime_progress}) and, at the
+largest quartile Q3, it approaches the greedy baseline, in agreement with the
+end-of-run comparison. The contrast between the anytime ranking (which rewards fast
+convergence) and the end-of-run GAP (which rewards final quality) is exactly the
+kind of insight the anytime methodology is designed to expose~\cite{weise2014benchmarking}.
 
 \begin{table}[htbp]
 \centering
@@ -798,17 +808,22 @@ LKH-3 value as reference.}
 \textbf{Method} & \textbf{Final} & \textbf{AUC} & \textbf{AUC} & \textbf{ERT} & \textbf{Global} \\
                 & \textbf{$F$}   & \textbf{prog.}& \textbf{ECDF}& \textbf{@20\%}& \textbf{rank} \\
 \hline
-\textbf{Greedy} & 1.5 & 1.0 & 2.5 & 2.50 & \textbf{2.00} \\
-DCIH            & 2.0 & 2.0 & 2.5 & 2.50 & 2.25 \\
-GRASP           & 3.0 & 3.0 & 2.5 & 2.75 & 2.88 \\
-GA              & 4.0 & 4.0 & 3.0 & 3.00 & 3.50 \\
+\textbf{NN}     & 3.0 & 8.0 & 1.0 & 1.00 & \textbf{2.00} \\
+Greedy          & 3.0 & 2.5 & 4.0 & 4.00 & 3.50 \\
+SA              & 3.0 & 2.0 & 5.0 & 5.00 & 4.00 \\
+\textbf{DCIH}   & 4.5 & 4.0 & 5.0 & 5.00 & 4.75 \\
+NI              & 4.5 & 3.0 & 5.0 & 5.00 & 4.75 \\
+GRASP           & 5.0 & 7.0 & 5.0 & 5.50 & 5.25 \\
+RI              & 8.0 & 5.0 & 6.5 & 6.50 & 6.50 \\
+GA              & 7.0 & 8.0 & 6.0 & 6.00 & 6.50 \\
+FI              & 9.0 & 8.0 & 7.0 & 7.00 & 7.50 \\
 \hline
 \end{tabular}
 \end{table}
 
 \subsection{Reproducibility}
 The procedure is automated in the companion module \texttt{benchmark\_weise}
-(Python): it instruments the four methods with the DE counter and log points, reads
+(Python): it instruments the nine methods with the DE counter and log points, reads
 the standard TSPLIB instances and the LKH-3 references from the official k-TSP
 package, and regenerates every figure and table with a single command. Because the
 time axis is machine-independent and the random seeds are fixed, the anytime
