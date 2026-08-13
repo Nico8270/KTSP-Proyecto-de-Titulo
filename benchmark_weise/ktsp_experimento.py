@@ -42,8 +42,16 @@ import instances as inst_mod
 # ─────────────────────────────── CONFIG ─────────────────────────────────────
 # Instancias a evaluar (nombre TSPLIB, n). Se descargan reales si hay red.
 INSTANCE_SPECS: List[Tuple[str, int]] = [
-    ("burma14", 14), ("ulysses22", 22), ("att48", 48), ("eil51", 51),
-    ("berlin52", 52), ("st70", 70), ("eil76", 76), ("kroA100", 100),
+    ("att48", 48), ("eil51", 51), ("berlin52", 52), ("st70", 70),
+    ("eil76", 76), ("pr76", 76), ("kroA100", 100), ("kroB100", 100),
+    ("kroC100", 100), ("kroD100", 100), ("kroE100", 100), ("eil101", 101),
+    ("lin105", 105), ("pr107", 107), ("pr124", 124), ("bier127", 127),
+    ("ch130", 130), ("pr136", 136), ("gr137", 137), ("ch150", 150),
+    ("kroA150", 150), ("kroB150", 150), ("rat195", 195), ("kroA200", 200),
+    ("kroB200", 200), ("ts225", 225), ("tsp225", 225), ("pr226", 226),
+    ("gr229", 229), ("gil262", 262), ("pr264", 264), ("a280", 280),
+    ("pr299", 299), ("lin318", 318), ("rd400", 400), ("fl417", 417),
+    ("pr439", 439), ("pcb442", 442),
 ]
 QUARTILES = [1, 2, 3]                 # Q1~n/4, Q2~n/2, Q3~3n/4
 SEED0 = 42                            # semilla base de los metodos estocasticos
