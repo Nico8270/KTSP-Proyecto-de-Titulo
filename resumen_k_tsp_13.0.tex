@@ -133,6 +133,9 @@ This problem belongs to the NP-hard class: choosing a subset of $k$ nodes among 
 The $k$-TSP also sits within the broader family of \emph{TSP with profits} and selective routing problems \cite{feillet2005profits}. In particular, it is the unit-prize special case of the Quota TSP, itself a variant of the Prize-Collecting TSP introduced by Balas \cite{balas1989pctsp}: when every node carries a unit prize and the quota equals $k$, collecting the quota is exactly visiting $k$ nodes \cite{bienstock1993pctsp}. A recent systematic survey of TSP variants places these selective problems in a common definitional framework \cite{tspt3co2025}.
 
 \vspace{2pt}
+Beyond the selective-routing framing, a large body of work targets the classical TSP itself. Exact methods based on integer programming and dynamic programming solve it optimally but scale poorly with $n$~\cite{dantzig1954,bellman1962,heldkarp1962,karp1972}, which motivated decades of research on construction heuristics and local search~\cite{lin1965,christofides1976,bentley1992,johnson1997,laporte1992}. Representative metaheuristic families include tabu search~\cite{glover1986}, simulated annealing~\cite{cerny1985}, ant colony optimization~\cite{dorigo1997acs}, variable neighborhood search~\cite{mladenovic1997vns} and iterated local search based on large-step Markov chains~\cite{martin1991}, as well as evolutionary approaches designed specifically for the TSP~\cite{potvin1996}; broad overviews and design principles are given in~\cite{blumroli2003,talbi2009}. Comprehensive treatments of the TSP and its variants~\cite{gutin2007book}, near-optimal exact solvers~\cite{applegate2006concorde} and polynomial-time approximation schemes for the Euclidean case~\cite{arora1998} complete this landscape, within which node-selection variants such as the multiple TSP~\cite{bektas2006} and the $k$-TSP naturally arise.
+
+\vspace{2pt}
 The main \textbf{motivation} for studying the $k$-TSP lies in applications where only a subset of locations must be served under a budget on the number of stops: selective sampling, prize-collecting routing, surveillance with limited visits, and resource-constrained logistics \cite{vansteenwegen2011top,blanchard2023}. Solving it efficiently reduces cost and improves resource utilization.
 
 \vspace{2pt}
@@ -949,6 +952,89 @@ Princeton, NJ: Princeton University Press, 2006.
 \bibitem{kirkpatrick1983} S. Kirkpatrick, C. D. Gelatt, and M. P. Vecchi,
 ``Optimization by simulated annealing,''
 \textit{Science}, vol. 220, no. 4598, pp. 671--680, 1983.
+
+\bibitem{dantzig1954} G. Dantzig, R. Fulkerson, and S. Johnson,
+``Solution of a large-scale traveling-salesman problem,''
+\textit{Operations Research}, vol. 2, no. 4, pp. 393--410, 1954.
+
+\bibitem{bellman1962} R. Bellman,
+``Dynamic programming treatment of the travelling salesman problem,''
+\textit{Journal of the ACM}, vol. 9, no. 1, pp. 61--63, 1962.
+
+\bibitem{heldkarp1962} M. Held and R. M. Karp,
+``A dynamic programming approach to sequencing problems,''
+\textit{Journal of the SIAM}, vol. 10, no. 1, pp. 196--210, 1962.
+
+\bibitem{karp1972} R. M. Karp,
+``Reducibility among combinatorial problems,''
+in \textit{Complexity of Computer Computations}, R. E. Miller and J. W. Thatcher, Eds.
+New York: Plenum Press, 1972, pp. 85--103.
+
+\bibitem{lin1965} S. Lin,
+``Computer solutions of the traveling salesman problem,''
+\textit{Bell System Technical Journal}, vol. 44, no. 10, pp. 2245--2269, 1965.
+
+\bibitem{christofides1976} N. Christofides,
+``Worst-case analysis of a new heuristic for the travelling salesman problem,''
+Graduate School of Industrial Administration, Carnegie Mellon University,
+Report 388, 1976.
+
+\bibitem{bentley1992} J. L. Bentley,
+``Fast algorithms for geometric traveling salesman problems,''
+\textit{ORSA Journal on Computing}, vol. 4, no. 4, pp. 387--411, 1992.
+
+\bibitem{johnson1997} D. S. Johnson and L. A. McGeoch,
+``The traveling salesman problem: A case study in local optimization,''
+in \textit{Local Search in Combinatorial Optimization}, E. Aarts and J. K. Lenstra, Eds.
+Chichester: Wiley, 1997, pp. 215--310.
+
+\bibitem{laporte1992} G. Laporte,
+``The traveling salesman problem: An overview of exact and approximate algorithms,''
+\textit{European Journal of Operational Research}, vol. 59, no. 2, pp. 231--247, 1992.
+
+\bibitem{arora1998} S. Arora,
+``Polynomial time approximation schemes for Euclidean traveling salesman and other geometric problems,''
+\textit{Journal of the ACM}, vol. 45, no. 5, pp. 753--782, 1998.
+
+\bibitem{glover1986} F. Glover,
+``Future paths for integer programming and links to artificial intelligence,''
+\textit{Computers \& Operations Research}, vol. 13, no. 5, pp. 533--549, 1986.
+
+\bibitem{cerny1985} V. \v{C}ern\'y,
+``Thermodynamical approach to the traveling salesman problem: An efficient simulation algorithm,''
+\textit{Journal of Optimization Theory and Applications}, vol. 45, no. 1, pp. 41--51, 1985.
+
+\bibitem{dorigo1997acs} M. Dorigo and L. M. Gambardella,
+``Ant colony system: A cooperative learning approach to the traveling salesman problem,''
+\textit{IEEE Transactions on Evolutionary Computation}, vol. 1, no. 1, pp. 53--66, 1997.
+
+\bibitem{mladenovic1997vns} N. Mladenovi\'c and P. Hansen,
+``Variable neighborhood search,''
+\textit{Computers \& Operations Research}, vol. 24, no. 11, pp. 1097--1100, 1997.
+
+\bibitem{martin1991} O. Martin, S. W. Otto, and E. W. Felten,
+``Large-step Markov chains for the traveling salesman problem,''
+\textit{Complex Systems}, vol. 5, no. 3, pp. 299--326, 1991.
+
+\bibitem{potvin1996} J.-Y. Potvin,
+``Genetic algorithms for the traveling salesman problem,''
+\textit{Annals of Operations Research}, vol. 63, no. 3, pp. 337--370, 1996.
+
+\bibitem{blumroli2003} C. Blum and A. Roli,
+``Metaheuristics in combinatorial optimization: Overview and conceptual comparison,''
+\textit{ACM Computing Surveys}, vol. 35, no. 3, pp. 268--308, 2003.
+
+\bibitem{talbi2009} E.-G. Talbi,
+\textit{Metaheuristics: From Design to Implementation}.
+Hoboken, NJ: Wiley, 2009.
+
+\bibitem{gutin2007book} G. Gutin and A. P. Punnen, Eds.,
+\textit{The Traveling Salesman Problem and Its Variations}.
+New York: Springer, 2007.
+
+\bibitem{bektas2006} T. Bekta\c{s},
+``The multiple traveling salesman problem: An overview of formulations and solution procedures,''
+\textit{Omega}, vol. 34, no. 3, pp. 209--219, 2006.
 
 \end{thebibliography}
 
