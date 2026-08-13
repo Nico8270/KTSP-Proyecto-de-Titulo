@@ -1,5 +1,10 @@
-Metodo,rank_global_mediano,puesto,AUC_ECDF,AUC_progreso,ERT@5%,GAP_final
-GA,2.125,1,2.0,3.0,2.0,2.25
-Greedy,2.125,2,2.5,1.75,2.5,1.75
-DCIH,3.0,3,3.0,2.75,3.0,3.0
-GRASP,3.0,4,3.0,3.0,3.0,2.75
+Metodo,rank_global_mediano,puesto,AUC_ECDF,AUC_progreso,ERT@20%,GAP_final
+NN,2.0,1,1.0,8.0,1.0,3.0
+Greedy,3.5,2,4.0,2.5,4.0,3.0
+SA,4.0,3,5.0,2.0,5.0,3.0
+DCIH,4.75,4,5.0,4.0,5.0,4.5
+NI,4.75,5,5.0,3.0,5.0,4.5
+GRASP,5.25,6,5.0,7.0,5.5,5.0
+RI,6.5,7,6.5,5.0,6.5,8.0
+GA,6.5,8,6.0,8.0,6.0,7.0
+FI,7.5,9,7.0,8.0,7.0,9.0
