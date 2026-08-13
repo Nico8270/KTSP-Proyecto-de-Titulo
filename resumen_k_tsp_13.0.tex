@@ -190,7 +190,6 @@ For each instance: (a) load/generate coordinates and distances; (b) set $k$ and 
 \interdisplaylinepenalty=10000
 \setlength{\abovedisplayskip}{6pt}
 \setlength{\belowdisplayskip}{6pt}
-\footnotesize
 
 \subsection{Data Structures and Genotype Encoding}
 
@@ -476,15 +475,14 @@ Selective routing problems such as the Orienteering Problem and the Prize-Collec
 
 % ===================== 8. EXPERIMENTAL ENVIRONMENT =====================
 \section{Experimental Environment}
-All experiments were executed on \textbf{Google Colab}, a cloud notebook environment with reproducible resources:
+All experiments were developed and executed locally in \textbf{Visual Studio Code}, with the full implementation versioned in a \textbf{private GitHub repository} to guarantee traceability and reproducibility of every change:
 \begin{itemize}
-    \item \textbf{Environment:} Google Colab cloud notebook.
-    \item \textbf{CPU:} Intel Xeon (virtualized, 2--4 cores).
-    \item \textbf{RAM:} 12--16 GB depending on the session.
-    \item \textbf{OS:} Linux (Ubuntu, virtualized in Colab).
+    \item \textbf{Environment:} Visual Studio Code on a local workstation (Windows), with an integrated Python interpreter.
+    \item \textbf{Version control:} private GitHub repository; each experiment corresponds to a tracked commit.
     \item \textbf{Languages and libraries:} Python 3.10 with \texttt{numpy}, \texttt{pandas}, \texttt{matplotlib}, \texttt{requests}.
+    \item \textbf{LKH-3:} the official Lin--Kernighan--Helsgaun binary is compiled and run locally to obtain the reference (BKS) values.
 \end{itemize}
-This environment allows consistent measurement of total tour length, and its public availability supports replication.
+Because the primary runtime measure is the \emph{machine-independent} number of distance evaluations (Section~\ref{sec:anytime}), the reported comparison does not depend on the specific hardware, which further supports replication.
 
 % ===================== 9. ROUTE ANALYSIS =====================
 \section{Analysis of Generated Tours}
@@ -522,13 +520,13 @@ SA & 15.41 & 17.78 & 17.58 \\
 
 \begin{table*}[htbp]
 \centering
-\caption{Results for the $k$-TSP, quartile Q1 ($k\approx n/4$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the BKS.}
+\caption{Results for the $k$-TSP, quartile Q1 ($k\approx n/4$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the LKH-3 best-known value (BKS).}
 \label{tab:resultados_Q1}
 {\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.95}%
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{BKS} \\
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{LKH-3} \\
 \hline
 att48 & 48 & 12 & \textbf{1925} & 2290 & \textbf{1925} & 2241 & 2304 & 3314 & \textbf{1925} & 2153 & 2363 & 1925 \\
 eil51 & 51 & 12 & 83 & 90 & \textbf{82} & 91 & 88 & 96 & \textbf{82} & 88 & 83 & 82 \\
@@ -574,13 +572,13 @@ pcb442 & 442 & 110 & 11369 & 14467 & 15023 & 11597 & 12179 & 17803 & 15838 & 112
 
 \begin{table*}[htbp]
 \centering
-\caption{Results for the $k$-TSP, quartile Q2 ($k\approx n/2$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the BKS.}
+\caption{Results for the $k$-TSP, quartile Q2 ($k\approx n/2$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the LKH-3 best-known value (BKS).}
 \label{tab:resultados_Q2}
 {\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.95}%
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{BKS} \\
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{LKH-3} \\
 \hline
 att48 & 48 & 24 & 3814 & 4197 & \textbf{3603} & 3924 & 3943 & 6477 & 4614 & 3744 & 4943 & 3603 \\
 eil51 & 51 & 25 & 188 & 189 & 181 & 197 & 199 & 239 & 188 & 193 & 198 & 175 \\
@@ -626,13 +624,13 @@ pcb442 & 442 & 221 & 24374 & 29122 & 29106 & 24841 & 25403 & 30999 & 29123 & 240
 
 \begin{table*}[htbp]
 \centering
-\caption{Results for the $k$-TSP, quartile Q3 ($k\approx 3n/4$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the BKS.}
+\caption{Results for the $k$-TSP, quartile Q3 ($k\approx 3n/4$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the LKH-3 best-known value (BKS).}
 \label{tab:resultados_Q3}
 {\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.95}%
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{BKS} \\
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{LKH-3} \\
 \hline
 att48 & 48 & 36 & 6710 & 6699 & 7049 & 7045 & 7036 & 8785 & 7435 & 6691 & 6863 & 6563 \\
 eil51 & 51 & 38 & 297 & 300 & 295 & 302 & 326 & 314 & 296 & 308 & 316 & 287 \\

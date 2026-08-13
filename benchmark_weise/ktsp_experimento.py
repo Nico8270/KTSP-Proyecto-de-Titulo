@@ -131,8 +131,10 @@ def main() -> pd.DataFrame:
             else:
                 ref, ref_src = float(best_found), "best_found"
 
+            # LKH-3 es la fuente del BKS: se reporta explicitamente como columna.
+            lkh3 = round(ref, 2) if ref_src == "BKS_LKH3" else ""
             row = {"Instancia": inst.name, "n": inst.n, "k": k, "Quartil": q,
-                   "Ref": round(ref, 2), "Ref_src": ref_src}
+                   "LKH-3_BKS": lkh3, "Ref": round(ref, 2), "Ref_src": ref_src}
             for name in method_names:
                 L = res_by_method[name]
                 row[f"{name}_Len"] = round(L, 2)
