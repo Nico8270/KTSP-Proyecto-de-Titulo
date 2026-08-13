@@ -20,7 +20,7 @@ Parámetros rápidos abajo en CONFIG.
 """
 
 from __future__ import annotations
-import os, json, pickle, time
+import os, json, pickle, time, shutil
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -44,15 +44,24 @@ FIGDIR = OUTDIR / "figuras"; FIGDIR.mkdir(exist_ok=True)
 PREFER_TSPLIB = os.environ.get("KTSP_NO_NET") != "1"
 
 # (nombre TSPLIB, n). Si hay red se bajan reales; si no, sintéticas del mismo n.
+# Las 38 instancias del paper (mismas que las tablas de resultados).
 INSTANCE_SPECS: List[Tuple[str, int]] = [
-    ("burma14", 14), ("ulysses22", 22), ("att48", 48), ("eil51", 51),
-    ("berlin52", 52), ("st70", 70), ("eil76", 76), ("kroA100", 100),
+    ("att48", 48), ("eil51", 51), ("berlin52", 52), ("st70", 70),
+    ("eil76", 76), ("pr76", 76), ("kroA100", 100), ("kroB100", 100),
+    ("kroC100", 100), ("kroD100", 100), ("kroE100", 100), ("eil101", 101),
+    ("lin105", 105), ("pr107", 107), ("pr124", 124), ("bier127", 127),
+    ("ch130", 130), ("pr136", 136), ("gr137", 137), ("ch150", 150),
+    ("kroA150", 150), ("kroB150", 150), ("rat195", 195), ("kroA200", 200),
+    ("kroB200", 200), ("ts225", 225), ("tsp225", 225), ("pr226", 226),
+    ("gr229", 229), ("gil262", 262), ("pr264", 264), ("a280", 280),
+    ("pr299", 299), ("lin318", 318), ("rd400", 400), ("fl417", 417),
+    ("pr439", 439), ("pcb442", 442),
 ]
 QUARTILES = [1, 2, 3]              # Q1~n/4, Q2~n/2, Q3~3n/4
-N_RUNS_STOCH = 15                  # corridas por método estocástico
+N_RUNS_STOCH = 10                  # corridas por método estocástico (coincide con el paper)
 GOAL_ERRORS = [0.35, 0.30, 0.25, 0.20, 0.15]   # umbrales de error meta F_t (Weise)
 SEED0 = 42
-BUDGET_SCALE = float(os.environ.get("KTSP_BUDGET_SCALE", "60"))
+BUDGET_SCALE = float(os.environ.get("KTSP_BUDGET_SCALE", "15"))  # presupuesto 15*n^2 DE
 
 # Overrides rápidos por entorno (para pruebas / smoke tests):
 #   KTSP_FAST=1  reduce instancias, corridas y presupuesto.
@@ -190,6 +199,16 @@ def main():
         "segundos": round(time.time() - t_start, 1),
     }
     (OUTDIR / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+
+    # Copiar las 3 figuras agregadas a la carpeta del paper (raíz del repo),
+    # que es donde el .tex las incluye con \includegraphics.
+    paper_dir = HERE.parent
+    for fig in ("01_progreso_agregado.png", "02_ecdf_agregado.png", "03_ert_vs_meta.png"):
+        src = FIGDIR / fig
+        if src.exists():
+            shutil.copy(str(src), str(paper_dir / fig))
+    print(f"[OK] Figuras del paper actualizadas en: {paper_dir}")
+
     print(f"\nLISTO en {manifest['segundos']}s. Salidas en {OUTDIR}")
     print(rank_df.to_string(index=False))
     return df, ert_df, rank_df
