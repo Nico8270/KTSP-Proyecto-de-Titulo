@@ -110,7 +110,7 @@ The $k$-Traveling Salesman Problem ($k$-TSP) is a variation of the classical Tra
 
 This work presents a repository and an experimental implementation of several optimization techniques for the $k$-TSP, including a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion construction heuristics, a Simulated Annealing metaheuristic, and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for solution quality we use the best-known values (BKS) obtained by the Lin--Kernighan--Helsgaun solver (LKH-3) on the $k$-TSP benchmark instances introduced by Pandiri \& Singh.
 
-We describe the data representation, the mathematical model, and an experimental design based on TSPLIB instances. Experiments on 38 TSPLIB instances, across three values of $k$ (about $n/4$, $n/2$, and $3n/4$), compare solution quality against the LKH-3 best-known values: the greedy cheapest-insertion heuristic is the most robust method on average across all three values of $k$, the genetic algorithm becomes the most frequent per-instance winner when $k$ is large, and DCIH offers a deterministic, reproducible alternative of comparable quality throughout.
+We describe the data representation, the mathematical model, and an experimental design based on TSPLIB instances. Experiments on 38 TSPLIB instances, across three values of $k$ (about $n/4$, $n/2$, and $3n/4$), compare nine methods against the LKH-3 best-known values: the greedy cheapest-insertion heuristic is the most robust method on average across all three values of $k$, Simulated Annealing is the strongest of the added metaheuristics, the genetic algorithm becomes the most frequent per-instance winner when $k$ is large, Farthest Insertion is the weakest for the $k$-TSP, and DCIH offers a deterministic, reproducible alternative of comparable quality throughout.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -488,12 +488,14 @@ This environment allows consistent measurement of total tour length, and its pub
 
 % ===================== 9. ROUTE ANALYSIS =====================
 \section{Analysis of Generated Tours}
-\subsection*{Solution patterns (Greedy vs.\ GRASP vs.\ GA vs.\ DCIH)}
+\subsection*{Solution patterns across the nine methods}
 
-The tours produced for the $k$-TSP are single closed loops through the home city over a selected subset of $k$ nodes. The constructive methods (Greedy, DCIH) tend to select nodes that are cheap to insert, yielding compact loops, while GRASP and the GA explore alternative subsets that can shorten the tour further. After 2-opt and the in/out exchange, crossings are removed and the selected subset stabilizes. The LKH-3 tours, which define the BKS reference here, attain the shortest known lengths and serve as the near-optimal baseline against which all methods are measured.
+The tours produced for the $k$-TSP are single closed loops through the home city over a selected subset of $k$ nodes. The cheapest-insertion constructive methods (Greedy, NI, DCIH) tend to select nodes that are cheap to insert, yielding compact loops, whereas Farthest Insertion deliberately picks distant nodes and produces long, sprawling tours that local search only partly repairs. Nearest Neighbor builds a short chain greedily but can be trapped by a costly final return edge. The population- and trajectory-based methods (GRASP, GA, RI, SA) explore alternative subsets that can shorten the tour further. After 2-opt and the in/out exchange, crossings are removed and the selected subset stabilizes. The LKH-3 tours, which define the BKS reference here, attain the shortest known lengths and serve as the near-optimal baseline against which all methods are measured.
 
 \section{Comparison of Results}
-This section reports the experimental results of the implemented methods on the $k$-TSP objective (\emph{total tour length}, lower is better): the greedy cheapest-insertion baseline, GRASP/multi-start, the genetic algorithm (GA), and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). The experiments use 38 standard TSPLIB instances and follow the $k$-TSP benchmark of Pandiri \& Singh~\cite{pandiri2020}, which defines three values of $k$ per instance: \textbf{Q1} ($k=\lfloor n/4\rfloor$), \textbf{Q2} ($k=\lfloor n/2\rfloor$), and \textbf{Q3} ($k=\lfloor 3n/4\rfloor$). Each result is compared against the best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} for the corresponding quartile, and the relative GAP is computed as $\mathrm{GAP}\%=100\,(\text{length}-\text{BKS})/\text{BKS}$.
+This section reports the experimental results of the implemented methods on the $k$-TSP objective (\emph{total tour length}, lower is better): the greedy cheapest-insertion baseline, GRASP/multi-start, the genetic algorithm (GA), the classical Nearest Neighbor (NN) and Nearest, Farthest, and Random Insertion heuristics (NI, FI, RI), the Simulated Annealing metaheuristic (SA), and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). The experiments use 38 standard TSPLIB instances and follow the $k$-TSP benchmark of Pandiri \& Singh~\cite{pandiri2020}, which defines three values of $k$ per instance: \textbf{Q1} ($k=\lfloor n/4\rfloor$), \textbf{Q2} ($k=\lfloor n/2\rfloor$), and \textbf{Q3} ($k=\lfloor 3n/4\rfloor$). Each result is compared against the best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} for the corresponding quartile, and the relative GAP is computed as $\mathrm{GAP}\%=100\,(\text{length}-\text{BKS})/\text{BKS}$.
+
+Over the 38 instances, the greedy cheapest-insertion baseline attains the lowest average GAP overall (about $12.6\%$), followed by Simulated Annealing (about $16.9\%$), which is the strongest of the newly added methods, and by GRASP and Nearest Neighbor. The genetic algorithm has a higher average GAP but is the most frequent per-instance winner (together with Greedy) and closes the gap for large $k$ (Q3). Among the construction heuristics, Farthest Insertion is clearly the weakest for the $k$-TSP: repeatedly inserting the node \emph{farthest} from the tour conflicts with the node-selection objective, which rewards choosing nodes that are cheap to include. DCIH remains a deterministic, reproducible alternative of quality comparable to GRASP and the insertion heuristics.
 
 Table~\ref{tab:resumen_gap} summarizes the average GAP per method and quartile. Tables~\ref{tab:resultados_Q1}, \ref{tab:resultados_Q2}, and \ref{tab:resultados_Q3} give the per-instance lengths for Q1, Q2, and Q3 respectively; values in bold coincide with the LKH-3 BKS.
 
@@ -505,10 +507,15 @@ Table~\ref{tab:resumen_gap} summarizes the average GAP per method and quartile. 
 \hline
 \textbf{Method} & \textbf{Q1 GAP\%} & \textbf{Q2 GAP\%} & \textbf{Q3 GAP\%} \\
 \hline
-Greedy & 14.92 & 15.46 & 14.36 \\
-GRASP & 21.63 & 22.79 & 20.23 \\
-GA & 30.94 & 23.17 & 15.02 \\
-\textbf{DCIH} & 19.94 & 23.62 & 20.59 \\
+Greedy & 7.57 & 15.26 & 14.95 \\
+GRASP & 18.60 & 19.45 & 17.34 \\
+GA & 28.25 & 20.69 & 15.04 \\
+NN & 22.38 & 20.04 & 15.56 \\
+NI & 20.47 & 21.74 & 21.66 \\
+FI & 98.23 & 55.67 & 31.63 \\
+RI & 48.51 & 27.58 & 15.89 \\
+SA & 15.41 & 17.78 & 17.58 \\
+\textbf{DCIH} & 19.83 & 23.19 & 20.36 \\
 \hline
 \end{tabular}
 \end{table}
@@ -517,153 +524,156 @@ GA & 30.94 & 23.17 & 15.02 \\
 \centering
 \caption{Results for the $k$-TSP, quartile Q1 ($k\approx n/4$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the BKS.}
 \label{tab:resultados_Q1}
-{\footnotesize\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{0.95}%
-\begin{tabular}{|l|c|c|c|c|c|c|c|}
+{\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.95}%
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Greedy} & \textbf{GRASP} & \textbf{GA} & \textbf{DCIH} & \textbf{BKS} \\
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{BKS} \\
 \hline
-att48 & 48 & 12 & 2363 & 2315 & \textbf{1925} & 2363 & 1925 \\
-eil51 & 51 & 12 & 88 & 90 & \textbf{82} & 83 & 82 \\
-berlin52 & 52 & 13 & \textbf{679} & 709 & \textbf{679} & 735 & 679 \\
-st70 & 70 & 17 & 140 & \textbf{120} & 125 & \textbf{120} & 120 \\
-eil76 & 76 & 19 & 107 & 122 & \textbf{102} & 129 & 102 \\
-pr76 & 76 & 19 & 23929 & 25966 & 24510 & 28089 & 23450 \\
-kroA100 & 100 & 25 & 5285 & 5778 & 5102 & 5885 & 4931 \\
-kroB100 & 100 & 25 & 5232 & 4549 & 4906 & 4676 & 4305 \\
-kroC100 & 100 & 25 & 5834 & 5835 & 5684 & 6577 & 4964 \\
-kroD100 & 100 & 25 & 4787 & 5125 & 5411 & 5449 & 4762 \\
-kroE100 & 100 & 25 & 4660 & 4899 & 5336 & 4587 & 3905 \\
-eil101 & 101 & 25 & 124 & 144 & 108 & 154 & 107 \\
-lin105 & 105 & 26 & 3534 & \textbf{2606} & \textbf{2606} & 2881 & 2606 \\
-pr107 & 107 & 26 & 10937 & 8615 & \textbf{8443} & 9032 & 8443 \\
-pr124 & 124 & 31 & 15508 & 15173 & 17833 & 16282 & 14325 \\
-bier127 & 127 & 31 & 11664 & 11628 & 11234 & 11994 & 10619 \\
-ch130 & 130 & 32 & 1296 & 1408 & 1346 & 1373 & 1130 \\
-pr136 & 136 & 34 & 24136 & 23620 & 26164 & 24235 & 21116 \\
-gr137 & 137 & 34 & 18514 & 18943 & 18101 & 18496 & 17399 \\
-ch150 & 150 & 37 & 1525 & 1541 & 1652 & 1369 & 1276 \\
-kroA150 & 150 & 37 & 6362 & 7483 & 6593 & 7286 & 5690 \\
-kroB150 & 150 & 37 & 6486 & 7446 & 7306 & 7802 & 5812 \\
-rat195 & 195 & 48 & 627 & 607 & 659 & 604 & 554 \\
-kroA200 & 200 & 50 & 7369 & 7327 & 8704 & 7998 & 6154 \\
-kroB200 & 200 & 50 & 7145 & 7559 & 8901 & 7979 & 6016 \\
-ts225 & 225 & 56 & 30478 & 32441 & 40656 & 35943 & 28828 \\
-tsp225 & 225 & 56 & 974 & 1175 & 1215 & 1080 & 913 \\
-pr226 & 226 & 56 & 25609 & 26550 & 32748 & 25781 & 20033 \\
-gr229 & 229 & 57 & 20110 & 26053 & 27002 & 20650 & 18555 \\
-gil262 & 262 & 65 & 661 & 680 & 755 & 792 & 541 \\
-pr264 & 264 & 66 & 9729 & 12551 & 22834 & 9581 & 9232 \\
-a280 & 280 & 70 & 763 & 775 & 888 & 702 & 649 \\
-pr299 & 299 & 74 & 13585 & 14680 & 14785 & 14440 & 11077 \\
-lin318 & 318 & 79 & 10089 & 9937 & 11974 & 10753 & 8544 \\
-rd400 & 400 & 100 & 3830 & 4264 & 4675 & 3897 & 3091 \\
-fl417 & 417 & 104 & 2187 & 2896 & 6125 & 2129 & 1831 \\
-pr439 & 439 & 109 & 22976 & 34718 & 24900 & 29358 & 19751 \\
-pcb442 & 442 & 110 & 13533 & 14836 & 14745 & 13818 & 10932 \\
+att48 & 48 & 12 & \textbf{1925} & 2290 & \textbf{1925} & 2241 & 2304 & 3314 & \textbf{1925} & 2153 & 2363 & 1925 \\
+eil51 & 51 & 12 & 83 & 90 & \textbf{82} & 91 & 88 & 96 & \textbf{82} & 88 & 83 & 82 \\
+berlin52 & 52 & 13 & \textbf{679} & 905 & \textbf{679} & 735 & 735 & 1967 & \textbf{679} & 735 & 735 & 679 \\
+st70 & 70 & 17 & \textbf{120} & \textbf{120} & 153 & 127 & 166 & 213 & 162 & 166 & \textbf{120} & 120 \\
+eil76 & 76 & 19 & 103 & 119 & \textbf{102} & 145 & 132 & 151 & 106 & 123 & 129 & 102 \\
+pr76 & 76 & 19 & \textbf{23450} & 28379 & \textbf{23450} & 32848 & 35264 & 51947 & 24901 & 25826 & 28089 & 23450 \\
+kroA100 & 100 & 25 & 5236 & 5788 & 5040 & 5950 & 5446 & 8883 & 6212 & 5395 & 5885 & 4931 \\
+kroB100 & 100 & 25 & 4353 & 4483 & 4705 & 6538 & 4850 & 7315 & 6156 & 4931 & 4676 & 4305 \\
+kroC100 & 100 & 25 & 5026 & 5804 & 4968 & 5995 & 6506 & 6753 & 6226 & 6271 & 6577 & 4964 \\
+kroD100 & 100 & 25 & 4978 & 5062 & 5310 & 5716 & 5926 & 8488 & 5716 & 4960 & 5449 & 4762 \\
+kroE100 & 100 & 25 & 3999 & 4816 & 5249 & 4762 & 4616 & 8212 & 5402 & 4175 & 4569 & 3905 \\
+eil101 & 101 & 25 & 113 & 144 & 110 & 151 & 142 & 163 & 129 & 143 & 154 & 107 \\
+lin105 & 105 & 26 & \textbf{2606} & \textbf{2606} & 3596 & \textbf{2606} & 2779 & 6644 & 3918 & 2764 & 2881 & 2606 \\
+pr107 & 107 & 26 & \textbf{8443} & 8615 & 9386 & 9028 & 8957 & 25748 & 14283 & 8666 & 8957 & 8443 \\
+pr124 & 124 & 31 & 14675 & 15091 & 15667 & 16486 & 15562 & 31720 & 23217 & 15601 & 15618 & 14325 \\
+bier127 & 127 & 31 & 10881 & 11413 & \textbf{10619} & 17271 & 11572 & 27032 & 15359 & 11447 & 11994 & 10619 \\
+ch130 & 130 & 32 & 1296 & 1367 & 1392 & 1492 & 1372 & 1841 & 1549 & 1372 & 1373 & 1130 \\
+pr136 & 136 & 34 & 22436 & 23621 & 26245 & 25211 & 24235 & 34154 & 28046 & 24235 & 24235 & 21116 \\
+gr137 & 137 & 34 & 17886 & 17702 & 20454 & 23337 & 18339 & 30790 & 22364 & 18122 & 18496 & 17399 \\
+ch150 & 150 & 37 & 1324 & 1439 & 1604 & 1420 & 1451 & 2034 & 1841 & 1330 & 1369 & 1276 \\
+kroA150 & 150 & 37 & 6497 & 6856 & 6277 & 6928 & 8173 & 9668 & 8044 & 7256 & 7286 & 5690 \\
+kroB150 & 150 & 37 & 6714 & 7089 & 6684 & 6741 & 7621 & 9075 & 7993 & 6775 & 7802 & 5812 \\
+rat195 & 195 & 48 & 587 & 590 & 670 & 590 & 607 & 762 & 713 & 607 & 624 & 554 \\
+kroA200 & 200 & 50 & 7094 & 7250 & 7852 & 7994 & 8050 & 11103 & 9272 & 7478 & 7998 & 6154 \\
+kroB200 & 200 & 50 & 7394 & 7115 & 7621 & 8298 & 8523 & 11471 & 9563 & 8318 & 7979 & 6016 \\
+ts225 & 225 & 56 & 34770 & 31771 & 37377 & 30000 & 29828 & 53793 & 45512 & 29739 & 35943 & 28828 \\
+tsp225 & 225 & 56 & 1028 & 1114 & 1131 & 1189 & 1159 & 1421 & 1231 & 1141 & 1062 & 913 \\
+pr226 & 226 & 56 & 24743 & 25978 & 34704 & 24594 & 24853 & 40399 & 38235 & 24864 & 25781 & 20033 \\
+gr229 & 229 & 57 & 19413 & 25551 & 22804 & 29181 & 20749 & 53777 & 31147 & 20749 & 20650 & 18555 \\
+gil262 & 262 & 65 & 643 & 649 & 687 & 735 & 735 & 863 & 751 & 705 & 792 & 541 \\
+pr264 & 264 & 66 & 9472 & 12077 & 21349 & 9616 & 9939 & 25363 & 24032 & 9824 & 9520 & 9232 \\
+a280 & 280 & 70 & 671 & 738 & 833 & 700 & 815 & 966 & 879 & 727 & 702 & 649 \\
+pr299 & 299 & 74 & 12858 & 13401 & 14678 & 13448 & 13685 & 19861 & 17025 & 13598 & 14709 & 11077 \\
+lin318 & 318 & 79 & 9437 & 9915 & 11676 & 9851 & 10221 & 17277 & 13311 & 10046 & 10753 & 8544 \\
+rd400 & 400 & 100 & 3872 & 3927 & 4137 & 3721 & 4089 & 5667 & 4501 & 3875 & 3897 & 3091 \\
+fl417 & 417 & 104 & 1867 & 2483 & 5923 & 2160 & 2129 & 8097 & 6990 & 2122 & 2129 & 1831 \\
+pr439 & 439 & 109 & 22564 & 31849 & 26824 & 22386 & 22519 & 51649 & 33772 & 22322 & 29389 & 19751 \\
+pcb442 & 442 & 110 & 11369 & 14467 & 15023 & 11597 & 12179 & 17803 & 15838 & 11277 & 13633 & 10932 \\
 \hline
-\end{tabular}}
+\end{tabular}}}
 \end{table*}
 
 \begin{table*}[htbp]
 \centering
 \caption{Results for the $k$-TSP, quartile Q2 ($k\approx n/2$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the BKS.}
 \label{tab:resultados_Q2}
-{\footnotesize\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{0.95}%
-\begin{tabular}{|l|c|c|c|c|c|c|c|}
+{\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.95}%
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Greedy} & \textbf{GRASP} & \textbf{GA} & \textbf{DCIH} & \textbf{BKS} \\
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{BKS} \\
 \hline
-att48 & 48 & 24 & 4740 & 4280 & \textbf{3603} & 4896 & 3603 \\
-eil51 & 51 & 25 & 193 & 191 & 177 & 198 & 175 \\
-berlin52 & 52 & 26 & 2016 & 2031 & \textbf{1874} & 2269 & 1874 \\
-st70 & 70 & 35 & 297 & 294 & 280 & 302 & 260 \\
-eil76 & 76 & 38 & 247 & 261 & 229 & 249 & 213 \\
-pr76 & 76 & 38 & 42968 & 51311 & 42749 & 51378 & 41248 \\
-kroA100 & 100 & 50 & 10198 & 10818 & 10913 & 12532 & 9184 \\
-kroB100 & 100 & 50 & 10170 & 9380 & 10923 & 11557 & 9096 \\
-kroC100 & 100 & 50 & 11206 & 10657 & 10483 & 12916 & 9457 \\
-kroD100 & 100 & 50 & 9990 & 10864 & 9956 & 11438 & 8719 \\
-kroE100 & 100 & 50 & 10680 & 10021 & 11057 & 11061 & 9097 \\
-eil101 & 101 & 50 & 255 & 310 & 263 & 276 & 227 \\
-lin105 & 105 & 52 & 6131 & 6677 & 6193 & 6066 & 5848 \\
-pr107 & 107 & 53 & 18211 & 18576 & 30547 & 18564 & 18028 \\
-pr124 & 124 & 62 & 26299 & 32871 & 35569 & 28151 & 22998 \\
-bier127 & 127 & 63 & 33091 & 28446 & 30447 & 28900 & 25761 \\
-ch130 & 130 & 65 & 2802 & 2878 & 2853 & 3145 & 2408 \\
-pr136 & 136 & 68 & 48664 & 54666 & 50574 & 50223 & 46414 \\
-gr137 & 137 & 68 & 33447 & 33451 & 35752 & 32687 & 29231 \\
-ch150 & 150 & 75 & 3245 & 3478 & 3368 & 3511 & 2760 \\
-kroA150 & 150 & 75 & 14172 & 14956 & 14481 & 15061 & 11496 \\
-kroB150 & 150 & 75 & 13616 & 14350 & 13147 & 15202 & 11357 \\
-rat195 & 195 & 97 & 1234 & 1222 & 1298 & 1231 & 1100 \\
-kroA200 & 200 & 100 & 14820 & 14628 & 15620 & 16045 & 12372 \\
-kroB200 & 200 & 100 & 14781 & 15145 & 15478 & 16395 & 12338 \\
-ts225 & 225 & 112 & 69383 & 70307 & 71421 & 74223 & 56828 \\
-tsp225 & 225 & 112 & 1967 & 2169 & 2130 & 2105 & 1708 \\
-pr226 & 226 & 113 & 42073 & 50460 & 47965 & 49551 & 36720 \\
-gr229 & 229 & 114 & 47860 & 53016 & 51139 & 49566 & 39618 \\
-gil262 & 262 & 131 & 1221 & 1341 & 1288 & 1382 & 993 \\
-pr264 & 264 & 132 & 24137 & 24045 & 32922 & 23423 & 22644 \\
-a280 & 280 & 140 & 1355 & 1511 & 1530 & 1362 & 1231 \\
-pr299 & 299 & 149 & 25833 & 26669 & 27046 & 26930 & 22390 \\
-lin318 & 318 & 159 & 20419 & 22531 & 22441 & 20949 & 15916 \\
-rd400 & 400 & 200 & 7941 & 8419 & 8082 & 7922 & 6350 \\
-fl417 & 417 & 208 & 5786 & 6976 & 8070 & 6162 & 5436 \\
-pr439 & 439 & 219 & 42307 & 57751 & 53256 & 55146 & 35404 \\
-pcb442 & 442 & 221 & 25747 & 30954 & 29366 & 27938 & 22537 \\
+att48 & 48 & 24 & 3814 & 4197 & \textbf{3603} & 3924 & 3943 & 6477 & 4614 & 3744 & 4943 & 3603 \\
+eil51 & 51 & 25 & 188 & 189 & 181 & 197 & 199 & 239 & 188 & 193 & 198 & 175 \\
+berlin52 & 52 & 26 & 1995 & 2024 & \textbf{1874} & \textbf{1874} & 2061 & 5291 & 1952 & \textbf{1874} & 2269 & 1874 \\
+st70 & 70 & 35 & 293 & 284 & 277 & 323 & 313 & 384 & 307 & 303 & 302 & 260 \\
+eil76 & 76 & 38 & 231 & 259 & 220 & 233 & 249 & 273 & 238 & 240 & 249 & 213 \\
+pr76 & 76 & 38 & 45066 & 50069 & 42359 & 47591 & 62194 & 65376 & 44854 & 49622 & 51378 & 41248 \\
+kroA100 & 100 & 50 & 10650 & 10528 & 9852 & 12246 & 12164 & 12938 & 11377 & 11202 & 12532 & 9184 \\
+kroB100 & 100 & 50 & 9842 & 9278 & 10924 & 12750 & 10628 & 12697 & 11281 & 10325 & 11557 & 9096 \\
+kroC100 & 100 & 50 & 11220 & 10458 & 10257 & 11018 & 12853 & 12522 & 10839 & 12710 & 12916 & 9457 \\
+kroD100 & 100 & 50 & 10233 & 10769 & 9463 & 11145 & 11593 & 12706 & 10659 & 10259 & 11438 & 8719 \\
+kroE100 & 100 & 50 & 9878 & 9886 & 10995 & 9926 & 10916 & 12561 & 11126 & 10559 & 11043 & 9097 \\
+eil101 & 101 & 50 & 263 & 295 & 245 & 331 & 269 & 338 & 258 & 259 & 276 & 227 \\
+lin105 & 105 & 52 & 5952 & 6677 & 5921 & 6171 & 6612 & 9784 & 7238 & 6442 & 6066 & 5848 \\
+pr107 & 107 & 53 & 18211 & 18383 & 30949 & 18650 & 18328 & 32890 & 30884 & 18154 & 18328 & 18028 \\
+pr124 & 124 & 62 & 27487 & 32502 & 31527 & 25386 & 27448 & 43178 & 37192 & 27448 & 27487 & 22998 \\
+bier127 & 127 & 63 & 27882 & 28568 & 34340 & 29733 & 31153 & 54960 & 36698 & 30050 & 28900 & 25761 \\
+ch130 & 130 & 65 & 2972 & 2923 & 2773 & 2781 & 3009 & 3424 & 3120 & 2979 & 3145 & 2408 \\
+pr136 & 136 & 68 & 47633 & 52280 & 50367 & 50325 & 50223 & 59154 & 50143 & 50223 & 48682 & 46414 \\
+gr137 & 137 & 68 & 32687 & 34337 & 35734 & 40207 & 34435 & 39862 & 36096 & 34042 & 33083 & 29231 \\
+ch150 & 150 & 75 & 3271 & 3386 & 3418 & 3405 & 3215 & 3773 & 3441 & 3215 & 3483 & 2760 \\
+kroA150 & 150 & 75 & 14593 & 13927 & 12498 & 15031 & 14671 & 17295 & 13957 & 14608 & 15061 & 11496 \\
+kroB150 & 150 & 75 & 13604 & 14125 & 12611 & 13376 & 14511 & 14915 & 13157 & 13128 & 15202 & 11357 \\
+rat195 & 195 & 97 & 1201 & 1222 & 1281 & 1163 & 1246 & 1445 & 1285 & 1238 & 1230 & 1100 \\
+kroA200 & 200 & 100 & 15560 & 14408 & 15167 & 14246 & 15896 & 17895 & 15478 & 15629 & 16045 & 12372 \\
+kroB200 & 200 & 100 & 15053 & 14586 & 15226 & 17343 & 16089 & 18482 & 15411 & 14877 & 16237 & 12338 \\
+ts225 & 225 & 112 & 71402 & 66992 & 67044 & 64093 & 70167 & 83583 & 69459 & 70167 & 69307 & 56828 \\
+tsp225 & 225 & 112 & 2094 & 2077 & 2031 & 2022 & 2175 & 2334 & 2096 & 2159 & 2086 & 1708 \\
+pr226 & 226 & 113 & 55362 & 48157 & 45746 & 56774 & 55560 & 60717 & 48782 & 55560 & 50141 & 36720 \\
+gr229 & 229 & 114 & 44764 & 48341 & 53480 & 57075 & 44489 & 78396 & 62419 & 44452 & 49566 & 39618 \\
+gil262 & 262 & 131 & 1265 & 1315 & 1244 & 1185 & 1362 & 1455 & 1265 & 1341 & 1377 & 993 \\
+pr264 & 264 & 132 & 23188 & 23194 & 31851 & 22934 & 23984 & 33995 & 32338 & 23547 & 23234 & 22644 \\
+a280 & 280 & 140 & 1298 & 1425 & 1494 & 1417 & 1453 & 1703 & 1555 & 1432 & 1382 & 1231 \\
+pr299 & 299 & 149 & 26280 & 26393 & 27744 & 26624 & 25231 & 30532 & 27358 & 25251 & 27199 & 22390 \\
+lin318 & 318 & 159 & 20313 & 21127 & 21532 & 21405 & 21718 & 25343 & 21910 & 21377 & 20949 & 15916 \\
+rd400 & 400 & 200 & 7895 & 7951 & 8252 & 7641 & 8332 & 8964 & 8240 & 8253 & 7990 & 6350 \\
+fl417 & 417 & 208 & 6059 & 6485 & 7785 & 6235 & 6018 & 9171 & 8002 & 5946 & 6162 & 5436 \\
+pr439 & 439 & 219 & 41861 & 57935 & 55441 & 44124 & 42048 & 74565 & 57457 & 41917 & 54542 & 35404 \\
+pcb442 & 442 & 221 & 24374 & 29122 & 29106 & 24841 & 25403 & 30999 & 29123 & 24063 & 27608 & 22537 \\
 \hline
-\end{tabular}}
+\end{tabular}}}
 \end{table*}
 
 \begin{table*}[htbp]
 \centering
 \caption{Results for the $k$-TSP, quartile Q3 ($k\approx 3n/4$). Total tour length per method; BKS = best-known value obtained by LKH-3 on the benchmark instances of Pandiri \& Singh. Values in \textbf{bold} match the BKS.}
 \label{tab:resultados_Q3}
-{\footnotesize\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{0.95}%
-\begin{tabular}{|l|c|c|c|c|c|c|c|}
+{\scriptsize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{0.95}%
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Greedy} & \textbf{GRASP} & \textbf{GA} & \textbf{DCIH} & \textbf{BKS} \\
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{DCIH} & \textbf{BKS} \\
 \hline
-att48 & 48 & 36 & 6877 & 6727 & 7215 & 6816 & 6563 \\
-eil51 & 51 & 38 & 303 & 304 & 298 & 316 & 287 \\
-berlin52 & 52 & 39 & 4549 & 4220 & 4442 & 4627 & 4174 \\
-st70 & 70 & 52 & 463 & 459 & 460 & 495 & 428 \\
-eil76 & 76 & 57 & 373 & 396 & 359 & 366 & 335 \\
-pr76 & 76 & 57 & 66580 & 72594 & 66337 & 70861 & 64142 \\
-kroA100 & 100 & 75 & 16744 & 15900 & 15408 & 18142 & 14379 \\
-kroB100 & 100 & 75 & 16204 & 16531 & 15937 & 18413 & 14680 \\
-kroC100 & 100 & 75 & 17252 & 16900 & 15228 & 18390 & 13892 \\
-kroD100 & 100 & 75 & 16478 & 15947 & 16038 & 17539 & 14058 \\
-kroE100 & 100 & 75 & 16965 & 17114 & 16067 & 17418 & 14622 \\
-eil101 & 101 & 75 & 445 & 440 & 423 & 458 & 386 \\
-lin105 & 105 & 78 & 9503 & 10157 & 10363 & 9388 & 8983 \\
-pr107 & 107 & 80 & 37637 & 38231 & 37683 & 38745 & 36292 \\
-pr124 & 124 & 93 & 40183 & 49268 & 45357 & 41170 & 39008 \\
-bier127 & 127 & 95 & 51088 & 56391 & 58880 & 53130 & 49680 \\
-ch130 & 130 & 97 & 4439 & 4515 & 4347 & 4712 & 3876 \\
-pr136 & 136 & 102 & 74436 & 78605 & 71585 & 78397 & 67910 \\
-gr137 & 137 & 102 & 51562 & 52044 & 47647 & 51456 & 43670 \\
-ch150 & 150 & 112 & 5005 & 5105 & 4878 & 5199 & 4366 \\
-kroA150 & 150 & 112 & 20542 & 21174 & 20284 & 21792 & 17395 \\
-kroB150 & 150 & 112 & 19655 & 21015 & 18925 & 21390 & 16879 \\
-rat195 & 195 & 146 & 1846 & 1913 & 1910 & 1850 & 1667 \\
-kroA200 & 200 & 150 & 22680 & 24633 & 22530 & 24181 & 19211 \\
-kroB200 & 200 & 150 & 23400 & 23138 & 22249 & 24860 & 18898 \\
-ts225 & 225 & 168 & 102616 & 102059 & 100789 & 104534 & 85656 \\
-tsp225 & 225 & 168 & 2983 & 3248 & 3132 & 3188 & 2624 \\
-pr226 & 226 & 169 & 60502 & 68527 & 56507 & 78670 & 47142 \\
-gr229 & 229 & 171 & 73199 & 78235 & 89517 & 74146 & 64457 \\
-gil262 & 262 & 196 & 1875 & 1956 & 1856 & 1940 & 1551 \\
-pr264 & 264 & 198 & 38240 & 43109 & 41956 & 42020 & 34346 \\
-a280 & 280 & 210 & 2050 & 2184 & 2161 & 2188 & 1845 \\
-pr299 & 299 & 224 & 39460 & 42648 & 38408 & 39938 & 32738 \\
-lin318 & 318 & 238 & 32561 & 34576 & 32307 & 32867 & 25303 \\
-rd400 & 400 & 300 & 11981 & 12791 & 11803 & 11937 & 9972 \\
-fl417 & 417 & 312 & 9853 & 12030 & 9571 & 11377 & 7930 \\
-pr439 & 439 & 329 & 66325 & 82830 & 83969 & 76532 & 58006 \\
-pcb442 & 442 & 331 & 40390 & 42461 & 41026 & 40952 & 34358 \\
+att48 & 48 & 36 & 6710 & 6699 & 7049 & 7045 & 7036 & 8785 & 7435 & 6691 & 6863 & 6563 \\
+eil51 & 51 & 38 & 297 & 300 & 295 & 302 & 326 & 314 & 296 & 308 & 316 & 287 \\
+berlin52 & 52 & 39 & 4349 & 4250 & 4340 & 4708 & 5162 & 5943 & 4561 & 4631 & 4627 & 4174 \\
+st70 & 70 & 52 & 447 & 454 & 472 & 485 & 511 & 506 & 466 & 485 & 486 & 428 \\
+eil76 & 76 & 57 & 358 & 388 & 357 & 353 & 405 & 413 & 370 & 372 & 376 & 335 \\
+pr76 & 76 & 57 & 65621 & 72347 & 76427 & 70284 & 79931 & 86418 & 74640 & 75552 & 70861 & 64142 \\
+kroA100 & 100 & 75 & 16900 & 15894 & 15278 & 15658 & 17234 & 17000 & 15468 & 16907 & 18142 & 14379 \\
+kroB100 & 100 & 75 & 16916 & 16401 & 16233 & 17576 & 16488 & 18461 & 16019 & 16299 & 18413 & 14680 \\
+kroC100 & 100 & 75 & 17204 & 16279 & 15129 & 14815 & 18783 & 17126 & 15221 & 16418 & 18390 & 13892 \\
+kroD100 & 100 & 75 & 15438 & 15753 & 14938 & 16450 & 18327 & 17374 & 15304 & 16838 & 17539 & 14058 \\
+kroE100 & 100 & 75 & 16748 & 17097 & 15494 & 17020 & 18255 & 17367 & 16024 & 16574 & 17372 & 14622 \\
+eil101 & 101 & 75 & 433 & 439 & 422 & 446 & 442 & 482 & 421 & 435 & 458 & 386 \\
+lin105 & 105 & 78 & 9274 & 10173 & 10175 & 9566 & 10056 & 12496 & 10649 & 9482 & 9388 & 8983 \\
+pr107 & 107 & 80 & 38179 & 37644 & 37944 & 37688 & 40687 & 38940 & 37643 & 39058 & 38780 & 36292 \\
+pr124 & 124 & 93 & 40484 & 45096 & 44497 & 42339 & 40385 & 59259 & 44605 & 40385 & 40506 & 39008 \\
+bier127 & 127 & 95 & 51722 & 51931 & 58088 & 65610 & 58529 & 84422 & 62716 & 54586 & 53130 & 49680 \\
+ch130 & 130 & 97 & 4446 & 4409 & 4428 & 4520 & 4541 & 5025 & 4376 & 4518 & 4712 & 3876 \\
+pr136 & 136 & 102 & 75924 & 74084 & 71668 & 81225 & 79538 & 82300 & 72066 & 78431 & 75924 & 67910 \\
+gr137 & 137 & 102 & 51429 & 50490 & 47384 & 46744 & 54376 & 53533 & 48175 & 52598 & 51852 & 43670 \\
+ch150 & 150 & 112 & 5098 & 5062 & 4934 & 4910 & 5185 & 5471 & 4951 & 5185 & 5171 & 4366 \\
+kroA150 & 150 & 112 & 20696 & 20815 & 19639 & 21619 & 21097 & 22727 & 19837 & 20875 & 21792 & 17395 \\
+kroB150 & 150 & 112 & 20092 & 20330 & 19016 & 18239 & 21481 & 20530 & 18761 & 20625 & 21431 & 16879 \\
+rat195 & 195 & 146 & 1812 & 1880 & 1911 & 1757 & 1877 & 1951 & 1916 & 1853 & 1821 & 1667 \\
+kroA200 & 200 & 150 & 23738 & 23281 & 23339 & 22004 & 25097 & 24322 & 22445 & 24608 & 24098 & 19211 \\
+kroB200 & 200 & 150 & 23709 & 22672 & 22118 & 24041 & 24364 & 23720 & 22532 & 23371 & 24702 & 18898 \\
+ts225 & 225 & 168 & 100138 & 102165 & 100233 & 98141 & 105659 & 104831 & 97765 & 105134 & 104329 & 85656 \\
+tsp225 & 225 & 168 & 3096 & 3066 & 3087 & 2978 & 3365 & 3332 & 3015 & 3192 & 3139 & 2624 \\
+pr226 & 226 & 169 & 76096 & 67041 & 55617 & 71619 & 73540 & 79205 & 58094 & 72995 & 78642 & 47142 \\
+gr229 & 229 & 171 & 71551 & 79083 & 87239 & 79477 & 73693 & 116715 & 90428 & 73373 & 74369 & 64457 \\
+gil262 & 262 & 196 & 1815 & 1903 & 1869 & 1849 & 1938 & 1984 & 1842 & 1929 & 1930 & 1551 \\
+pr264 & 264 & 198 & 41226 & 40419 & 40415 & 37969 & 41812 & 42945 & 40687 & 41345 & 41954 & 34346 \\
+a280 & 280 & 210 & 2059 & 2205 & 2127 & 2057 & 2174 & 2345 & 2155 & 2128 & 2190 & 1845 \\
+pr299 & 299 & 224 & 38539 & 40335 & 38679 & 38391 & 39357 & 41816 & 38249 & 39314 & 40393 & 32738 \\
+lin318 & 318 & 238 & 31760 & 32456 & 33651 & 32139 & 33120 & 36147 & 32584 & 32647 & 32784 & 25303 \\
+rd400 & 400 & 300 & 11910 & 12195 & 12139 & 11639 & 12341 & 12274 & 11979 & 12197 & 12030 & 9972 \\
+fl417 & 417 & 312 & 10539 & 11375 & 9355 & 10143 & 10820 & 11559 & 9650 & 10805 & 11403 & 7930 \\
+pr439 & 439 & 329 & 67177 & 83454 & 90201 & 74522 & 68148 & 99252 & 87209 & 67964 & 76775 & 58006 \\
+pcb442 & 442 & 331 & 38114 & 43323 & 40379 & 36174 & 40401 & 44072 & 42075 & 38507 & 40135 & 34358 \\
 \hline
-\end{tabular}}
+\end{tabular}}}
 \end{table*}
 
 \subsection*{Analysis}
@@ -807,7 +817,7 @@ results are reproducible across machines.
 \section{Conclusions and Future Work}
 The $k$-TSP is a selective routing problem: choosing exactly $k$ nodes (including the home city) and ordering them into a single minimum-length tour. Its difficulty stems from the coupled selection-and-ordering decisions, which make exhaustive enumeration intractable for medium and large instances and motivate heuristic and metaheuristic methods.
 
-This work implemented and compared a greedy cheapest-insertion heuristic, a GRASP/multi-start scheme, a genetic algorithm over the subset-and-order encoding, and the proposed deterministic heuristic \textbf{DCIH}, evaluated on 38 TSPLIB instances across three values of $k$ and compared against the best-known values obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}). The experiments show that the greedy cheapest-insertion baseline is the most robust method on average across the whole range of $k$, that the genetic algorithm matches it and becomes the most frequent per-instance winner only for large $k$ (Q3), and that DCIH provides a deterministic, reproducible alternative of comparable quality throughout.
+This work implemented and compared nine methods for the $k$-TSP: a greedy cheapest-insertion heuristic, a GRASP/multi-start scheme, a genetic algorithm over the subset-and-order encoding, the classical Nearest Neighbor and Nearest, Farthest, and Random Insertion construction heuristics, a Simulated Annealing metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}, evaluated on 38 TSPLIB instances across three values of $k$ and compared against the best-known values obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}). The experiments show that the greedy cheapest-insertion baseline is the most robust method on average across the whole range of $k$, that Simulated Annealing is the best of the added methods, that the genetic algorithm matches the baseline and becomes the most frequent per-instance winner only for large $k$ (Q3), that Farthest Insertion is the weakest because selecting distant nodes conflicts with the node-selection objective, and that DCIH provides a deterministic, reproducible alternative of comparable quality throughout.
 
 The proposed \textbf{DCIH} heuristic is intentionally simple and \emph{fully deterministic}: it selects nodes by minimum marginal insertion cost and refines the tour with 2-opt and an in/out exchange, breaking ties by node index. This guarantees that re-running it produces identical tours, prioritizing correctness and reproducibility.
 
