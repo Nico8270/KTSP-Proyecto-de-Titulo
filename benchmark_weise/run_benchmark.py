@@ -30,6 +30,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# Estilo global: fuentes mas grandes y salida nitida (mejor legibilidad en el paper)
+plt.rcParams.update({
+    "figure.dpi": 200, "savefig.dpi": 200,
+    "font.size": 13, "axes.titlesize": 14, "axes.labelsize": 13,
+    "xtick.labelsize": 11, "ytick.labelsize": 11, "legend.fontsize": 11,
+    "lines.linewidth": 2.0,
+})
+
 import ktsp_core as core
 from ktsp_core import EVAL, METHODS
 import instances as inst_mod
@@ -279,12 +287,15 @@ def make_all_figures(all_runs, refs, method_names):
         _fig_progress_one(kq, all_runs[kq], refs[kq][0])
 
 
-def _scaled_common_grid(all_runs, method):
-    """Rejilla comun de DE ESCALADO (de/n^2) que cubre todas las corridas del metodo."""
+def _global_scaled_grid(all_runs):
+    """Rejilla comun GLOBAL de DE escalado (de/n^2) que cubre TODOS los metodos, de
+    modo que todas las curvas se dibujan sobre el MISMO presupuesto y son
+    directamente comparables. Los metodos que terminan antes se extienden con su
+    ultimo (mejor) valor -- linea plana --, ya que su solucion ya no cambia."""
     smin, smax = np.inf, 0.0
     for (name, q), runs in all_runs.items():
         for r in runs:
-            if r.method != method or r.de.size == 0:
+            if r.de.size == 0:
                 continue
             s = r.de / (r.n * r.n)
             smin = min(smin, float(s.min())); smax = max(smax, float(s.max()))
@@ -295,34 +306,34 @@ def _scaled_common_grid(all_runs, method):
 
 def _fig_progress_aggregated(all_runs, refs, method_names):
     """
-    Progreso agregado: cada corrida se evalua como funcion escalon best-so-far
-    sobre una rejilla comun de DE escalado (de/n^2), agrupando TODAS las corridas
-    de todas las instancias/cuartiles y tomando la mediana. Al ser cada serie
-    monotona decreciente, la mediana tambien lo es.
+    Progreso agregado sobre una rejilla comun GLOBAL de DE escalado (de/n^2): cada
+    corrida se evalua como funcion escalon best-so-far y se toma la mediana sobre
+    todas las corridas/instancias/cuartiles. Todos los metodos se dibujan sobre el
+    mismo rango de presupuesto; los deterministas o baratos (NN, NI, FI, DCIH) que
+    convergen pronto aparecen como linea plana a la derecha (su solucion no mejora).
     """
+    sgrid = _global_scaled_grid(all_runs)
+    if sgrid is None:
+        return
     plt.figure(figsize=(7.5, 5))
     for m in method_names:
-        sgrid = _scaled_common_grid(all_runs, m)
-        if sgrid is None:
-            continue
         series = []
         for (name, q), runs in all_runs.items():
             ref = refs[(name, q)][0]
             for r in runs:
                 if r.method != m or r.de.size == 0:
                     continue
-                grid_de = sgrid * (r.n * r.n)
-                series.append(M.best_error_on_grid(r, ref, grid_de))
+                series.append(M.best_error_on_grid(r, ref, sgrid * (r.n * r.n)))
         if not series:
             continue
         med = np.nanmedian(np.vstack(series), axis=0)
         plt.plot(sgrid, 100 * med, color=COLORS[m], label=m, lw=2)
     plt.xscale("log"); plt.yscale("log")
-    plt.xlabel("Scaled DE  (distance evaluations / n^2)")
+    plt.xlabel("Scaled DE  (distance evaluations / $n^2$)")
     plt.ylabel("Median error F  (%)   [F = len/ref - 1]")
     plt.title("Anytime progress curves (aggregated over instances and quartiles)")
-    plt.grid(True, which="both", ls=":", alpha=0.5); plt.legend()
-    plt.tight_layout(); plt.savefig(FIGDIR / "01_progreso_agregado.png", dpi=150)
+    plt.grid(True, which="both", ls=":", alpha=0.5); plt.legend(ncol=2, fontsize=11)
+    plt.tight_layout(); plt.savefig(FIGDIR / "01_progreso_agregado.png", dpi=200)
     plt.close()
 
 
@@ -347,32 +358,37 @@ def _fig_progress_one(kq, runs, ref):
 
 
 def _fig_ecdf_aggregated(all_runs, refs, method_names, F_t=0.20):
+    """ECDF agregado sobre la MISMA rejilla comun global que las curvas de progreso,
+    de modo que todos los metodos se comparan sobre el mismo presupuesto. Cada
+    corrida aporta, en cada punto de la rejilla (DE escalado), 1 si ya alcanzo el
+    error meta con ese presupuesto y 0 si no; se promedia sobre todas las corridas."""
+    sgrid = _global_scaled_grid(all_runs)
+    if sgrid is None:
+        return
     plt.figure(figsize=(7.5, 5))
     for m in method_names:
-        xs, ys = [], []
+        cols = []
         for (name, q), runs in all_runs.items():
             ref = refs[(name, q)][0]
-            mruns = [r for r in runs if r.method == m]
-            if not any(r.de.size for r in mruns):
-                continue
-            n = mruns[0].n
-            grid = M.de_grid(mruns)
-            ec = M.ecdf_curve(mruns, ref, F_t, grid)
-            xs.append(grid / (n * n)); ys.append(ec)
-        if not xs:
+            for r in runs:
+                if r.method != m or r.de.size == 0:
+                    continue
+                hit = M.de_to_reach(r, ref, F_t)
+                if hit is None:
+                    cols.append(np.zeros_like(sgrid))
+                else:
+                    cols.append((sgrid * (r.n * r.n) >= hit).astype(float))
+        if not cols:
             continue
-        common = np.logspace(np.log10(min(x.min() for x in xs)),
-                             np.log10(max(x.max() for x in xs)), 60)
-        stacked = [np.interp(np.log10(common), np.log10(gx), gy, left=0.0, right=gy[-1])
-                   for gx, gy in zip(xs, ys)]
-        mean = np.mean(np.vstack(stacked), axis=0)
-        plt.plot(common, mean, color=COLORS[m], label=m, lw=2)
+        frac = np.mean(np.vstack(cols), axis=0)
+        plt.plot(sgrid, frac, color=COLORS[m], label=m, lw=2)
     plt.xscale("log")
-    plt.xlabel("Scaled DE (distance evaluations / n^2)")
+    plt.xlabel("Scaled DE (distance evaluations / $n^2$)")
     plt.ylabel(f"Fraction of runs with F <= {int(F_t*100)}%")
     plt.title("Aggregated ECDF — probability of reaching the target error vs time")
-    plt.ylim(-0.02, 1.02); plt.grid(True, which="both", ls=":", alpha=0.5); plt.legend()
-    plt.tight_layout(); plt.savefig(FIGDIR / "02_ecdf_agregado.png", dpi=150)
+    plt.ylim(-0.02, 1.02); plt.grid(True, which="both", ls=":", alpha=0.5)
+    plt.legend(ncol=2, fontsize=11)
+    plt.tight_layout(); plt.savefig(FIGDIR / "02_ecdf_agregado.png", dpi=200)
     plt.close()
 
 def _fig_ert_vs_goal(all_runs, refs, method_names):
@@ -395,13 +411,16 @@ def _fig_ert_vs_goal(all_runs, refs, method_names):
                     vals.append(e / (n * n))
             ys.append(np.median(vals) if vals else np.nan)
         plt.plot([100 * f for f in Fts], ys, "o-", color=COLORS[m], label=m, lw=2)
-    plt.xscale("log"); plt.yscale("log")
-    plt.gca().invert_xaxis()
-    plt.xlabel("Target error F_t (%) — more demanding to the right")
-    plt.ylabel("Median ERT (DE / n^2)")
+    xt = [100 * f for f in Fts]
+    plt.yscale("log")                       # eje X lineal con etiquetas claras (%)
+    plt.gca().invert_xaxis()                # mas exigente hacia la derecha
+    plt.xticks(xt, [f"{int(x)}" for x in xt])
+    plt.xlabel("Target error $F_t$ (%) — more demanding to the right")
+    plt.ylabel("Median ERT (DE / $n^2$)")
     plt.title("Estimated Running Time (ERT) to reach the target error")
-    plt.grid(True, which="both", ls=":", alpha=0.5); plt.legend(loc="center left")
-    plt.tight_layout(); plt.savefig(FIGDIR / "03_ert_vs_meta.png", dpi=150)
+    plt.grid(True, which="both", ls=":", alpha=0.5)
+    plt.legend(loc="center left", ncol=2, fontsize=11)
+    plt.tight_layout(); plt.savefig(FIGDIR / "03_ert_vs_meta.png", dpi=200)
     plt.close()
 
 
