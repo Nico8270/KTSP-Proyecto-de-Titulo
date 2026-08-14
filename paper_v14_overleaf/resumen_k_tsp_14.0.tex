@@ -434,25 +434,25 @@ The Lin--Kernighan--Helsgaun solver (LKH, and its extension LKH-3) is among the 
 \textbf{Method} & \textbf{Main characteristics} & \textbf{Reference} \\ \hline
 Greedy (cheapest insertion) &
 Builds the tour by minimum marginal insertion until $k$ nodes; 2-opt refinement; fast baseline. &
-\cite{croes1958} \\ \hline
+\cite{croes1958,rosenkrantz1977,gutin2002greedy} \\ \hline
 GRASP / multi-start &
 Randomized greedy construction $+$ local search; best over many restarts; reproducible via fixed seed. &
-\cite{feo1995grasp} \\ \hline
+\cite{feo1995grasp,blumroli2003} \\ \hline
 Genetic Algorithm (GA) &
 Encodes subset $+$ order; tournament, subset-aware crossover, swap/in--out mutation, elitism, 2-opt. &
-\cite{holland1975adaptation} \\ \hline
+\cite{holland1975adaptation,potvin1996} \\ \hline
 Nearest Neighbor (NN) &
 Extends the tour to the nearest unvisited node until $k$; 2-opt $+$ in/out refinement; deterministic. &
-\cite{rosenkrantz1977} \\ \hline
+\cite{rosenkrantz1977,johnson1997} \\ \hline
 Nearest / Farthest Insertion (NI, FI) &
 Insertion family; inserts the node closest to (NI) or farthest from (FI) the tour at its cheapest position; deterministic. &
-\cite{rosenkrantz1977} \\ \hline
+\cite{rosenkrantz1977,bentley1992} \\ \hline
 Random Insertion (RI) &
 Multi-start insertion with the next node chosen at random; local search; reproducible via fixed seed. &
-\cite{rosenkrantz1977} \\ \hline
+\cite{rosenkrantz1977,laporte1992} \\ \hline
 Simulated Annealing (SA) &
 Metropolis acceptance over 2-opt and in/out neighbourhoods with geometric cooling; escapes local optima. &
-\cite{kirkpatrick1983} \\ \hline
+\cite{kirkpatrick1983,cerny1985} \\ \hline
 \textbf{DCIH (proposed)} &
 Deterministic cheapest-insertion selection $+$ 2-opt and in/out exchange; fully reproducible. &
 --- \\ \hline
