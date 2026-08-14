@@ -277,7 +277,7 @@ so that shorter tours obtain higher fitness. The feasibility of $T$ is guarantee
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{Genotipo-Fenotipo.png}
+    \includegraphics[width=\linewidth]{{Genotipo-Fenotipo_V14.0}.png}
     \caption{Genotype$\rightarrow$phenotype flow for the $k$-TSP: the genotype encodes the selected subset of $k$ nodes and their order; decoding closes the sequence into a single tour through the home city, which is then evaluated by its total length $F(T)$ and refined by local search.}
     \label{fig:Genotipo_Fenotipo}
 \end{figure}
@@ -340,7 +340,7 @@ This is a \emph{selective} single-tour TSP: it differs from the standard TSP by 
 % ===================== 4. SOLUTION (BEFORE TECHNIQUES) =====================
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\linewidth]{Graficok-TSP.png}
+    \includegraphics[width=0.65\linewidth]{{Graficok-TSP_V14.0}.png}
     \caption{Visualization of a $k$-TSP solution on the \texttt{eil51} instance with $k=25$ ($\lfloor n/2\rfloor$ of the $n=51$ nodes, i.e.\ quartile Q2). A single tour (blue) through the home city (red star) visits the $k$ selected nodes, while the remaining $n-k$ nodes (gray) are left unvisited. The tour shown is the GA solution, of length 177, within $1.1\%$ of the BKS (175); see Table~\ref{tab:resultados_Q2}.}
     \label{fig:eil51_ktsp}
 \end{figure}
@@ -743,7 +743,7 @@ under it (AUC) on the logarithmic DE axis.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{01_progreso_agregado.png}
+    \includegraphics[width=\linewidth]{{01_progreso_agregado_V14.0}.png}
     \caption{Anytime \textbf{progress curves} aggregated over the 38 TSPLIB
     instances and the three quartiles of $k$: median best-so-far error $F$ (\%)
     versus the machine-independent time (distance evaluations scaled by $n^2$).
@@ -757,7 +757,7 @@ under it (AUC) on the logarithmic DE axis.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{02_ecdf_agregado.png}
+    \includegraphics[width=\linewidth]{{02_ecdf_agregado_V14.0}.png}
     \caption{Aggregated \textbf{ECDF} for the target error $F_t=20\%$: fraction of
     runs (over instances, quartiles and repetitions) that reach a tour within
     $20\%$ of the LKH-3 reference as a function of the scaled distance evaluations.
@@ -769,7 +769,7 @@ under it (AUC) on the logarithmic DE axis.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{03_ert_vs_meta.png}
+    \includegraphics[width=\linewidth]{{03_ert_vs_meta_V14.0}.png}
     \caption{Median \textbf{ERT} (scaled distance evaluations, $\mathrm{DE}/n^2$)
     to reach each target error $F_t$ (from $35\%$ down to $15\%$; more demanding to
     the right). Nearest Neighbor and Greedy reach a given quality with the least
