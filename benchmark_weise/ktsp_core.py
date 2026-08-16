@@ -508,6 +508,85 @@ def sa_ktsp(D, n, k, home=HOME, seed=42, time_limit=1e9, alpha=0.9995,
     return {"tour": best, "length": tour_length(best, D), "source": "simulated_annealing"}
 
 
+def tabu_ktsp(D, n, k, home=HOME, seed=42, time_limit=1e9, tenure=10,
+              log: Optional[LogFn] = None, budget_de: Optional[int] = None,
+              max_iters: int = 2_000_000):
+    """Tabu Search sobre el espacio (subconjunto + orden) del k-TSP.
+
+    Busqueda local CON MEMORIA: en cada iteracion evalua un conjunto de movimientos
+    candidatos en dos vecindarios --- reverso de segmento (2-opt) e intercambio
+    dentro/fuera --- y aplica el MEJOR movimiento no prohibido, aunque empeore. El
+    atributo del movimiento queda en la lista tabu durante `tenure` iteraciones para
+    evitar ciclos; un movimiento tabu se permite si mejora la mejor solucion global
+    (criterio de aspiracion). Estocastico (semilla)."""
+    t0 = time.perf_counter(); emit = _mk_logger(log, t0)
+    rng = random.Random(seed + 11)
+
+    cur = two_opt_cycle(_insertion_build(D, n, k, home, "nearest"), D)
+    cur_len = tour_length(cur, D)
+    best, best_len = list(cur), cur_len
+    emit(best_len)
+
+    inset = np.zeros(n, dtype=bool); inset[np.asarray(cur)] = True
+    outside = [int(v) for v in range(n) if not inset[v]]
+    m = len(cur)
+    tabu: Dict = {}                        # atributo de movimiento -> iteracion de expiracion
+    n_cand = min(max(8, m), 40)            # tamano del vecindario muestreado
+    it = 0
+    while it < max_iters and m >= 4:
+        it += 1
+        cand = []                          # (delta, kind, data, attr)
+        for _ in range(n_cand):            # candidatos 2-opt
+            i = rng.randrange(1, m - 1); j = rng.randrange(i + 1, m)
+            a = cur[i - 1]; ti = cur[i]; tj = cur[j]; b = cur[(j + 1) % m]
+            if a == tj or ti == b:
+                continue
+            delta = (D[a, tj] + D[ti, b]) - (D[a, ti] + D[tj, b])
+            attr = frozenset((frozenset((a, ti)), frozenset((tj, b))))
+            cand.append((delta, "2opt", (i, j), attr))
+        EVAL.add(4 * n_cand)
+        if outside:                        # candidatos dentro/fuera
+            for _ in range(n_cand):
+                p = rng.randrange(1, m)
+                a = cur[p - 1]; b = cur[(p + 1) % m]; old = cur[p]
+                new = outside[rng.randrange(len(outside))]
+                delta = (D[a, new] + D[new, b]) - (D[a, old] + D[old, b])
+                cand.append((delta, "swap", (p, new, old), frozenset((old, new))))
+            EVAL.add(4 * n_cand)
+        if not cand:
+            break
+        cand.sort(key=lambda c: c[0])
+        chosen = None
+        for c in cand:
+            is_tabu = tabu.get(c[3], 0) > it
+            if (not is_tabu) or (cur_len + c[0] < best_len - 1e-9):   # aspiracion
+                chosen = c; break
+        if chosen is None:
+            chosen = cand[0]               # todos tabu: aceptar el mejor de todas formas
+        delta, kind, data, attr = chosen
+        if kind == "2opt":
+            i, j = data; cur[i:j + 1] = cur[i:j + 1][::-1]
+        else:
+            p, new, old = data
+            cur[p] = new; inset[old] = False; inset[new] = True
+            outside.remove(new); outside.append(old)
+        cur_len += delta
+        tabu[attr] = it + tenure
+        if cur_len < best_len - 1e-9:
+            best_len = cur_len; best = list(cur); emit(best_len)
+        stop_time = (time.perf_counter() - t0) >= time_limit
+        stop_de = budget_de is not None and EVAL.de >= budget_de
+        if stop_time or stop_de:
+            break
+
+    best = local_search_ktsp(best, D, n, home)
+    L = tour_length(best, D)
+    if L < best_len:
+        best_len = L
+    emit(best_len)
+    return {"tour": best, "length": tour_length(best, D), "source": "tabu_search"}
+
+
 # Registro de metodos (nombre visible -> (fn, es_estocastico))
 METHODS = {
     "Greedy": (greedy_ktsp, True),
@@ -518,5 +597,6 @@ METHODS = {
     "FI":     (fi_ktsp,     False),  # Farthest Insertion (determinista)
     "RI":     (ri_ktsp,     True),   # Random Insertion multi-arranque
     "SA":     (sa_ktsp,     True),   # Simulated Annealing (metaheuristica)
+    "TS":     (tabu_ktsp,   True),   # Tabu Search (metaheuristica con memoria)
     "DCIH":   (nbr_ktsp,    False),  # heuristica determinista propuesta (paper: DCIH)
 }

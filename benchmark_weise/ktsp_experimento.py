@@ -75,6 +75,8 @@ def run_method(name: str, fn, D, n: int, k: int, seed: int) -> dict:
         return fn(D, n, k, time_limit=TIME_LIMIT, seed=seed, max_iters=10_000)
     if name == "SA":
         return fn(D, n, k, time_limit=TIME_LIMIT, seed=seed)
+    if name == "TS":
+        return fn(D, n, k, time_limit=TIME_LIMIT, seed=seed)
     if name == "DCIH":
         win = 0 if n <= 200 else min(n - 1, max(120, k + 20))
         return fn(D, n, k, cand_window=win)

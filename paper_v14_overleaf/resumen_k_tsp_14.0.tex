@@ -108,7 +108,7 @@ rlinfati@ubiobio.cl}
 \begin{abstract}
 The $k$-Traveling Salesman Problem ($k$-TSP) is a variation of the classical Traveling Salesman Problem (TSP). Given a set of $n$ cities that includes a home city (depot) and a fixed value $k$ with $1 < k \le n$, the $k$-TSP seeks a single tour of minimum total length that starts and ends at the home city and visits \emph{exactly} $k$ cities (the home city included), chosen from the $n$ available. Solving it therefore involves two coupled decisions: \emph{which} $k$ cities to visit and in \emph{which order}.
 
-This work presents a repository and an experimental implementation of several optimization techniques for the $k$-TSP, including a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion construction heuristics, a Simulated Annealing metaheuristic, and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for solution quality we use the best-known values (BKS) obtained by the Lin--Kernighan--Helsgaun solver (LKH-3) on the $k$-TSP benchmark instances introduced by Pandiri \& Singh.
+This work presents a repository and an experimental implementation of several optimization techniques for the $k$-TSP, including a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion construction heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for solution quality we use the best-known values (BKS) obtained by the Lin--Kernighan--Helsgaun solver (LKH-3) on the $k$-TSP benchmark instances introduced by Pandiri \& Singh.
 
 We describe the data representation, the mathematical model, and an experimental design based on TSPLIB instances. Experiments on 38 TSPLIB instances, across three values of $k$ (about $n/4$, $n/2$, and $3n/4$), compare nine methods against the LKH-3 best-known values: the greedy cheapest-insertion heuristic is the most robust method on average across all three values of $k$, Simulated Annealing is the strongest of the added metaheuristics, the genetic algorithm becomes the most frequent per-instance winner when $k$ is large, Farthest Insertion is the weakest for the $k$-TSP, and DCIH offers a deterministic, reproducible alternative of comparable quality throughout.
 \end{abstract}
@@ -142,7 +142,7 @@ The main \textbf{motivation} for studying the $k$-TSP lies in applications where
 The \textbf{general objective} of this work is to develop a repository that models, solves, and compares $k$-TSP instances using standard TSPLIB instances and synthetic benchmarks. The \textbf{specific objectives} are:
 \begin{itemize}
     \item To formulate the problem mathematically, incorporating node-selection, degree, and subtour-elimination constraints for a single tour over a chosen subset.
-    \item To implement several solution techniques: a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion heuristics, a Simulated Annealing metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}.
+    \item To implement several solution techniques: a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}.
     \item To evaluate solution quality against the best-known values (BKS) obtained by LKH-3~\cite{Helsgaun,lin1973} on the $k$-TSP benchmark instances of Pandiri \& Singh~\cite{pandiri2020}.
 \end{itemize}
 
@@ -168,6 +168,7 @@ The $k$-TSP is considered with:
   \item \textbf{Genetic Algorithm (GA):} an individual encodes the \emph{selected subset and its order}; tournament selection, a subset-aware crossover, swap/in--out mutation, elitism, and 2-opt local improvement.
   \item \textbf{Classical construction heuristics (NN, NI, FI, RI):} the Nearest Neighbor tour and the Nearest, Farthest, and Random Insertion heuristics, all refined by 2-opt and in/out exchange, as standard well-understood baselines.
   \item \textbf{Simulated Annealing (SA):} a single-solution metaheuristic with Metropolis acceptance over the 2-opt and in/out neighbourhoods, complementing the population-based GA.
+  \item \textbf{Tabu Search (TS):} a memory-based local search that always moves to the best non-tabu neighbour and forbids recently used moves for a fixed tenure, with an aspiration criterion.
   \item \textbf{DCIH (Deterministic Cheapest-Insertion Heuristic):} the proposed \emph{deterministic} heuristic. It selects the $k$ nodes by minimum marginal insertion cost and refines with 2-opt plus an in/out node exchange, with ties broken by node index so the result is fully reproducible (described below in Section~\ref{sec:soltech}).
 \end{itemize}
 The best-known values (BKS) obtained by LKH-3 on the $k$-TSP benchmark serve as the quality reference (Section~\ref{sec:soltech}).
@@ -175,7 +176,7 @@ The best-known values (BKS) obtained by LKH-3 on the $k$-TSP benchmark serve as 
 \paragraph{Experimental protocol.}
 \begin{enumerate}[label=\roman*)]
   \item \textbf{Instances:} small and medium TSPLIB instances; following the $k$-TSP benchmark of Pandiri \& Singh~\cite{pandiri2020}, three values of $k$ are evaluated per instance, namely $k=\lfloor n/4\rfloor$ (Q1), $k=\lfloor n/2\rfloor$ (Q2), and $k=\lfloor 3n/4\rfloor$ (Q3).
-  \item \textbf{Parameters:} time budgets per heuristic (e.g., GRASP $12$\,s, GA $20$\,s), population size, and a fixed seed for the stochastic methods (GRASP, GA, RI, SA). The deterministic methods (NN, NI, FI, DCIH) use no seed.
+  \item \textbf{Parameters:} time budgets per heuristic (e.g., GRASP $12$\,s, GA $20$\,s), population size, and a fixed seed for the stochastic methods (GRASP, GA, RI, SA, TS). The deterministic methods (NN, NI, FI, DCIH) use no seed.
   \item \textbf{Metrics:} total tour length (SUM) and the relative GAP against the LKH-3 best-known value (BKS).
   \item \textbf{Comparison:} the relative GAP is computed against the best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} for each instance and value of $k$.
   \item \textbf{Analysis:} comparative tables and relative GAP across methods, instances, and values of $k$.
@@ -184,7 +185,7 @@ The best-known values (BKS) obtained by LKH-3 on the $k$-TSP benchmark serve as 
 
 \paragraph{Execution flow.}
 For each instance: (a) load/generate coordinates and distances; (b) set $k$ and seed;
-(c) run Greedy, GRASP, GA, NN, NI, FI, RI, SA, and DCIH within their budgets; (d) collect total tour length;
+(c) run Greedy, GRASP, GA, NN, NI, FI, RI, SA, TS, and DCIH within their budgets; (d) collect total tour length;
 (e) compute the relative GAP against the BKS and export results to CSV/LaTeX.
 
 % ===================== 2. REPRESENTATION (ADT) =====================
@@ -382,6 +383,9 @@ A stochastic multi-start variant of the insertion family \cite{rosenkrantz1977}:
 \paragraph{Simulated Annealing (SA).}
 A single-solution metaheuristic \cite{kirkpatrick1983}. Starting from a Nearest-Insertion tour, SA explores two neighbourhoods: (i) segment reversal (a 2-opt move that reorders the tour) and (ii) an in/out exchange that swaps a selected node for an unselected one, thereby also searching the selection space. A candidate move with cost change $\Delta$ is always accepted if $\Delta<0$ and otherwise accepted with the Metropolis probability $\exp(-\Delta/T)$; the temperature $T$ is cooled geometrically. SA thus escapes local optima that trap the purely greedy constructions.
 
+\paragraph{Tabu Search (TS).}
+A memory-based metaheuristic \cite{glover1986}. Starting from a Nearest-Insertion tour, at each iteration TS evaluates a sampled set of moves in the same two neighbourhoods (2-opt and in/out exchange) and applies the \emph{best} available move, even if it worsens the tour. To avoid cycling, the attribute of each applied move (the swapped edges or nodes) is stored in a \emph{tabu list} and forbidden for a fixed number of iterations (the \emph{tenure}); a forbidden move is nevertheless allowed if it yields a new global best (\emph{aspiration criterion}). Compared with Simulated Annealing, TS explores the neighbourhood more systematically and its escape from local optima is guided by memory rather than by a random acceptance rule.
+
 \FloatBarrier
 \begin{algorithm}[H]
 \small
@@ -453,6 +457,9 @@ Multi-start insertion with the next node chosen at random; local search; reprodu
 Simulated Annealing (SA) &
 Metropolis acceptance over 2-opt and in/out neighbourhoods with geometric cooling; escapes local optima. &
 \cite{kirkpatrick1983,cerny1985} \\ \hline
+Tabu Search (TS) &
+Memory-based local search over 2-opt and in/out moves; tabu list with tenure and aspiration; best non-tabu move each step. &
+\cite{glover1986} \\ \hline
 \textbf{DCIH (proposed)} &
 Deterministic cheapest-insertion selection $+$ 2-opt and in/out exchange; fully reproducible. &
 --- \\ \hline
@@ -833,7 +840,7 @@ results are reproducible across machines.
 \section{Conclusions and Future Work}
 The $k$-TSP is a selective routing problem: choosing exactly $k$ nodes (including the home city) and ordering them into a single minimum-length tour. Its difficulty stems from the coupled selection-and-ordering decisions, which make exhaustive enumeration intractable for medium and large instances and motivate heuristic and metaheuristic methods.
 
-This work implemented and compared nine methods for the $k$-TSP: a greedy cheapest-insertion heuristic, a GRASP/multi-start scheme, a genetic algorithm over the subset-and-order encoding, the classical Nearest Neighbor and Nearest, Farthest, and Random Insertion construction heuristics, a Simulated Annealing metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}, evaluated on 38 TSPLIB instances across three values of $k$ and compared against the best-known values obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}). The experiments show that the greedy cheapest-insertion baseline is the most robust method on average across the whole range of $k$, that Simulated Annealing is the best of the added methods, that the genetic algorithm matches the baseline and becomes the most frequent per-instance winner only for large $k$ (Q3), that Farthest Insertion is the weakest because selecting distant nodes conflicts with the node-selection objective, and that DCIH provides a deterministic, reproducible alternative of comparable quality throughout.
+This work implemented and compared nine methods for the $k$-TSP: a greedy cheapest-insertion heuristic, a GRASP/multi-start scheme, a genetic algorithm over the subset-and-order encoding, the classical Nearest Neighbor and Nearest, Farthest, and Random Insertion construction heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}, evaluated on 38 TSPLIB instances across three values of $k$ and compared against the best-known values obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}). The experiments show that the greedy cheapest-insertion baseline is the most robust method on average across the whole range of $k$, that Simulated Annealing is the best of the added methods, that the genetic algorithm matches the baseline and becomes the most frequent per-instance winner only for large $k$ (Q3), that Farthest Insertion is the weakest because selecting distant nodes conflicts with the node-selection objective, and that DCIH provides a deterministic, reproducible alternative of comparable quality throughout.
 
 The proposed \textbf{DCIH} heuristic is intentionally simple and \emph{fully deterministic}: it selects nodes by minimum marginal insertion cost and refines the tour with 2-opt and an in/out exchange, breaking ties by node index. This guarantees that re-running it produces identical tours, prioritizing correctness and reproducibility.
 

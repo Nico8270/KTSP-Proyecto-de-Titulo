@@ -111,6 +111,8 @@ def run_once(method_name: str, fn, D, n, k, quartile, run_id, budget_de) -> Run:
         res = fn(D, n, k, time_limit=1e9, seed=seed, max_iters=10_000, **kwargs)
     elif method_name == "SA":
         res = fn(D, n, k, time_limit=1e9, seed=seed, **kwargs)
+    elif method_name == "TS":
+        res = fn(D, n, k, time_limit=1e9, seed=seed, **kwargs)
     elif method_name == "DCIH":
         win = 0 if n <= 200 else min(n - 1, max(120, k + 20))
         res = fn(D, n, k, cand_window=win, **kwargs)
@@ -273,7 +275,7 @@ def compute_tables(all_runs, refs, method_names):
 COLORS = {
     "Greedy": "#1f77b4", "GRASP": "#ff7f0e", "GA": "#2ca02c",
     "NN": "#9467bd", "NI": "#8c564b", "FI": "#e377c2",
-    "RI": "#7f7f7f", "SA": "#bcbd22", "DCIH": "#d62728",
+    "RI": "#7f7f7f", "SA": "#bcbd22", "TS": "#17becf", "DCIH": "#d62728",
 }
 
 
