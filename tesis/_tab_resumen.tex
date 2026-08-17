@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption{Average relative GAP (\%) vs the LKH-3 BKS, per method and quartile. Lower is better. Q1: $k=\lfloor n/4\rfloor$, Q2: $k=\lfloor n/2\rfloor$, Q3: $k=\lfloor 3n/4\rfloor$. Computed over 38 TSPLIB instances.}
+\label{tab:resumen_gap}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Q1 GAP\%} & \textbf{Q2 GAP\%} & \textbf{Q3 GAP\%} \\
+\hline
+Greedy & 7.57 & 15.26 & 14.95 \\
+GRASP & 18.03 & 19.57 & 17.39 \\
+GA & 29.74 & 22.50 & 15.60 \\
+NN & 22.38 & 20.04 & 15.56 \\
+NI & 20.47 & 21.74 & 21.66 \\
+FI & 98.23 & 55.67 & 31.63 \\
+RI & 48.74 & 28.18 & 16.11 \\
+SA & 15.72 & 17.81 & 17.89 \\
+TS & 9.36 & 13.63 & 14.48 \\
+\textbf{DCIH} & 19.83 & 23.19 & 20.36 \\
+\hline
+\end{tabular}
+\end{table}
