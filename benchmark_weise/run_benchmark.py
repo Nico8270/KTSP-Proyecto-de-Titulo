@@ -334,8 +334,10 @@ def _fig_progress_aggregated(all_runs, refs, method_names):
     plt.xlabel("Scaled DE  (distance evaluations / $n^2$)")
     plt.ylabel("Median error F  (%)   [F = len/ref - 1]")
     plt.title("Anytime progress curves (aggregated over instances and quartiles)")
-    plt.grid(True, which="both", ls=":", alpha=0.5); plt.legend(ncol=2, fontsize=11)
-    plt.tight_layout(); plt.savefig(FIGDIR / "01_progreso_agregado.png", dpi=200)
+    plt.grid(True, which="both", ls=":", alpha=0.5)
+    plt.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), fontsize=10,
+               framealpha=0.95, borderaxespad=0.0)
+    plt.savefig(FIGDIR / "01_progreso_agregado.png", dpi=200, bbox_inches="tight")
     plt.close()
 
 
@@ -423,8 +425,9 @@ def _fig_ert_vs_goal(all_runs, refs, method_names):
     plt.ylabel("Median ERT (DE / $n^2$)")
     plt.title("Estimated Running Time (ERT) to reach the target error")
     plt.grid(True, which="both", ls=":", alpha=0.5)
-    plt.legend(loc="center left", ncol=2, fontsize=11)
-    plt.tight_layout(); plt.savefig(FIGDIR / "03_ert_vs_meta.png", dpi=200)
+    plt.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), fontsize=10,
+               framealpha=0.95, borderaxespad=0.0)
+    plt.savefig(FIGDIR / "03_ert_vs_meta.png", dpi=200, bbox_inches="tight")
     plt.close()
 
 
