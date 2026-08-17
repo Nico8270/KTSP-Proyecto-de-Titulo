@@ -133,7 +133,7 @@ This problem belongs to the NP-hard class: choosing a subset of $k$ nodes among 
 The $k$-TSP also sits within the broader family of \emph{TSP with profits} and selective routing problems \cite{feillet2005profits}. In particular, it is the unit-prize special case of the Quota TSP, itself a variant of the Prize-Collecting TSP introduced by Balas \cite{balas1989pctsp}: when every node carries a unit prize and the quota equals $k$, collecting the quota is exactly visiting $k$ nodes \cite{bienstock1993pctsp}. A recent systematic survey of TSP variants places these selective problems in a common definitional framework \cite{tspt3co2025}.
 
 \vspace{2pt}
-Beyond the selective-routing framing, a large body of work targets the classical TSP itself. Exact methods based on integer programming and dynamic programming solve it optimally but scale poorly with $n$~\cite{dantzig1954,bellman1962,heldkarp1962,karp1972}, which motivated decades of research on construction heuristics and local search~\cite{lin1965,christofides1976,bentley1992,johnson1997,laporte1992}. Representative metaheuristic families include tabu search~\cite{glover1986,gloverlaguna1997}, simulated annealing~\cite{cerny1985}, ant colony optimization~\cite{dorigo1997acs}, variable neighborhood search~\cite{mladenovic1997vns} and iterated local search based on large-step Markov chains~\cite{martin1991}, as well as evolutionary approaches designed specifically for the TSP~\cite{potvin1996}; broad overviews and design principles are given in~\cite{blumroli2003,talbi2009}. Comprehensive treatments of the TSP and its variants~\cite{gutin2007book}, near-optimal exact solvers~\cite{applegate2006concorde} and polynomial-time approximation schemes for the Euclidean case~\cite{arora1998} complete this landscape, within which node-selection variants such as the multiple TSP~\cite{bektas2006} and the $k$-TSP naturally arise.
+Beyond the selective-routing framing, a large body of work targets the classical TSP itself. Exact methods based on integer programming and dynamic programming solve it optimally but scale poorly with $n$~\cite{dantzig1954,bellman1962,heldkarp1962,karp1972}, which motivated decades of research on construction heuristics and local search~\cite{lin1965,christofides1976,bentley1992,johnson1997,laporte1992}. Representative metaheuristic families include tabu search~\cite{glover1986,gloverlaguna1997,knox1994}, simulated annealing~\cite{cerny1985}, ant colony optimization~\cite{dorigo1997acs}, variable neighborhood search~\cite{mladenovic1997vns} and iterated local search based on large-step Markov chains~\cite{martin1991}, as well as evolutionary approaches designed specifically for the TSP~\cite{potvin1996}; broad overviews and design principles are given in~\cite{blumroli2003,talbi2009}. Comprehensive treatments of the TSP and its variants~\cite{gutin2007book}, near-optimal exact solvers~\cite{applegate2006concorde} and polynomial-time approximation schemes for the Euclidean case~\cite{arora1998} complete this landscape, within which node-selection variants such as the multiple TSP~\cite{bektas2006} and the $k$-TSP naturally arise.
 
 \vspace{2pt}
 The main \textbf{motivation} for studying the $k$-TSP lies in applications where only a subset of locations must be served under a budget on the number of stops: selective sampling, prize-collecting routing, surveillance with limited visits, and resource-constrained logistics \cite{vansteenwegen2011top,blanchard2023}. Solving it efficiently reduces cost and improves resource utilization.
@@ -384,7 +384,7 @@ A stochastic multi-start variant of the insertion family \cite{rosenkrantz1977}:
 A single-solution metaheuristic \cite{kirkpatrick1983}. Starting from a Nearest-Insertion tour, SA explores two neighbourhoods: (i) segment reversal (a 2-opt move that reorders the tour) and (ii) an in/out exchange that swaps a selected node for an unselected one, thereby also searching the selection space. A candidate move with cost change $\Delta$ is always accepted if $\Delta<0$ and otherwise accepted with the Metropolis probability $\exp(-\Delta/T)$; the temperature $T$ is cooled geometrically. SA thus escapes local optima that trap the purely greedy constructions.
 
 \paragraph{Tabu Search (TS).}
-A memory-based metaheuristic \cite{glover1986,gloverlaguna1997}. Starting from a Nearest-Insertion tour, at each iteration TS evaluates a sampled set of moves in the same two neighbourhoods (2-opt and in/out exchange) and applies the \emph{best} available move, even if it worsens the tour. To avoid cycling, the attribute of each applied move (the swapped edges or nodes) is stored in a \emph{tabu list} and forbidden for a fixed number of iterations (the \emph{tenure}); a forbidden move is nevertheless allowed if it yields a new global best (\emph{aspiration criterion}). Compared with Simulated Annealing, TS explores the neighbourhood more systematically and its escape from local optima is guided by memory rather than by a random acceptance rule.
+A memory-based metaheuristic \cite{glover1986,gloverlaguna1997,knox1994}. Starting from a Nearest-Insertion tour, at each iteration TS evaluates a sampled set of moves in the same two neighbourhoods (2-opt and in/out exchange) and applies the \emph{best} available move, even if it worsens the tour. To avoid cycling, the attribute of each applied move (the swapped edges or nodes) is stored in a \emph{tabu list} and forbidden for a fixed number of iterations (the \emph{tenure}); a forbidden move is nevertheless allowed if it yields a new global best (\emph{aspiration criterion}). Compared with Simulated Annealing, TS explores the neighbourhood more systematically and its escape from local optima is guided by memory rather than by a random acceptance rule.
 
 \FloatBarrier
 \begin{algorithm}[H]
@@ -459,7 +459,7 @@ Metropolis acceptance over 2-opt and in/out neighbourhoods with geometric coolin
 \cite{kirkpatrick1983,cerny1985} \\ \hline
 Tabu Search (TS) &
 Memory-based local search over 2-opt and in/out moves; tabu list with tenure and aspiration; best non-tabu move each step. &
-\cite{glover1986,gloverlaguna1997} \\ \hline
+\cite{glover1986,gloverlaguna1997,knox1994} \\ \hline
 \textbf{DCIH (proposed)} &
 Deterministic cheapest-insertion selection $+$ 2-opt and in/out exchange; fully reproducible. &
 --- \\ \hline
@@ -1042,6 +1042,10 @@ New York: Springer, 2007.
 \bibitem{gloverlaguna1997} F. Glover and M. Laguna,
 \textit{Tabu Search}.
 Boston, MA: Kluwer Academic Publishers, 1997.
+
+\bibitem{knox1994} J. Knox,
+``Tabu search performance on the symmetric traveling salesman problem,
+\textit{Computers \& Operations Research}, vol. 21, no. 8, pp. 867--876, 1994.
 
 \bibitem{bektas2006} T. Bekta\c{s},
 ``The multiple traveling salesman problem: An overview of formulations and solution procedures,''
