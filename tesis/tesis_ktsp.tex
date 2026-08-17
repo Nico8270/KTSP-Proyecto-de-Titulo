@@ -159,6 +159,15 @@ TSPLIB.
 \tableofcontents
 \clearpage
 
+% ======================= LIST OF FIGURES / TABLES =======================
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\clearpage
+
 % ============================================================================
 %  CHAPTER 1 — CONTEXT AND OBJECTIVES
 % ============================================================================
@@ -314,8 +323,36 @@ part of the tour. Distances are Euclidean or, more generally, follow the
 modeled with (i)~the selection of exactly $k$ nodes including the depot,
 (ii)~degree constraints that force a single closed tour over the selected subset,
 and (iii)~subtour-elimination constraints. The objective is the total tour length
-(SUM), to be minimized. The genotype--phenotype relationship of this encoding is
-illustrated in Figure~\ref{fig:genotipo}.
+(SUM), to be minimized.
+
+Formally, let $V=\{0,1,\dots,n-1\}$ be the set of nodes, with $0$ the depot, and
+let $d_{ij}\ge 0$ be the distance between $i$ and $j$. We use binary variables
+$x_{ij}=1$ if the tour traverses the arc $(i,j)$ and $y_i=1$ if node $i$ is
+selected, together with continuous Miller--Tucker--Zemlin (MTZ) ordering variables
+$u_i$~\cite{miller1960mtz}. The $k$-TSP can then be written as
+\begin{align}
+\min\quad & \sum_{i\in V}\sum_{j\in V,\,j\neq i} d_{ij}\,x_{ij} \label{eq:obj}\\
+\text{s.t.}\quad
+& y_0 = 1, \label{eq:depot}\\
+& \sum_{i\in V} y_i = k, \label{eq:select}\\
+& \sum_{j\neq i} x_{ij} = y_i, \qquad \forall i\in V, \label{eq:out}\\
+& \sum_{j\neq i} x_{ji} = y_i, \qquad \forall i\in V, \label{eq:in}\\
+& u_i - u_j + k\,x_{ij} \le k-1, \quad \forall i,j\in V\setminus\{0\},\, i\neq j, \label{eq:mtz}\\
+& x_{ij}\in\{0,1\},\ y_i\in\{0,1\},\ u_i\in\mathbb{R}. \label{eq:dom}
+\end{align}
+The objective~\eqref{eq:obj} minimizes the total tour length. Constraint
+\eqref{eq:depot} forces the depot into the tour and \eqref{eq:select} fixes the
+number of visited nodes to exactly $k$. The degree
+constraints~\eqref{eq:out}--\eqref{eq:in} state that a node has exactly one
+outgoing and one incoming arc if and only if it is selected, so that the arcs form
+a single closed tour over the chosen subset. The MTZ
+inequalities~\eqref{eq:mtz} eliminate subtours among the non-depot nodes. This
+formulation makes explicit the two coupled decisions of the $k$-TSP --- the
+selection encoded by $y$ and the ordering encoded by $x$ --- and is used here only
+to define the problem precisely; the solution methods of Section~\ref{sec:methods}
+operate directly on the tour-based encoding rather than on this integer program.
+The genotype--phenotype relationship of that encoding is illustrated in
+Figure~\ref{fig:genotipo}.
 
 \begin{figure}[t]
 \centering
@@ -415,6 +452,20 @@ stochastic method (Greedy, GRASP, GA, RI, SA, TS) is run $10$ times per instance
 and quartile; the deterministic methods (NN, NI, FI, DCIH) are run once. All
 methods share a budget of $15\,n^2$ distance evaluations.
 
+\subsection{Experimental Environment and Reproducibility}
+All experiments were developed and executed locally in Visual Studio Code, with
+the full implementation versioned in a private GitHub repository so that every
+experiment corresponds to a tracked commit. The code is written in Python~3.10
+with \texttt{numpy}, \texttt{pandas} and \texttt{matplotlib}; the official LKH-3
+binary is compiled and run locally to obtain the reference (BKS) values. The ten
+methods are implemented over a shared core of vectorized primitives, and the whole
+pipeline --- instance loading, execution of the methods, computation of the
+relative GAP, and generation of every table and figure --- is automated so that
+the results can be regenerated with a single command. Because the primary runtime
+measure is the \emph{machine-independent} number of distance evaluations, the
+reported comparison does not depend on the specific hardware, which is a key
+requirement of the anytime methodology and further supports replication.
+
 \section{Results}
 Table~\ref{tab:resumen_gap} summarizes the average relative GAP per method and
 quartile. Tables~\ref{tab:resultados_Q1}--\ref{tab:resultados_Q3} report the
@@ -434,6 +485,21 @@ Insertion is clearly the weakest for the $k$-TSP: repeatedly inserting the node
 rewards choosing nodes that are cheap to include. DCIH remains a deterministic,
 reproducible alternative of quality comparable to GRASP and the insertion
 heuristics.
+
+The value of $k$ has a clear effect on the relative performance of the methods.
+For small $k$ (Q1), where the selection decision dominates, the greedy
+cheapest-insertion baseline and Tabu Search are the strongest, because choosing a
+few cheap-to-include nodes and refining them locally is highly effective, whereas
+the genetic algorithm --- which spends part of its budget exploring subsets --- is
+comparatively weak. As $k$ grows (Q2 and especially Q3), the selection problem
+becomes less binding (a larger fraction of the nodes must be visited) and the
+problem approaches an ordinary TSP over the selected subset; there the genetic
+algorithm and the other trajectory-based metaheuristics close the gap and the GA
+becomes the most frequent per-instance winner. This behaviour, visible both in
+Table~\ref{tab:resumen_gap} and in the per-instance
+Tables~\ref{tab:resultados_Q1}--\ref{tab:resultados_Q3}, is consistent with the
+intuition that the difficulty of the $k$-TSP shifts from \emph{selection} to
+\emph{ordering} as $k$ increases.
 
 \input{_tab_q1.tex}
 \input{_tab_q2.tex}

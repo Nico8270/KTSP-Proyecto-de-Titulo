@@ -389,8 +389,10 @@ def _fig_ecdf_aggregated(all_runs, refs, method_names, F_t=0.20):
     plt.ylabel(f"Fraction of runs with F <= {int(F_t*100)}%")
     plt.title("Aggregated ECDF — probability of reaching the target error vs time")
     plt.ylim(-0.02, 1.02); plt.grid(True, which="both", ls=":", alpha=0.5)
-    plt.legend(ncol=2, fontsize=11)
-    plt.tight_layout(); plt.savefig(FIGDIR / "02_ecdf_agregado.png", dpi=200)
+    # leyenda FUERA del area del grafico (a la derecha) para no tapar las curvas
+    plt.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), fontsize=10,
+               framealpha=0.95, borderaxespad=0.0)
+    plt.savefig(FIGDIR / "02_ecdf_agregado.png", dpi=200, bbox_inches="tight")
     plt.close()
 
 def _fig_ert_vs_goal(all_runs, refs, method_names):
