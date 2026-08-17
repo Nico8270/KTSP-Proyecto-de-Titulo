@@ -3,6 +3,7 @@
 
 % ---------------------- PREÁMBULO ----------------------
 \usepackage{cite}
+\usepackage{url}
 \usepackage{tikz}
 \usetikzlibrary{calc,positioning,arrows.meta}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
@@ -37,7 +38,7 @@
 % --- AJUSTES PARA EVITAR SOLAPES ---
 \usepackage{microtype}     % mejor espaciado y cortes
 \usepackage[bottom]{footmisc}
-\usepackage{stfloats}      % mejor colocación de floats
+% \usepackage{stfloats}  (removido: conflicto con dblfloatfix)
 \usepackage{dblfloatfix}   % floats a dos columnas fiables
 \usepackage{balance}
 \usepackage{etoolbox}
@@ -387,7 +388,7 @@ A single-solution metaheuristic \cite{kirkpatrick1983}. Starting from a Nearest-
 A memory-based metaheuristic \cite{glover1986,gloverlaguna1997,knox1994}. Starting from a Nearest-Insertion tour, at each iteration TS evaluates a sampled set of moves in the same two neighbourhoods (2-opt and in/out exchange) and applies the \emph{best} available move, even if it worsens the tour. To avoid cycling, the attribute of each applied move (the swapped edges or nodes) is stored in a \emph{tabu list} and forbidden for a fixed number of iterations (the \emph{tenure}); a forbidden move is nevertheless allowed if it yields a new global best (\emph{aspiration criterion}). Compared with Simulated Annealing, TS explores the neighbourhood more systematically and its escape from local optima is guided by memory rather than by a random acceptance rule.
 
 \FloatBarrier
-\begin{algorithm}[H]
+\begin{algorithm}[t]
 \small
 \DontPrintSemicolon
 \SetKwInput{KwIn}{Input}
