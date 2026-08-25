@@ -23,6 +23,8 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{lmodern}
+\usepackage{microtype}          % mejor espaciado; evita texto pegado al margen
+\sloppy                          % relaja el ajuste de línea para no desbordar
 
 \onehalfspacing
 \graphicspath{{.}{./}}
@@ -118,7 +120,7 @@ content of this document.
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-The $k$-Traveling Salesman Problem ($k$-TSP) is a variant of the classical
+The $k$-Traveling Salesman Problem ($k$-TSP) is a generalization of the classical
 Traveling Salesman Problem in which, given $n$ cities that include a home city
 (depot) and a fixed value $k$ with $1<k\le n$, one seeks a single closed tour of
 minimum total length that starts and ends at the depot and visits exactly $k$
@@ -133,10 +135,9 @@ Neighbor and the Nearest, Farthest and Random Insertion construction heuristics,
 Simulated Annealing, Tabu Search, and the proposed deterministic heuristic
 \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for
 solution quality, the best-known values (BKS) obtained by the
-Lin--Kernighan--Helsgaun solver (LKH-3) on the benchmark instances of Pandiri \&
-Singh are used. Experiments on 38 standard TSPLIB instances, across three values
+Lin--Kernighan--Helsgaun solver (LKH-3) on standard benchmark instances are used. Experiments on 38 standard TSPLIB instances, across three values
 of $k$ ($\approx n/4$, $n/2$, $3n/4$), evaluate solution quality (relative GAP)
-and, following Weise \textit{et~al.}, the \emph{anytime} behavior of the methods
+and the \emph{anytime} behavior of the methods
 through progress curves, ECDF, estimated running time (ERT) and an aggregated
 global ranking on a machine-independent time axis.
 
@@ -149,9 +150,9 @@ proposed DCIH offers a deterministic, fully reproducible alternative of
 comparable quality.
 
 \vspace{0.3cm}
-\noindent\textbf{Keywords:} $k$-TSP, greedy heuristics, GRASP, genetic algorithms,
-simulated annealing, tabu search, Lin--Kernighan--Helsgaun, anytime benchmarking,
-TSPLIB.
+\noindent\textbf{Keywords:} anytime benchmarking, genetic algorithms, GRASP,
+greedy heuristics, $k$-TSP, Lin--Kernighan--Helsgaun, simulated annealing,
+tabu search, TSPLIB.
 
 \clearpage
 
@@ -173,13 +174,13 @@ TSPLIB.
 % ============================================================================
 \chapter{Context and Objectives}
 
-\section{Context}
+\section{Context and Motivation}
 Route optimization is one of the most studied problems in operations research
 and computer science because of its direct impact on logistics, transportation,
 surveillance and resource planning. The Traveling Salesman Problem (TSP) --- the
 task of finding a minimum-length closed tour that visits every city exactly once
 --- is the canonical representative of this family and a reference benchmark for
-combinatorial optimization.
+combinatorial optimization~\cite{lawler1985,applegate2006concorde}.
 
 Many real applications, however, do not require visiting \emph{all} the available
 locations. When a fleet, a courier or a sensor must serve only a subset of the
@@ -195,8 +196,9 @@ $(k-1)!/2$ distinct tours, so exhaustive enumeration is intractable already for
 medium-sized instances.
 
 The $k$-TSP belongs to the broader family of \emph{TSP with profits} and
-selective routing problems, which includes the Orienteering Problem and the
-Prize-Collecting TSP. It models, for instance, selective sampling, prize- or
+selective routing problems~\cite{feillet2005profits}, which includes the
+Orienteering Problem~\cite{vansteenwegen2011top} and the Prize-Collecting
+TSP~\cite{balas1989pctsp}. It models, for instance, selective sampling, prize- or
 quota-collecting routing, surveillance with a limited number of visits, and
 resource-constrained logistics, where solving the problem well translates
 directly into lower cost and better resource utilization. This practical
@@ -262,6 +264,14 @@ obtain the reference values. Because the primary runtime measure is the
 \emph{machine-independent} number of distance evaluations, the comparison does not
 depend on the specific hardware, which further supports replication.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.98\textwidth]{metodologia.png}
+\caption{Work methodology: the four stages of the study, from data design to the
+experimental (anytime) evaluation.}
+\label{fig:metodologia}
+\end{figure}
+
 \section{Conference Submission}\label{sec:congress}
 The core results of this thesis were written up as a scientific paper
 (reproduced in Chapter~\ref{chap:study}) and \textbf{submitted to Optima~2025},
@@ -270,6 +280,18 @@ the congress hosted by Universidad Católica del Norte (Chile), on
 review} (submitted). The paper condenses the mathematical model, the ten solution
 techniques and the experimental comparison into the format required by the venue,
 and constitutes the core scientific contribution of this work.
+
+\section{Structure of the Document}
+The remainder of this thesis is organized as follows. \textbf{Chapter~1} (this
+chapter) presented the context, the general and specific objectives, the work
+methodology and the dissemination of the results. \textbf{Chapter~2} contains the
+core of the work --- the paper reproduced as a chapter ---: the problem statement
+and related work, the data representation and the mathematical model of the
+$k$-TSP, the ten solution techniques, the experimental design based on TSPLIB
+instances and the LKH-3 reference, the results (end-of-run and \emph{anytime}
+evaluation) and the analysis of the generated tours. Finally, \textbf{Chapter~3}
+draws the conclusions, summarizes the contributions and outlines future work. The
+bibliography closes the document.
 
 \clearpage
 
@@ -318,7 +340,10 @@ the benchmark instances of Pandiri \& Singh~\cite{pandiri2020}.
 \section{Data Representation and Mathematical Model}
 A \emph{tour-based} encoding is used: each solution is a single circular sequence
 of exactly $k$ nodes that includes the depot; the remaining $n-k$ nodes are not
-part of the tour. Distances are Euclidean or, more generally, follow the
+part of the tour. Concretely, the implementation represents a tour as a Python
+\texttt{list} of node indices and the distance matrix as a \texttt{numpy} array,
+which allows the local-search primitives (2-opt and the in/out exchange) to be
+vectorized for efficiency. Distances are Euclidean or, more generally, follow the
 \texttt{EDGE\_WEIGHT\_TYPE} declared by each TSPLIB instance. The $k$-TSP is
 modeled with (i)~the selection of exactly $k$ nodes including the depot,
 (ii)~degree constraints that force a single closed tour over the selected subset,
@@ -431,11 +456,45 @@ $T \leftarrow \textbf{TwoOptCycle}(T,d)$\;
 \Return{$T$}\;
 \end{algorithm}
 
+Table~\ref{tab:metodos} summarizes the ten methods and highlights their main
+differences: the family they belong to, whether they are deterministic, and the
+core idea of each.
+
+\begin{table}[h]
+\centering
+\caption{The ten solution techniques compared, and their main differences. LKH-3
+is the source of the reference values (BKS) and is not among the methods run.}
+\label{tab:metodos}
+{\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Method} & \textbf{Family} & \textbf{Deterministic} & \textbf{Core idea} \\
+\midrule
+Greedy & Construction & No (seed) & cheapest insertion + restarts \\
+GRASP & Metaheuristic & No & randomized greedy + local search \\
+GA & Metaheuristic & No & evolves subset $+$ order \\
+NN & Construction & Yes & go to the nearest unvisited node \\
+NI & Construction & Yes & insert the node nearest the tour \\
+FI & Construction & Yes & insert the node farthest from the tour \\
+RI & Construction & No & insert a random node (multi-start) \\
+SA & Metaheuristic & No & Metropolis acceptance $+$ cooling \\
+TS & Metaheuristic & No & best non-tabu move $+$ memory \\
+\textbf{DCIH} & Construction (proposed) & Yes & deterministic cheapest insertion $+$ refinement \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
 \section{Benchmarks and Evaluation}
 Experiments use 38 standard TSPLIB instances and follow the $k$-TSP benchmark of
-Pandiri \& Singh~\cite{pandiri2020}, which defines three values of $k$ per
-instance: \textbf{Q1} ($k=\lfloor n/4\rfloor$), \textbf{Q2} ($k=\lfloor n/2\rfloor$)
-and \textbf{Q3} ($k=\lfloor 3n/4\rfloor$). Each result is compared against the
+Pandiri \& Singh~\cite{pandiri2020}. To study how the number of visited nodes
+affects the methods, each instance is evaluated at \emph{three values of $k$},
+expressed as quartiles of the instance size $n$: \textbf{Q1} with
+$k=\lfloor n/4\rfloor$ (visit about a quarter of the cities, where the
+\emph{selection} decision dominates), \textbf{Q2} with $k=\lfloor n/2\rfloor$
+(visit about half), and \textbf{Q3} with $k=\lfloor 3n/4\rfloor$ (visit about three
+quarters, where the problem approaches an ordinary TSP over the selected subset).
+Thus every instance contributes three test cases and the 38 instances yield 114
+(instance, $k$) pairs in total. Each result is compared against the
 best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} for the corresponding
 quartile, and the relative GAP is computed as
 $\mathrm{GAP}\%=100\,(\text{length}-\text{BKS})/\text{BKS}$.
@@ -452,7 +511,7 @@ stochastic method (Greedy, GRASP, GA, RI, SA, TS) is run $10$ times per instance
 and quartile; the deterministic methods (NN, NI, FI, DCIH) are run once. All
 methods share a budget of $15\,n^2$ distance evaluations.
 
-\subsection{Experimental Environment and Reproducibility}
+\subsection*{Experimental Environment and Reproducibility}
 All experiments were developed and executed locally in Visual Studio Code, with
 the full implementation versioned in a private GitHub repository so that every
 experiment corresponds to a tracked commit. The code is written in Python~3.10
@@ -465,6 +524,22 @@ the results can be regenerated with a single command. Because the primary runtim
 measure is the \emph{machine-independent} number of distance evaluations, the
 reported comparison does not depend on the specific hardware, which is a key
 requirement of the anytime methodology and further supports replication.
+
+\paragraph{Repository structure.}
+The repository is organized as follows: \texttt{ktsp\_core.py} contains the ten
+methods and the shared local-search primitives; \texttt{instances.py} loads the
+TSPLIB (or synthetic) instances and the LKH-3 reference values; \texttt{metrics.py}
+implements the anytime metrics (progress, ERT, ECDF, ranking);
+\texttt{run\_benchmark.py} runs the full experiment and regenerates the figures and
+tables; and \texttt{ktsp\_experimento.py} produces the per-instance comparison. A
+Jupyter notebook reproduces the LKH-3 reference computation.
+
+\paragraph{Parameters.}
+For a fair comparison, the parameters of the metaheuristics (tabu tenure, cooling
+schedule, population size, time budgets) were kept fixed across all instances
+rather than tuned per case. This is a deliberate limitation: instance-specific
+tuning would likely improve the results of the metaheuristics and is left as future
+work (Section~\ref{sec:future} in Chapter~3).
 
 \section{Results}
 Table~\ref{tab:resumen_gap} summarizes the average relative GAP per method and
@@ -612,7 +687,7 @@ local-search core, enabling a fair comparison; (iii)~the proposed deterministic
 DCIH heuristic; and (iv)~an anytime, machine-independent evaluation of the methods
 against the LKH-3 reference.
 
-\section{Future Work}
+\section{Future Work}\label{sec:future}
 Several directions remain open. First, more powerful metaheuristics --- such as
 ant colony optimization~\cite{dorigo1997acs}, variable neighborhood
 search~\cite{mladenovic1997vns} or hybrid (memetic) schemes combining Tabu Search

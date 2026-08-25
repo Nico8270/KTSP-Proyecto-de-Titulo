@@ -107,22 +107,23 @@ rlinfati@ubiobio.cl}
 \maketitle
 
 \begin{abstract}
-The $k$-Traveling Salesman Problem ($k$-TSP) is a variation of the classical Traveling Salesman Problem (TSP). Given a set of $n$ cities that includes a home city (depot) and a fixed value $k$ with $1 < k \le n$, the $k$-TSP seeks a single tour of minimum total length that starts and ends at the home city and visits \emph{exactly} $k$ cities (the home city included), chosen from the $n$ available. Solving it therefore involves two coupled decisions: \emph{which} $k$ cities to visit and in \emph{which order}.
+The $k$-Traveling Salesman Problem ($k$-TSP) is a generalization of the classical Traveling Salesman Problem (TSP). Given a set of $n$ cities that includes a home city (depot) and a fixed value $k$ with $1 < k \le n$, the $k$-TSP seeks a single tour of minimum total length that starts and ends at the home city and visits \emph{exactly} $k$ cities (the home city included), chosen from the $n$ available. Solving it therefore involves two coupled decisions: \emph{which} $k$ cities to visit and in \emph{which order}.
 
-This work presents a repository and an experimental implementation of several optimization techniques for the $k$-TSP, including a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion construction heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for solution quality we use the best-known values (BKS) obtained by the Lin--Kernighan--Helsgaun solver (LKH-3) on the $k$-TSP benchmark instances introduced by Pandiri \& Singh.
+This work presents a repository and an experimental implementation of several optimization techniques for the $k$-TSP, including a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion construction heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for solution quality we use the best-known values (BKS) obtained by the Lin--Kernighan--Helsgaun solver (LKH-3) on standard $k$-TSP benchmark instances.
 
 We describe the data representation, the mathematical model, and an experimental design based on TSPLIB instances. Experiments on 38 TSPLIB instances, across three values of $k$ (about $n/4$, $n/2$, and $3n/4$), compare ten methods against the LKH-3 best-known values: the greedy cheapest-insertion heuristic and Tabu Search are the most robust on average across all three values of $k$ (Tabu Search being the best of the metaheuristics), Simulated Annealing follows, the genetic algorithm becomes the most frequent per-instance winner when $k$ is large, Farthest Insertion is the weakest for the $k$-TSP, and DCIH offers a deterministic, reproducible alternative of comparable quality throughout.
 \end{abstract}
 
 \begin{IEEEkeywords}
-$k$-TSP, node selection, combinatorial optimization,
-greedy heuristics, GRASP, genetic algorithms, Lin--Kernighan--Helsgaun, TSPLIB.
+combinatorial optimization, genetic algorithms, GRASP, greedy heuristics,
+$k$-TSP, Lin--Kernighan--Helsgaun, node selection, simulated annealing,
+tabu search, TSPLIB.
 \end{IEEEkeywords}
 
 % ===================== 1. INTRODUCCIÓN =====================
 \section{Introduction}
 
-The \textbf{$k$-TSP} is a variation of the classical \textit{Traveling Salesman Problem} (TSP) and has been studied in the combinatorial optimization literature \cite{venkatesh2018,pandiri2020,ene2017,blanchard2023}. Unlike the standard TSP, in which a single salesman must visit \emph{all} the cities, in the $k$-TSP the salesman visits only a \emph{subset} of exactly $k$ cities (including a fixed home city) and the remaining $n-k$ cities are left unvisited. The objective is to minimize the total length of the single resulting tour.
+The \textbf{$k$-TSP} is a generalization of the classical \textit{Traveling Salesman Problem} (TSP) and has been studied in the combinatorial optimization literature \cite{venkatesh2018,pandiri2020,ene2017,blanchard2023}. Unlike the standard TSP, in which a single salesman must visit \emph{all} the cities, in the $k$-TSP the salesman visits only a \emph{subset} of exactly $k$ cities (including a fixed home city) and the remaining $n-k$ cities are left unvisited. The objective is to minimize the total length of the single resulting tour.
 
 \vspace{2pt}
 Formally, given $n$ cities with a designated home city (depot) and a fixed value $k$ with $1 < k \le n$, a feasible solution is obtained by first \emph{selecting} which $k$ cities to include (the home city among them) and then determining a \emph{circular ordering} of those $k$ cities \cite{venkatesh2018}. This dual (selection $+$ ordering) nature is what distinguishes the $k$-TSP from the standard TSP and is the source of its combinatorial difficulty.
