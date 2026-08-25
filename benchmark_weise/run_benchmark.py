@@ -277,6 +277,14 @@ COLORS = {
     "NN": "#9467bd", "NI": "#8c564b", "FI": "#e377c2",
     "RI": "#7f7f7f", "SA": "#bcbd22", "TS": "#17becf", "DCIH": "#d62728",
 }
+# Estilo de linea + marcador por metodo, para distinguirlos tambien en BLANCO Y NEGRO
+STYLES = {
+    "Greedy": ("-", "o"), "GRASP": ("--", "s"), "GA": ("-.", "^"),
+    "NN": (":", "D"), "NI": ("-", "v"), "FI": ("--", "P"),
+    "RI": ("-.", "X"), "SA": (":", "*"), "TS": ("-", "p"), "DCIH": ("--", "h"),
+}
+def _ls(m):  return STYLES.get(m, ("-", "o"))[0]
+def _mk(m):  return STYLES.get(m, ("-", "o"))[1]
 
 
 def make_all_figures(all_runs, refs, method_names):
@@ -329,7 +337,8 @@ def _fig_progress_aggregated(all_runs, refs, method_names):
         if not series:
             continue
         med = np.nanmedian(np.vstack(series), axis=0)
-        plt.plot(sgrid, 100 * med, color=COLORS[m], label=m, lw=2)
+        plt.plot(sgrid, 100 * med, color=COLORS[m], label=m, lw=2,
+                 ls=_ls(m), marker=_mk(m), markevery=8, markersize=6, markerfacecolor="white")
     plt.xscale("log"); plt.yscale("log")
     plt.xlabel("Scaled DE  (distance evaluations / $n^2$)")
     plt.ylabel("Median error F  (%)   [F = len/ref - 1]")
@@ -385,7 +394,8 @@ def _fig_ecdf_aggregated(all_runs, refs, method_names, F_t=0.20):
         if not cols:
             continue
         frac = np.mean(np.vstack(cols), axis=0)
-        plt.plot(sgrid, frac, color=COLORS[m], label=m, lw=2)
+        plt.plot(sgrid, frac, color=COLORS[m], label=m, lw=2,
+                 ls=_ls(m), marker=_mk(m), markevery=8, markersize=6, markerfacecolor="white")
     plt.xscale("log")
     plt.xlabel("Scaled DE (distance evaluations / $n^2$)")
     plt.ylabel(f"Fraction of runs with F <= {int(F_t*100)}%")
@@ -416,7 +426,8 @@ def _fig_ert_vs_goal(all_runs, refs, method_names):
                 if np.isfinite(e):
                     vals.append(e / (n * n))
             ys.append(np.median(vals) if vals else np.nan)
-        plt.plot([100 * f for f in Fts], ys, "o-", color=COLORS[m], label=m, lw=2)
+        plt.plot([100 * f for f in Fts], ys, color=COLORS[m], label=m, lw=2,
+                 ls=_ls(m), marker=_mk(m), markersize=7, markerfacecolor="white")
     xt = [100 * f for f in Fts]
     plt.yscale("log")                       # eje X lineal con etiquetas claras (%)
     plt.gca().invert_xaxis()                # mas exigente hacia la derecha
