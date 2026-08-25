@@ -2,151 +2,140 @@
 **Heuristic Approaches for the k-Traveling Salesman Problem: A Reproducible Comparison**
 Autor: Nicolás Barrientos · Profesor guía: Dr. Gustavo Gatica · Universidad Andrés Bello
 
-> Diapositivas en inglés · guión hablado en español.
-> Tiempo total ≈ 15 min. El tiempo sugerido de cada diapositiva va entre paréntesis.
-> Consejo: no leas la diapositiva palabra por palabra; usa estas notas como apoyo.
+> Diapositivas en inglés · guión hablado en español. Total ≈ 15 min.
+> El tiempo sugerido de cada diapositiva va entre paréntesis. No leas la diapositiva
+> palabra por palabra; usa estas notas como apoyo. El PPT tiene 18 diapositivas.
 
 ---
 
-## Diapositiva 1 — Portada (0:20)
-"Buenos días. Mi nombre es Nicolás Barrientos y presentaré mi proyecto de título,
-titulado *Heuristic Approaches for the k-Traveling Salesman Problem: a Reproducible
-Comparison*, desarrollado bajo la guía del Dr. Gustavo Gatica. El trabajo, además,
-fue enviado como paper al congreso Optima 2025."
+## 1 — Portada (0:20)
+"Buenos días. Soy Nicolás Barrientos y presento mi proyecto de título,
+*Heuristic Approaches for the k-Traveling Salesman Problem: a Reproducible
+Comparison*, guiado por el Dr. Gustavo Gatica. El trabajo fue enviado como paper al
+congreso Optima 2025."
 
-## Diapositiva 2 — Contexto y motivación (1:00)
-"La optimización de rutas está en todas partes: logística, transporte, vigilancia,
-planificación de recursos. El modelo clásico es el *Traveling Salesman Problem*, que
-busca la ruta cerrada más corta que visita todas las ciudades.
-Pero en muchos casos reales no se visitan **todas** las ubicaciones, sino solo un
-**subconjunto**, por un presupuesto de paradas. Ese es el **k-TSP**: elegir k de n
-ciudades —incluyendo un depósito— y ordenarlas en un único recorrido cerrado de
-longitud mínima. Aparece en muestreo selectivo, ruteo con recompensas, vigilancia
-con visitas limitadas y logística con recursos acotados."
+## 2 — Contexto y motivación (0:55)
+"La optimización de rutas está en todas partes: logística, transporte, vigilancia.
+El modelo clásico es el TSP, que busca la ruta cerrada más corta que visita todas
+las ciudades. Pero muchos casos reales visitan solo un **subconjunto** de
+ubicaciones, por un presupuesto de paradas. Ese es el **k-TSP**: elegir k de n
+ciudades —con un depósito— y ordenarlas en un recorrido cerrado mínimo."
 
-## Diapositiva 3 — Objetivos (1:00)
-"El **objetivo general** fue desarrollar un repositorio reproducible que modela,
-resuelve y compara instancias del k-TSP, evaluando heurísticas y metaheurísticas
-contra los valores de referencia de LKH-3.
-Como **objetivos específicos**: formular el problema matemáticamente; implementar
-**diez** técnicas; evaluar la calidad con el GAP relativo sobre 38 instancias TSPLIB
-y tres valores de k; complementar con un análisis *anytime*; y liberar todo de forma
-que cada tabla y figura se regenere con un solo comando."
+## 3 — Objetivos (0:50)
+"El objetivo general: un repositorio reproducible que modela, resuelve y compara el
+k-TSP contra la referencia LKH-3. Como específicos: formular el problema; implementar
+**diez** métodos; evaluar la calidad con el GAP sobre 38 instancias y tres valores
+de k; complementar con análisis anytime; y liberar todo para regenerarlo con un
+comando."
 
-## Diapositiva 4 — Metodología de trabajo (1:00)
-"El trabajo se organizó en cuatro etapas: (a) diseño de datos, con estructuras
-uniformes para instancias reales y sintéticas; (b) el modelo matemático; (c) la
-resolución heurística, con los diez métodos sobre un **núcleo común** de primitivas
-—2-opt, intercambio dentro/fuera e inserción más barata—, lo que hace la comparación
-justa; y (d) la evaluación experimental.
-Todo en Python, versionado en un repositorio privado de GitHub, usando Visual Studio
-Code, y con el binario oficial de LKH-3 compilado localmente. Como medida de tiempo
-usamos las **evaluaciones de distancia**, independiente de la máquina."
+## 4 — Metodología de trabajo (0:55)
+"Cuatro etapas: diseño de datos, modelo matemático, resolución heurística —con los
+diez métodos sobre un núcleo común de 2-opt, intercambio e inserción, lo que hace la
+comparación justa— y evaluación experimental. Todo en Python, en VS Code, versionado
+en un GitHub privado, con LKH-3 local; el tiempo se mide en evaluaciones de
+distancia, independiente de la máquina."
 
-## Diapositiva 5 — Asistencia a evento: Optima 2025 (0:30)
-"El núcleo de la tesis se escribió como un paper científico y se **envió a Optima
-2025**, congreso organizado por la Universidad Católica del Norte, el 30 de noviembre
-de 2025. Actualmente está en revisión. Ese paper es la contribución central del
-trabajo y se incluye como capítulo de la tesis."
+## 5 — Asistencia a evento: Optima 2025 (0:25)
+"El núcleo se escribió como paper y se **envió a Optima 2025**, en la Universidad
+Católica del Norte, el 30 de noviembre de 2025; está en revisión. Es la contribución
+central y se incluye como capítulo de la tesis."
 
-## Diapositiva 6 — El problema de investigación (1:15)
-"Formalmente: dadas n ciudades con un depósito y un k fijo, buscamos un recorrido
-cerrado de longitud mínima que visite exactamente k ciudades. La dificultad está en
-que hay **dos decisiones acopladas**: *cuáles* k nodos visitar y *en qué orden*.
-El número de subconjuntos posibles crece de forma combinatoria —C(n-1, k-1), cada
-uno con (k-1)!/2 recorridos— así que la enumeración exhaustiva es inviable y se
-necesitan heurísticas.
-A la derecha ven la representación que usamos: un *genotipo* —subconjunto más orden—
-que se decodifica en un único recorrido cerrado, el *fenotipo*. Como referencia
-cercana al óptimo usamos los valores BKS de LKH-3 sobre el benchmark de Pandiri y
-Singh."
+## 6 — El problema de investigación (1:00)
+"Formalmente: dadas n ciudades con depósito y un k fijo, buscar el recorrido cerrado
+más corto que visita exactamente k ciudades. La dificultad está en **dos decisiones
+acopladas**: *cuáles* k nodos y *en qué orden*. El número de combinaciones crece
+combinatorialmente, así que se necesitan heurísticas. A la derecha, la representación
+genotipo–fenotipo: subconjunto más orden que se decodifica en un recorrido."
 
-## Diapositiva 7 — Tabla de referencia: GAP promedio (1:15)
-"Esta tabla resume el resultado central: el **GAP promedio** de cada método frente a
-LKH-3, para los tres valores de k, sobre las 38 instancias. Recuerden: menor es
-mejor.
-Lo más importante: **Greedy** y **Tabu Search** logran el menor GAP promedio —del
-orden del 12–13%—. El algoritmo genético mejora cuando k es grande (Q3). Y
-**Farthest Insertion** es claramente el peor, con GAPs enormes, porque insertar los
-nodos más lejanos choca con el objetivo de seleccionar nodos baratos de incluir."
+## 7 — Modelo matemático (0:45)  [NUEVA]
+"Este es el modelo formal. Las variables: x indica si un arco está en el tour, y si un
+nodo se selecciona, y u son las variables de orden de Miller–Tucker–Zemlin. La función
+objetivo minimiza la longitud total. Las restricciones fuerzan que el depósito esté,
+que se visiten exactamente k nodos, el grado de cada nodo, y las MTZ eliminan
+subtours. Deja explícitas las dos decisiones: selección (y) y orden (x)."
 
-## Diapositiva 8 — Heurísticas (1/3): construcción (1:15)
-"Los métodos de **construcción**. El **Greedy** inserta el nodo de menor costo
-marginal hasta llegar a k y refina con 2-opt. **Nearest Neighbor** avanza siempre al
-nodo más cercano. **Nearest y Farthest Insertion** insertan el nodo más cercano o más
-lejano al recorrido, en su mejor posición. Y **Random Insertion** elige el siguiente
-nodo al azar, con múltiples arranques.
-Todos comparten el mismo núcleo de búsqueda local, así que la comparación es justa."
+## 8 — Instancias y cuartiles (0:40)  [NUEVA]
+"Usamos 38 instancias TSPLIB, con n de 48 a 442 ciudades. Cada instancia se prueba en
+**tres valores de k**, como cuartiles de su tamaño: Q1 visita un cuarto —ahí manda la
+selección—, Q2 la mitad, y Q3 tres cuartos —ahí se parece a un TSP normal—. Así son
+38 × 3 = 114 casos de prueba, todos comparados contra LKH-3."
 
-## Diapositiva 9 — Heurísticas (2/3): metaheurísticas (1:15)
-"Las **metaheurísticas**. **GRASP** combina construcción aleatorizada con búsqueda
-local y muchos reinicios. El **algoritmo genético** codifica subconjunto y orden, con
-torneo, cruzamiento consciente del subconjunto, mutación y elitismo. **Simulated
-Annealing** acepta empeoramientos con probabilidad exp(-Δ/T), enfriando la
-temperatura, para escapar de óptimos locales. Y **Tabu Search** es una búsqueda con
-**memoria**: toma el mejor movimiento no prohibido, guarda los movimientos recientes
-en una lista tabú, y permite excepciones si mejora el mejor global. Tabu Search
-resultó ser la mejor de las metaheurísticas."
+## 9 — Tabla de referencia: GAP promedio (1:00)
+"Esta tabla resume el resultado central: el GAP promedio de cada método frente a
+LKH-3, por cuartil; menor es mejor. **Greedy** y **Tabu Search** logran el menor GAP.
+El genético mejora para k grande. Y **Farthest Insertion** es el peor, porque insertar
+los nodos más lejanos choca con el objetivo de seleccionar nodos baratos."
 
-## Diapositiva 10 — Heurísticas (3/3): DCIH, la propuesta (1:30)
-"Y esta es mi propuesta: **DCIH**, *Deterministic Cheapest-Insertion Heuristic*.
-Tiene dos fases: en la primera selecciona y ordena los k nodos por costo marginal de
-inserción mínimo, rompiendo empates por índice de nodo; en la segunda refina con
-2-opt e intercambio dentro/fuera hasta que no mejora.
-Su gracia es que es **totalmente determinista**: con los mismos datos siempre devuelve
-exactamente el mismo recorrido, sin azar. Prioriza la correctitud y la
-reproducibilidad por sobre ganar por suerte, y logra una calidad comparable a GRASP y
-a las heurísticas de inserción."
+## 10 — Resultados completos, parte 1/2 (0:25)  [NUEVA]
+"Para transparencia, aquí están los resultados **por instancia** —la longitud de cada
+recorrido por método—. En negrita, los que igualan el óptimo de LKH-3. Esta es la
+primera mitad de las instancias."
 
-## Diapositiva 11 — Análisis de resultados (1/2): fin de corrida (1:30)
-"Al comparar el **resultado final**: Greedy y Tabu Search dan el mejor GAP promedio,
-del orden del 12,5%. El algoritmo genético cierra la brecha cuando k es grande y gana
-en muchas instancias individuales. Farthest Insertion es el más débil, por lo que ya
-expliqué. Y DCIH es una alternativa determinista y reproducible de calidad
-comparable. En total comparamos **diez** métodos contra los valores BKS de LKH-3."
+## 11 — Resultados completos, parte 2/2 (0:20)  [NUEVA]
+"Y la segunda mitad, hasta pcb442, la instancia más grande. Las tablas completas de
+los tres cuartiles están en la tesis."
 
-## Diapositiva 12 — Análisis de resultados (2/2): anytime (1:30)
-"Pero el resultado final no lo dice todo. Siguiendo la metodología de Weise,
-analizamos el comportamiento **anytime**: la calidad a lo largo del tiempo, medido en
-evaluaciones de distancia, independiente de la máquina.
-En la curva de progreso, todos los métodos se dibujan sobre el mismo presupuesto. El
-ranking global, que combina cuatro criterios, pone a **Nearest Neighbor primero**,
-porque llega muy rápido a una buena solución con pocas evaluaciones. Pero ojo: NN es
-el más **rápido**, no el de mejor calidad final. Esa distinción entre 'rápido' y
-'mejor' es justamente lo que esta metodología permite ver."
+## 12 — Heurísticas (1/3): construcción (1:00)
+"Los métodos de construcción: **Greedy** inserta el nodo más barato hasta k y refina.
+**Nearest Neighbor** avanza al más cercano. **Nearest y Farthest Insertion** insertan
+el más cercano o más lejano al tour. **Random Insertion** elige al azar con reinicios.
+Todos comparten el mismo núcleo de búsqueda local."
 
-## Diapositiva 13 — Conclusiones y mejoras futuras (1:15)
-"En conclusión: Greedy y Tabu Search son los más robustos, con Tabu Search como la
-mejor metaheurística; el genético destaca para k grande; Farthest Insertion es el más
-débil; y DCIH aporta una opción determinista y reproducible. El análisis anytime
-separó lo 'rápido' de lo 'mejor'.
-Como **trabajo futuro**: metaheurísticas más potentes o híbridas —colonia de hormigas,
-VNS, o un memético que combine Tabu Search con el genético—; ajuste de parámetros por
-instancia; reglas de selección de nodos dedicadas; e instancias más grandes y
-problemas de ruteo selectivo relacionados."
+## 13 — Heurísticas (2/3): metaheurísticas (1:00)
+"Las metaheurísticas: **GRASP**, construcción aleatorizada más búsqueda local;
+**genético**, evoluciona subconjunto y orden; **Simulated Annealing**, acepta
+empeoramientos con probabilidad exp(-Δ/T) enfriando; y **Tabu Search**, búsqueda con
+**memoria** que toma el mejor movimiento no prohibido. Tabu Search es la mejor de las
+metaheurísticas."
 
-## Diapositiva 14 — Referencias (0:20)
-"Estas son algunas de las referencias principales; la bibliografía completa, con 50
-referencias, está en la tesis y en el paper. Muchas gracias, quedo atento a sus
-preguntas."
+## 14 — Heurísticas (3/3): DCIH, la propuesta (1:10)
+"Mi propuesta: **DCIH**. Fase 1: selecciona y ordena por costo marginal mínimo,
+rompiendo empates por índice. Fase 2: refina con 2-opt e intercambio. Es **totalmente
+determinista**: mismos datos, mismo recorrido, sin azar. Prioriza correctitud y
+reproducibilidad, con calidad comparable a GRASP y a las inserciones."
+
+## 15 — Análisis de resultados (1/2): fin de corrida (1:10)
+"En el resultado final: Greedy y Tabu Search dan el mejor GAP promedio, ~12,5%. El
+genético cierra la brecha para k grande y gana en muchas instancias. Farthest
+Insertion es el más débil. DCIH, determinista y de calidad comparable. En total,
+diez métodos contra LKH-3."
+
+## 16 — Análisis de resultados (2/2): anytime (1:20)
+"Pero el final no lo dice todo. Con la metodología de Weise analizamos el
+comportamiento **anytime**: la calidad a lo largo del tiempo, medido en evaluaciones
+de distancia. El ranking global pone a **Nearest Neighbor primero**, porque llega muy
+rápido a una buena solución. Pero NN es el más **rápido**, no el de mejor calidad
+final. Esa distinción entre 'rápido' y 'mejor' es lo que permite ver esta metodología."
+
+## 17 — Conclusiones y mejoras futuras (1:05)
+"En conclusión: Greedy y Tabu Search, los más robustos, con TS como mejor
+metaheurística; el genético destaca para k grande; Farthest Insertion, el más débil;
+DCIH, opción determinista y reproducible. Como futuro: metaheurísticas híbridas,
+ajuste de parámetros por instancia, reglas de selección dedicadas, e instancias más
+grandes."
+
+## 18 — Referencias (0:15)
+"Estas son las referencias principales; la bibliografía completa, 50 referencias, está
+en la tesis y el paper. Muchas gracias, quedo atento a sus preguntas."
 
 ---
 
 ## Preguntas probables (preparación)
 - **¿Por qué NN queda primero en el ranking anytime pero no en calidad?**
-  Porque el ranking anytime premia la *velocidad de convergencia* (ERT, ECDF), y NN
-  llega a una solución decente con muy pocas evaluaciones; en calidad final, sin
-  embargo, queda a mitad de tabla. Son dos preguntas distintas: "¿quién es más rápido?"
-  vs "¿quién llega más lejos?".
+  Porque el ranking anytime premia la *velocidad de convergencia* (ERT, ECDF): NN llega
+  a algo decente con muy pocas evaluaciones. En calidad final queda a mitad de tabla.
+  Son dos preguntas distintas: "¿quién es más rápido?" vs "¿quién llega más lejos?".
 - **¿Por qué Farthest Insertion es tan malo aquí?**
-  Porque en el k-TSP hay que *seleccionar* nodos baratos de incluir; insertar los más
-  lejanos va en contra de ese objetivo.
+  En el k-TSP hay que *seleccionar* nodos baratos de incluir; insertar los más lejanos
+  va en contra de ese objetivo.
 - **¿Qué aporta DCIH frente a Greedy?**
-  Determinismo y reproducibilidad total (mismo tour siempre), con una construcción
-  única con desempate por índice y un refinamiento que también cambia el subconjunto.
-- **¿Por qué usar evaluaciones de distancia y no segundos?**
-  Para que la comparación no dependa del hardware ni del lenguaje: es una medida
-  reproducible entre máquinas (metodología de Weise).
+  Determinismo y reproducibilidad total; construcción única con desempate por índice y
+  un refinamiento que también cambia el subconjunto.
+- **¿Por qué evaluaciones de distancia y no segundos?**
+  Para que la comparación no dependa del hardware ni del lenguaje (metodología de Weise).
 - **¿Por qué LKH-3 como referencia?**
-  Es uno de los mejores solvers para TSP y variantes; da los mejores valores conocidos
-  (BKS) del benchmark, así que sirve como referencia cercana al óptimo.
+  Es uno de los mejores solvers para TSP; da los mejores valores conocidos del
+  benchmark, cercanos al óptimo.
+- **¿Qué representa el modelo matemático (variables x, y, u)?**
+  x = arcos del tour, y = nodos seleccionados, u = orden (MTZ para evitar subtours).
+  Deja explícitas las dos decisiones del k-TSP.
