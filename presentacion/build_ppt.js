@@ -34,7 +34,7 @@ function vruns(str, base){
 let PAGE = 0;
 function foot(s){
   PAGE++;
-  s.addText("Nicolás Barrientos · k-TSP · Universidad Andrés Bello · 2026",
+  s.addText("Proyecto de título · Nicolás Barrientos",
     {x:0.5,y:H-0.42,w:10.5,h:0.3,fontFace:BODY_FONT,fontSize:9,color:MUTED,margin:0});
   s.addText(String(PAGE),{x:W-0.9,y:H-0.42,w:0.5,h:0.3,fontFace:BODY_FONT,fontSize:10,color:MUTED,align:"right",margin:0});
 }
