@@ -4,15 +4,14 @@ Autor: Nicolás Barrientos · Profesor guía: Dr. Gustavo Gatica · Universidad 
 
 > Diapositivas en inglés · guión hablado en español. Total ≈ 15 min.
 > El tiempo sugerido de cada diapositiva va entre paréntesis. No leas la diapositiva
-> palabra por palabra; usa estas notas como apoyo. El PPT tiene 18 diapositivas.
+> palabra por palabra; usa estas notas como apoyo. El PPT tiene 17 diapositivas.
 
 ---
 
 ## 1 — Portada (0:20)
 "Buenos días. Soy Nicolás Barrientos y presento mi proyecto de título,
 *Heuristic Approaches for the k-Traveling Salesman Problem: a Reproducible
-Comparison*, guiado por el Dr. Gustavo Gatica. El trabajo fue enviado como paper al
-congreso Optima 2025."
+Comparison*, guiado por el Dr. Gustavo Gatica."
 
 ## 2 — Contexto y motivación (0:55)
 "La optimización de rutas está en todas partes: logística, transporte, vigilancia.
@@ -35,86 +34,81 @@ comparación justa— y evaluación experimental. Todo en Python, en VS Code, ve
 en un GitHub privado, con LKH-3 local; el tiempo se mide en evaluaciones de
 distancia, independiente de la máquina."
 
-## 5 — Asistencia a evento: Optima 2025 (0:25)
-"El núcleo se escribió como paper y se **envió a Optima 2025**, en la Universidad
-Católica del Norte, el 30 de noviembre de 2025; está en revisión. Es la contribución
-central y se incluye como capítulo de la tesis."
-
-## 6 — El problema de investigación (1:00)
+## 5 — El problema de investigación (1:00)
 "Formalmente: dadas n ciudades con depósito y un k fijo, buscar el recorrido cerrado
 más corto que visita exactamente k ciudades. La dificultad está en **dos decisiones
 acopladas**: *cuáles* k nodos y *en qué orden*. El número de combinaciones crece
 combinatorialmente, así que se necesitan heurísticas. A la derecha, la representación
 genotipo–fenotipo: subconjunto más orden que se decodifica en un recorrido."
 
-## 7 — Modelo matemático (0:45)  [NUEVA]
+## 6 — Modelo matemático (0:45)  [NUEVA]
 "Este es el modelo formal. Las variables: x indica si un arco está en el tour, y si un
 nodo se selecciona, y u son las variables de orden de Miller–Tucker–Zemlin. La función
 objetivo minimiza la longitud total. Las restricciones fuerzan que el depósito esté,
 que se visiten exactamente k nodos, el grado de cada nodo, y las MTZ eliminan
 subtours. Deja explícitas las dos decisiones: selección (y) y orden (x)."
 
-## 8 — Instancias y cuartiles (0:40)  [NUEVA]
+## 7 — Instancias y cuartiles (0:40)  [NUEVA]
 "Usamos 38 instancias TSPLIB, con n de 48 a 442 ciudades. Cada instancia se prueba en
 **tres valores de k**, como cuartiles de su tamaño: Q1 visita un cuarto —ahí manda la
 selección—, Q2 la mitad, y Q3 tres cuartos —ahí se parece a un TSP normal—. Así son
 38 × 3 = 114 casos de prueba, todos comparados contra LKH-3."
 
-## 9 — Tabla de referencia: GAP promedio (1:00)
+## 8 — Tabla de referencia: GAP promedio (1:00)
 "Esta tabla resume el resultado central: el GAP promedio de cada método frente a
 LKH-3, por cuartil; menor es mejor. **Greedy** y **Tabu Search** logran el menor GAP.
 El genético mejora para k grande. Y **Farthest Insertion** es el peor, porque insertar
 los nodos más lejanos choca con el objetivo de seleccionar nodos baratos."
 
-## 10 — Resultados completos, parte 1/2 (0:25)  [NUEVA]
+## 9 — Resultados completos, parte 1/2 (0:25)  [NUEVA]
 "Para transparencia, aquí están los resultados **por instancia** —la longitud de cada
 recorrido por método—. En negrita, los que igualan el óptimo de LKH-3. Esta es la
 primera mitad de las instancias."
 
-## 11 — Resultados completos, parte 2/2 (0:20)  [NUEVA]
+## 10 — Resultados completos, parte 2/2 (0:20)  [NUEVA]
 "Y la segunda mitad, hasta pcb442, la instancia más grande. Las tablas completas de
 los tres cuartiles están en la tesis."
 
-## 12 — Heurísticas (1/3): construcción (1:00)
+## 11 — Heurísticas (1/3): construcción (1:00)
 "Los métodos de construcción: **Greedy** inserta el nodo más barato hasta k y refina.
 **Nearest Neighbor** avanza al más cercano. **Nearest y Farthest Insertion** insertan
 el más cercano o más lejano al tour. **Random Insertion** elige al azar con reinicios.
 Todos comparten el mismo núcleo de búsqueda local."
 
-## 13 — Heurísticas (2/3): metaheurísticas (1:00)
+## 12 — Heurísticas (2/3): metaheurísticas (1:00)
 "Las metaheurísticas: **GRASP**, construcción aleatorizada más búsqueda local;
 **genético**, evoluciona subconjunto y orden; **Simulated Annealing**, acepta
 empeoramientos con probabilidad exp(-Δ/T) enfriando; y **Tabu Search**, búsqueda con
 **memoria** que toma el mejor movimiento no prohibido. Tabu Search es la mejor de las
 metaheurísticas."
 
-## 14 — Heurísticas (3/3): DCIH, la propuesta (1:10)
+## 13 — Heurísticas (3/3): DCIH, la propuesta (1:10)
 "Mi propuesta: **DCIH**. Fase 1: selecciona y ordena por costo marginal mínimo,
 rompiendo empates por índice. Fase 2: refina con 2-opt e intercambio. Es **totalmente
 determinista**: mismos datos, mismo recorrido, sin azar. Prioriza correctitud y
 reproducibilidad, con calidad comparable a GRASP y a las inserciones."
 
-## 15 — Análisis de resultados (1/2): fin de corrida (1:10)
+## 14 — Análisis de resultados (1/2): fin de corrida (1:10)
 "En el resultado final: Greedy y Tabu Search dan el mejor GAP promedio, ~12,5%. El
 genético cierra la brecha para k grande y gana en muchas instancias. Farthest
 Insertion es el más débil. DCIH, determinista y de calidad comparable. En total,
 diez métodos contra LKH-3."
 
-## 16 — Análisis de resultados (2/2): anytime (1:20)
+## 15 — Análisis de resultados (2/2): anytime (1:20)
 "Pero el final no lo dice todo. Con la metodología de Weise analizamos el
 comportamiento **anytime**: la calidad a lo largo del tiempo, medido en evaluaciones
 de distancia. El ranking global pone a **Nearest Neighbor primero**, porque llega muy
 rápido a una buena solución. Pero NN es el más **rápido**, no el de mejor calidad
 final. Esa distinción entre 'rápido' y 'mejor' es lo que permite ver esta metodología."
 
-## 17 — Conclusiones y mejoras futuras (1:05)
+## 16 — Conclusiones y mejoras futuras (1:05)
 "En conclusión: Greedy y Tabu Search, los más robustos, con TS como mejor
 metaheurística; el genético destaca para k grande; Farthest Insertion, el más débil;
 DCIH, opción determinista y reproducible. Como futuro: metaheurísticas híbridas,
 ajuste de parámetros por instancia, reglas de selección dedicadas, e instancias más
 grandes."
 
-## 18 — Referencias (0:15)
+## 17 — Referencias (0:15)
 "Estas son las referencias principales; la bibliografía completa, 50 referencias, está
 en la tesis y el paper. Muchas gracias, quedo atento a sus preguntas."
 

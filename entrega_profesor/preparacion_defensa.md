@@ -5,7 +5,7 @@ _Guía rápida: resumen de lo que tengo + banco de preguntas probables (incluida
 ---
 
 ## 0. Resumen de lo que tengo (elevator pitch, ~1 min)
-"Mi proyecto es una **comparación reproducible de diez métodos** para el *k*-TSP —el TSP donde se visitan solo *k* de *n* ciudades—. Implementé desde heurísticas de construcción (Greedy, Nearest Neighbor, inserciones) hasta metaheurísticas (GRASP, genético, Simulated Annealing, Tabu Search) y una propuesta propia, **DCIH**, una heurística determinista. Los evalué sobre **38 instancias TSPLIB** en tres valores de *k*, usando como referencia los mejores valores conocidos de **LKH-3**. Además del resultado final (GAP), hice un análisis **anytime** estilo Weise, midiendo el tiempo en evaluaciones de distancia (independiente de la máquina). Todo es reproducible: cada tabla y figura se regenera con un comando, versionado en GitHub. El trabajo se envió como paper a **Optima 2025**."
+"Mi proyecto es una **comparación reproducible de diez métodos** para el *k*-TSP —el TSP donde se visitan solo *k* de *n* ciudades—. Implementé desde heurísticas de construcción (Greedy, Nearest Neighbor, inserciones) hasta metaheurísticas (GRASP, genético, Simulated Annealing, Tabu Search) y una propuesta propia, **DCIH**, una heurística determinista. Los evalué sobre **38 instancias TSPLIB** en tres valores de *k*, usando como referencia los mejores valores conocidos de **LKH-3**. Además del resultado final (GAP), hice un análisis **anytime** estilo Weise, midiendo el tiempo en evaluaciones de distancia (independiente de la máquina). Todo es reproducible: cada tabla y figura se regenera con un comando, versionado en GitHub."
 
 **Estado de entregables:** paper (IEEE, inglés) ✓ · tesis por compendio (31 pág.) ✓ · presentación (18 diapositivas) + guión ✓ · código reproducible en GitHub ✓.
 
@@ -140,7 +140,7 @@ Localmente en Visual Studio Code, Python 3.10 (numpy/pandas/matplotlib), con el 
 Sí, como apoyo (redacción/estilo en inglés, organización, depuración/documentación de código y generación de figuras **a partir de mis propios datos**). Todo el contenido científico —modelo, algoritmos, protocolo, datos, resultados y conclusiones— es mío. Está declarado explícitamente en la tesis.
 
 **P: ¿Por qué esto amerita una tesis/paper?**
-Porque aporta evidencia empírica reproducible sobre un problema poco comparado de forma sistemática, con una metodología de evaluación moderna (anytime) y una propuesta propia, y fue sometido a revisión en un congreso (Optima 2025).
+Porque aporta evidencia empírica reproducible sobre un problema poco comparado de forma sistemática, con una metodología de evaluación moderna (anytime) y una propuesta propia, y está preparado para ser enviado a un congreso cuando se finalicen las revisiones.
 
 ---
 

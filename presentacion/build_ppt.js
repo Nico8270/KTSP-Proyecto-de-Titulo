@@ -77,7 +77,7 @@ s.addText("A Reproducible Comparison of Ten Methods",
 s.addText([{text:"Author:  ",options:{bold:true,color:"CADCFC"}},{text:"Nicolás Barrientos",options:{color:WHITE,breakLine:true}},
   {text:"Advisor:  ",options:{bold:true,color:"CADCFC"}},{text:"Dr. Gustavo Gatica",options:{color:WHITE}}],
   {x:0.75,y:5.5,w:8,h:0.9,fontFace:BODY_FONT,fontSize:16,margin:0,valign:"top",paraSpaceAfter:4});
-s.addText("Undergraduate thesis · Paper submitted to Optima 2025 · Santiago de Chile, 2026",
+s.addText("Undergraduate thesis · k-TSP · Santiago de Chile, 2026",
   {x:0.75,y:6.75,w:11.8,h:0.4,fontFace:BODY_FONT,fontSize:12,color:"9FB0CC",margin:0});
 PAGE=1;
 
@@ -129,23 +129,8 @@ s.addText([{text:"Tools & reproducibility:  ",options:{bold:true,color:GOLD}},
  {x:0.85,y:6.22,w:11.6,h:0.6,fontFace:BODY_FONT,fontSize:12.5,valign:"middle",margin:0});
 foot(s);
 
-// ============ 5 — CONFERENCE ============
-s=p.addSlide(); bgLight(s); header(s,"4 · Dissemination","Conference Submission — Optima 2025");
-s.addShape(p.ShapeType.roundRect,{x:0.6,y:2.0,w:5.9,h:4.2,rectRadius:0.1,fill:{color:LIGHT}});
-s.addText("OPTIMA 2025",{x:0.9,y:2.4,w:5.3,h:0.7,fontFace:TITLE_FONT,fontSize:34,bold:true,color:MAROON,margin:0});
-s.addText([{text:"Venue:  ",options:{bold:true}},{text:"Universidad Católica del Norte, Chile",options:{breakLine:true}},
- {text:"Submitted:  ",options:{bold:true}},{text:"November 30, 2025",options:{breakLine:true}},
- {text:"Status:  ",options:{bold:true}},{text:"Under review (submitted)",options:{}}],
- {x:0.9,y:3.3,w:5.3,h:2.6,fontFace:BODY_FONT,fontSize:17,color:DARK,valign:"top",paraSpaceAfter:12,margin:0});
-bullets(s,6.9,2.1,5.9,[
- "The core of this thesis was written up as a scientific paper and submitted to Optima 2025.",
- "The paper condenses the mathematical model, the ten solution techniques and the experimental comparison.",
- "It constitutes the main scientific contribution and is reproduced as a chapter of the thesis.",
-],15.5);
-foot(s);
-
 // ============ 6 — RESEARCH PROBLEM ============
-s=p.addSlide(); bgLight(s); header(s,"5 · Research Problem","The k-TSP: Selection + Ordering");
+s=p.addSlide(); bgLight(s); header(s,"4 · Research Problem","The k-TSP: Selection + Ordering");
 bullets(s,0.6,1.7,7.0,[
  "Given n cities with a depot and a fixed k (1 < k ≤ n), find one closed tour of minimum length visiting exactly k cities.",
  "Two coupled decisions: WHICH k nodes to visit and IN WHICH ORDER.",
@@ -236,7 +221,7 @@ foot(s);
 const q2all=JSON.parse(fs.readFileSync("_q2_rows.json","utf8"));
 const head=["Inst.","n","k","Grd","GRA","GA","NN","NI","FI","RI","SA","TS","DCIH","LKH-3"];
 function tableSlide(part, subtitle){
-  const sl=p.addSlide(); bgLight(sl); header(sl,"7 · Full results","Complete Results — per instance (Q2) "+subtitle);
+  const sl=p.addSlide(); bgLight(sl); header(sl,"8 · Full results","Complete Results — per instance (Q2) "+subtitle);
   const tr=[head.map(h=>({text:h,options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}}))];
   part.forEach((r,i)=>{ const bks=r[r.length-1]; const fill=i%2?"FFFFFF":"F4F5F7";
     tr.push(r.map((c,ci)=>{ const isB=ci>=3&&ci<r.length-1&&c===bks;
@@ -252,7 +237,7 @@ tableSlide(q2all.slice(0,19), "— part 1/2");
 tableSlide(q2all.slice(19),  "— part 2/2");
 
 // ============ 11 — HEURISTICS 1/3 ============
-s=p.addSlide(); bgLight(s); header(s,"8 · Methods (1/3)","Construction Heuristics");
+s=p.addSlide(); bgLight(s); header(s,"9 · Methods (1/3)","Construction Heuristics");
 const cons=[["Greedy (cheapest insertion)","Insert the node of smallest marginal cost until k; 2-opt refinement; deterministic restarts."],
  ["Nearest Neighbor (NN)","Extend the tour to the nearest unvisited node until k; then local search."],
  ["Nearest / Farthest Insertion","Insert the node closest to (NI) or farthest from (FI) the tour at its cheapest position."],
@@ -269,7 +254,7 @@ s.addText("All share a common core: 2-opt, in/out exchange and cheapest insertio
 foot(s);
 
 // ============ 12 — HEURISTICS 2/3 ============
-s=p.addSlide(); bgLight(s); header(s,"9 · Methods (2/3)","Metaheuristics");
+s=p.addSlide(); bgLight(s); header(s,"10 · Methods (2/3)","Metaheuristics");
 const meta=[["GRASP / multi-start","Randomized greedy construction + local search; best over many restarts."],
  ["Genetic Algorithm (GA)","Encodes subset + order; tournament, subset-aware crossover, mutation, elitism, 2-opt."],
  ["Simulated Annealing (SA)","Accepts worsening moves with probability exp(−Δ/T); geometric cooling escapes local optima."],
@@ -284,7 +269,7 @@ s.addText("Tabu Search is the best of the metaheuristics in average GAP.",
 foot(s);
 
 // ============ 13 — HEURISTICS 3/3 (DCIH) ============
-s=p.addSlide(); bgLight(s); header(s,"10 · Methods (3/3)","DCIH — the Proposed Heuristic");
+s=p.addSlide(); bgLight(s); header(s,"11 · Methods (3/3)","DCIH — the Proposed Heuristic");
 s.addShape(p.ShapeType.roundRect,{x:0.6,y:1.75,w:6.0,h:4.5,rectRadius:0.1,fill:{color:LIGHT}});
 s.addText("Deterministic Cheapest-Insertion Heuristic",{x:0.85,y:1.95,w:5.5,h:0.7,fontFace:BODY_FONT,fontSize:16,bold:true,color:MAROON,margin:0});
 s.addText([{text:"Phase 1 — Selection + ordering:  ",options:{bold:true,breakLine:true}},
@@ -303,7 +288,7 @@ bullets(s,7.0,1.95,5.8,[
 foot(s);
 
 // ============ 14 — RESULTS 1/2 ============
-s=p.addSlide(); bgLight(s); header(s,"11 · Results (1/2)","End-of-Run Comparison");
+s=p.addSlide(); bgLight(s); header(s,"12 · Results (1/2)","End-of-Run Comparison");
 const stt=[["≈12.5%","best avg GAP","Greedy & Tabu Search"],["1st","most frequent\nwinner (large k)","Genetic Algorithm"],["10","methods compared","vs LKH-3 BKS"]];
 let sx=0.7; stt.forEach(st=>{ s.addShape(p.ShapeType.roundRect,{x:sx,y:1.85,w:3.9,h:1.7,rectRadius:0.1,fill:{color:NAVY}});
   s.addText(st[0],{x:sx,y:2.0,w:3.9,h:0.8,align:"center",fontFace:TITLE_FONT,fontSize:34,bold:true,color:GOLD,margin:0});
@@ -319,7 +304,7 @@ bullets(s,0.7,3.95,12.0,[
 foot(s);
 
 // ============ 15 — RESULTS 2/2 (ANYTIME) ============
-s=p.addSlide(); bgLight(s); header(s,"12 · Results (2/2)","Anytime Evaluation (Weise et al.)");
+s=p.addSlide(); bgLight(s); header(s,"13 · Results (2/2)","Anytime Evaluation (Weise et al.)");
 s.addImage({path:"01_progreso_agregado.png",x:0.55,y:1.8,w:7.4,h:4.6});
 bullets(s,8.15,1.95,4.7,[
  "Machine-independent time = distance evaluations (scaled by n²).",
@@ -331,7 +316,7 @@ foot(s);
 
 // ============ 16 — CONCLUSIONS ============
 s=p.addSlide(); s.background={color:NAVY};
-s.addText("13 · CONCLUSIONS",{x:0.6,y:0.45,w:12,h:0.3,fontFace:BODY_FONT,fontSize:12,bold:true,color:GOLD,charSpacing:2,margin:0});
+s.addText("14 · CONCLUSIONS",{x:0.6,y:0.45,w:12,h:0.3,fontFace:BODY_FONT,fontSize:12,bold:true,color:GOLD,charSpacing:2,margin:0});
 s.addText("Conclusions and Future Work",{x:0.6,y:0.72,w:12,h:0.8,fontFace:TITLE_FONT,fontSize:28,bold:true,color:WHITE,margin:0});
 s.addText("Conclusions",{x:0.6,y:1.75,w:6,h:0.4,fontFace:BODY_FONT,fontSize:16,bold:true,color:GOLD,margin:0});
 s.addText([
@@ -350,7 +335,7 @@ s.addText([
 foot(s);
 
 // ============ 17 — REFERENCES ============
-s=p.addSlide(); bgLight(s); header(s,"14 · References","Selected References");
+s=p.addSlide(); bgLight(s); header(s,"15 · References","Selected References");
 bullets(s,0.6,1.75,12.1,[
  "Pandiri & Singh (2020). The k-TSP benchmark. OPSEARCH.",
  "Helsgaun (2017). LKH-3: extension of the Lin–Kernighan–Helsgaun TSP solver.",

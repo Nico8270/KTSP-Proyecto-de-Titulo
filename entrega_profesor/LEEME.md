@@ -24,6 +24,6 @@ Los `.zip` contienen el código LaTeX y todas las imágenes. En Overleaf:
 ## Estado
 - Paper: 10 métodos, resultados reales sobre 38 instancias TSPLIB vs LKH-3, 50 referencias.
 - Tesis: por compendio (front matter + Cap.1 + el paper como Cap.2 + conclusiones).
-- Presentación: portada, contexto, objetivos, metodología, Optima 2025, problema,
+- Presentación: portada, contexto, objetivos, metodología, problema,
   modelo matemático, cuartiles, resultados (resumen + tabla completa), heurísticas,
   análisis anytime, conclusiones y referencias.
