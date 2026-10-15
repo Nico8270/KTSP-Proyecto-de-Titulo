@@ -163,12 +163,14 @@ def _mk_logger(log: Optional[LogFn], t0: float):
     return _emit
 
 
-def greedy_ktsp(D, n, k, home=HOME, restarts=5, seed=42,
+def greedy_ktsp(D, n, k, home=HOME, restarts=5, seed=42, time_limit=None,
                 log: Optional[LogFn] = None, budget_de: Optional[int] = None):
     t0 = time.perf_counter(); emit = _mk_logger(log, t0)
     best_tour, best_len = None, float("inf")
     order = np.argsort(D[home])
-    seeds = [int(v) for v in order if v != home][:max(1, restarts)]
+    seeds = [int(v) for v in order if v != home]
+    if time_limit is None:                     # presupuesto por nº de reinicios
+        seeds = seeds[:max(1, restarts)]
     for s in seeds:
         built = _cheapest_insertion_build(D, n, k, home, s)
         emit(tour_length(built, D))            # punto anytime: construido (pre-LS)
@@ -179,6 +181,8 @@ def greedy_ktsp(D, n, k, home=HOME, restarts=5, seed=42,
         emit(L)                                 # punto anytime: tras cada restart
         if budget_de is not None and EVAL.de >= budget_de:
             break
+        if time_limit is not None and (time.perf_counter() - t0) >= time_limit:
+            break                               # presupuesto por tiempo de reloj
     return {"tour": best_tour, "length": best_len, "source": "greedy_insertion+LS"}
 
 

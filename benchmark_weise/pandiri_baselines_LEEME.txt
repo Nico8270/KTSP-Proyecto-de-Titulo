@@ -1,0 +1,15 @@
+pandiri_baselines.csv
+=====================
+Resultados PUBLICADOS por Pandiri & Singh (2020), "Two multi-start heuristics
+for the k-traveling salesman problem", OPSEARCH 57:1164-1204, Tablas 4-9
+(Apéndice I). Transcritos para usarlos como líneas base de comparación.
+
+Métodos: GVNS, HH_RAND, HH_GREEDY  (columnas *_best, *_worst, *_avg).
+Escenarios: Small (k=floor(n/4)), Medium (k=floor(n/2)), Large (k=floor(3n/4)).
+Criterios: SR (0.05*n s), LR (0.2*n s).  Mejores de 10 corridas.
+
+Cobertura: 455 filas = 76 instancias x 6 grupos, MENOS 1.
+  * Falta: lin318 en el grupo (Medium, LR). Esa fila NO aparece en la Tabla 8
+    del paper original (salta de lin105 a p654); no se inventó.
+  * Las 3 filas de gr120 (Medium-SR, Large-SR, Large-LR) y todas las verificadas
+    se leyeron directamente de las imágenes de las páginas para asegurar exactitud.

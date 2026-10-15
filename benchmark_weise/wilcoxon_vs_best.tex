@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Wilcoxon signed-rank test of each method against the best method (TS), paired on the per-instance GAP\% over all 114 cases. $p<0.05$ indicates a statistically significant difference.}
+\label{tab:wilcoxon}
+\begin{tabular}{lrrcc}
+\hline
+Method & Mean GAP\% & $\Delta$ vs.\ best & $p$-value & Sig. \\
+\hline
+\textbf{TS} & \textbf{12.49} & --- & --- & --- \\
+Greedy & 12.59 & +0.10 & 0.924 & no \\
+SA & 17.14 & +4.65 & $<$0.001 & yes \\
+GRASP & 18.33 & +5.84 & $<$0.001 & yes \\
+NN & 19.33 & +6.84 & $<$0.001 & yes \\
+DCIH & 21.13 & +8.64 & $<$0.001 & yes \\
+NI & 21.29 & +8.80 & $<$0.001 & yes \\
+GA & 22.61 & +10.12 & $<$0.001 & yes \\
+RI & 31.01 & +18.52 & $<$0.001 & yes \\
+FI & 61.84 & +49.35 & $<$0.001 & yes \\
+\hline
+\end{tabular}
+\end{table}
