@@ -47,9 +47,11 @@ PAPER38 = ("att48 eil51 berlin52 st70 eil76 pr76 kroA100 kroB100 kroC100 kroD100
 
 def load_instance(name: str) -> Instance:
     text = (TSPDIR / f"{name}.tsp").read_text(errors="ignore")
-    coords, ewtype = _parse_tsplib(text)
-    D = _distance_matrix(coords, ewtype)
-    return Instance(name=name, n=len(coords), D=D, ewtype=ewtype, synthetic=False, coords=coords)
+    coords, D, ewtype = _parse_tsplib(text)
+    if D is None:                                  # instancia por coordenadas
+        D = _distance_matrix(coords, ewtype)
+    return Instance(name=name, n=D.shape[0], D=D, ewtype=ewtype,
+                    synthetic=False, coords=coords)
 
 
 def budget_for(n: int) -> int:

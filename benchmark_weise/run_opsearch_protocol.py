@@ -163,6 +163,11 @@ def main():
     ap.add_argument("--smoke", action="store_true", help="3 tiny instances, quick test")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 1) - 1),
                     help="parallel worker processes (default: CPUs-1)")
+    ap.add_argument("--names", nargs="+", default=None,
+                    help="run only these instances (by TSPLIB name)")
+    ap.add_argument("--merge", action="store_true",
+                    help="merge results into existing resultados_opsearch.csv "
+                         "(replace rows for the instances/criteria just run)")
     ap.add_argument("--outdir", default=HERE)
     args = ap.parse_args()
 
@@ -170,6 +175,12 @@ def main():
     if args.smoke:
         names = names[:3]
         args.criteria = ["SR"]
+    if args.names:
+        wanted = set(args.names)
+        names = [m for m in names if m in wanted]
+        missing = wanted - set(names)
+        if missing:
+            print(f"WARNING: unknown instance names ignored: {sorted(missing)}")
     if args.max_n is not None:
         names = [m for m in names if inst.OFFICIAL_KTSP[m]["n"] <= args.max_n]
 
@@ -225,9 +236,19 @@ def main():
                       f"ETA {eta:.1f} min)")
 
     df = pd.DataFrame(rows).drop(columns=["_elapsed"])
+    out_csv = os.path.join(args.outdir, "resultados_opsearch.csv")
+
+    if args.merge and os.path.exists(out_csv):
+        old = pd.read_csv(out_csv)
+        # Drop the (Instance, Criterion) combos we just recomputed, keep the rest.
+        done_keys = set(zip(df.Instance, df.Criterion))
+        mask = [(i, c) not in done_keys for i, c in zip(old.Instance, old.Criterion)]
+        kept = old[mask]
+        df = pd.concat([kept, df], ignore_index=True)
+        print(f"Merged: kept {len(kept)} old rows + {len(rows)} new rows.")
+
     # Stable ordering regardless of completion order.
     df = df.sort_values(["Criterion", "n", "Scenario"]).reset_index(drop=True)
-    out_csv = os.path.join(args.outdir, "resultados_opsearch.csv")
     df.to_csv(out_csv, index=False)
     print(f"\nWrote {out_csv}  ({len(df)} rows)")
 

@@ -175,38 +175,124 @@ def load_tsplib(name: str) -> Optional[Instance]:
             data = r.content
             if url.endswith(".gz"):
                 data = gzip.decompress(data)
-            coords, ewtype = _parse_tsplib(data.decode("latin-1"))
-            if coords is None:
+            coords, D, ewtype = _parse_tsplib(data.decode("latin-1"))
+            if D is None and coords is None:
                 continue
-            D = _distance_matrix(coords, ewtype)
-            return Instance(name=name, n=len(coords), D=D, ewtype=ewtype,
+            if D is None:                         # instancia por coordenadas
+                D = _distance_matrix(coords, ewtype)
+            n = D.shape[0]
+            return Instance(name=name, n=n, D=D, ewtype=ewtype,
                             synthetic=False, coords=coords)
         except Exception:
             continue
     return None
 
 
-def _parse_tsplib(text: str) -> Tuple[Optional[np.ndarray], str]:
+def _parse_tsplib(text: str) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], str]:
+    """Devuelve (coords, D, ewtype).
+
+    - Instancias por coordenadas (EUC_2D/GEO/ATT/CEIL_2D): coords != None, D None.
+    - Instancias EXPLICIT (matriz de distancias): coords None, D != None.
+    """
     ewtype = "EUC_2D"
+    ewformat = ""
+    dim = None
     lines = text.splitlines()
     coords: List[Tuple[float, float]] = []
-    reading = False
+    weights: List[float] = []
+    section = None                                # None | "COORD" | "WEIGHT"
     for ln in lines:
         s = ln.strip()
-        if s.startswith("EDGE_WEIGHT_TYPE"):
-            ewtype = s.split(":")[-1].strip()
-        elif s.startswith("NODE_COORD_SECTION"):
-            reading = True
-        elif s in ("EOF", "") and reading:
-            if s == "EOF":
+        if not s:
+            continue
+        up = s.upper()
+        if up.startswith("DIMENSION"):
+            try:
+                dim = int(s.split(":")[-1].strip())
+            except ValueError:
+                pass
+            continue
+        if up.startswith("EDGE_WEIGHT_TYPE"):
+            ewtype = s.split(":")[-1].strip(); continue
+        if up.startswith("EDGE_WEIGHT_FORMAT"):
+            ewformat = s.split(":")[-1].strip().upper(); continue
+        if up.startswith("NODE_COORD_SECTION") or up.startswith("DISPLAY_DATA_SECTION"):
+            section = "COORD"; continue
+        if up.startswith("EDGE_WEIGHT_SECTION"):
+            section = "WEIGHT"; continue
+        if up in ("EOF",) or up.endswith("_SECTION"):
+            if up == "EOF":
                 break
-        elif reading:
+            section = None if not up.startswith("EDGE_WEIGHT") else section
+            continue
+        if section == "COORD":
             parts = s.split()
             if len(parts) >= 3:
-                coords.append((float(parts[1]), float(parts[2])))
-    if not coords:
-        return None, ewtype
-    return np.array(coords), ewtype
+                try:
+                    coords.append((float(parts[1]), float(parts[2])))
+                except ValueError:
+                    pass
+        elif section == "WEIGHT":
+            for tok in s.split():
+                try:
+                    weights.append(float(tok))
+                except ValueError:
+                    pass
+
+    if ewtype.upper() == "EXPLICIT" and weights:
+        D = _explicit_matrix(weights, dim, ewformat)
+        if D is not None:
+            return None, D, ewtype
+    if coords:
+        return np.array(coords), None, ewtype
+    return None, None, ewtype
+
+
+def _explicit_matrix(weights: List[float], dim: Optional[int], fmt: str
+                     ) -> Optional[np.ndarray]:
+    """Reconstruye la matriz n x n desde EDGE_WEIGHT_SECTION según el formato."""
+    w = np.asarray(weights, float)
+    fmt = (fmt or "").upper()
+    # inferir n si no hay DIMENSION fiable
+    def tri_n(count, with_diag):
+        # count = n(n+1)/2 (con diag) o n(n-1)/2 (sin diag)
+        import math as _m
+        if with_diag:
+            return int((-1 + _m.isqrt(1 + 8 * count)) // 2)
+        return int((1 + _m.isqrt(1 + 8 * count)) // 2)
+    n = dim
+    if fmt == "FULL_MATRIX":
+        if n is None:
+            n = int(round(len(w) ** 0.5))
+        return w[: n * n].reshape(n, n)
+    D = None
+    if fmt in ("UPPER_ROW", "LOWER_ROW"):           # sin diagonal
+        if n is None:
+            n = tri_n(len(w), with_diag=False)
+        D = np.zeros((n, n))
+        idx = 0
+        if fmt == "UPPER_ROW":
+            for i in range(n):
+                for j in range(i + 1, n):
+                    D[i, j] = D[j, i] = w[idx]; idx += 1
+        else:  # LOWER_ROW
+            for i in range(1, n):
+                for j in range(i):
+                    D[i, j] = D[j, i] = w[idx]; idx += 1
+    elif fmt in ("UPPER_DIAG_ROW", "LOWER_DIAG_ROW", ""):  # con diagonal (defecto)
+        if n is None:
+            n = tri_n(len(w), with_diag=True)
+        D = np.zeros((n, n))
+        idx = 0
+        if fmt == "UPPER_DIAG_ROW" or fmt == "":
+            for i in range(n):
+                for j in range(i, n):
+                    D[i, j] = D[j, i] = w[idx]; idx += 1
+        else:  # LOWER_DIAG_ROW
+            for i in range(n):
+                for j in range(i + 1):
+                    D[i, j] = D[j, i] = w[idx]; idx += 1
+    return D
 
 
 def _geo_rad(x: float) -> float:
