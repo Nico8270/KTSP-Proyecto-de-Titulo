@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{Two-tailed Wilcoxon signed-rank test (paired on the per-instance relative gap over the 76 instances) between our two strongest methods and the approaches of Pandiri and Singh (2020). A negative $\Delta$ means our method has a smaller (better) mean gap; $p<0.05$ denotes a significant difference}
+\label{tab:wilcoxon}
+\begin{tabular}{llrrc}
+\hline
+Crit. & Comparison & $\Delta$ gap (\%) & $p$-value & Better \\
+\hline
+SR & Greedy vs GVNS & -11.84 & 0.011 & Greedy \\
+SR & Greedy vs HH\_RAND & +0.41 & $<$0.001 & HH\_RAND \\
+SR & Greedy vs HH\_GREEDY & -0.98 & $<$0.001 & Greedy \\
+SR & TS vs GVNS & -10.93 & $<$0.001 & TS \\
+SR & TS vs HH\_RAND & +1.32 & $<$0.001 & HH\_RAND \\
+SR & TS vs HH\_GREEDY & -0.07 & $<$0.001 & TS \\
+\hline
+LR & Greedy vs GVNS & -4.38 & 0.048 & Greedy \\
+LR & Greedy vs HH\_RAND & +3.33 & $<$0.001 & HH\_RAND \\
+LR & Greedy vs HH\_GREEDY & +2.63 & $<$0.001 & HH\_GREEDY \\
+LR & TS vs GVNS & -3.96 & $<$0.001 & TS \\
+LR & TS vs HH\_RAND & +3.74 & $<$0.001 & HH\_RAND \\
+LR & TS vs HH\_GREEDY & +3.04 & $<$0.001 & HH\_GREEDY \\
+\hline
+\end{tabular}
+\end{table}

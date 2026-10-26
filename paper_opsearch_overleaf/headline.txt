@@ -1,0 +1,20 @@
+Global mean GAP%:
+HHRAND_GAP%       6.227559
+HHGREEDY_GAP%     7.274544
+Greedy_GAP%       8.123700
+TS_GAP%           8.817743
+SA_GAP%          11.852980
+GA_GAP%          12.822114
+GRASP_GAP%       13.609735
+GVNS_GAP%        16.212018
+DCIH_GAP%        17.541596
+NI_GAP%          18.328311
+NN_GAP%          18.494917
+RI_GAP%          25.329002
+FI_GAP%          64.638741
+
+Head-to-head:
+('SR', 'best-of-ours vs best-of-Pandiri', np.int64(52), np.int64(51), np.int64(125))
+('SR', 'best-of-ours vs HH_GREEDY', np.int64(71), np.int64(52), np.int64(105))
+('LR', 'best-of-ours vs best-of-Pandiri', np.int64(44), np.int64(62), np.int64(122))
+('LR', 'best-of-ours vs HH_GREEDY', np.int64(66), np.int64(59), np.int64(103))

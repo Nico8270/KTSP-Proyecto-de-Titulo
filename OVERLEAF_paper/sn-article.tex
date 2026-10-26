@@ -1,0 +1,84 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Springer Nature LaTeX template (sn-jnl) -- OPSEARCH submission
+%  Reference style: sn-chicago (author-year, natbib: \citet / \citep)
+%
+%  HOW TO COMPILE (Overleaf):
+%    1. New Project -> Templates -> "Springer Nature LaTeX Template"
+%       (this provides sn-jnl.cls and the sn-*.bst files).
+%    2. Upload THIS file (sn-article.tex), body.tex, sn-bibliography.bib,
+%       tab_comparacion_global.tex, tab_wilcoxon.tex and the figs/ folder.
+%    3. Set sn-article.tex as the main document and Recompile.
+%  Compiler: pdfLaTeX. If you prefer strict APA, change sn-chicago to sn-apa
+%  (narrative citations may then need apacite's \citeA instead of \citet).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[sn-chicago]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{textcomp}
+\usepackage{url}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Heuristic approaches for the $k$-TSP]{Heuristic Approaches for the
+$k$-Traveling Salesman Problem: A Reproducible Comparison on the TSPLIB Benchmark}
+
+\author[1]{\fnm{Nicol\'as} \sur{Barrientos}}\email{nbarrientos8000@gmail.com}
+
+\author*[1]{\fnm{Gustavo} \sur{Gatica}}\email{ggatica@unab.cl}
+
+\affil[1]{\orgdiv{Facultad de Ingenier\'ia}, \orgname{Universidad Andr\'es Bello},
+\orgaddress{\city{Santiago}, \country{Chile}}}
+
+\abstract{The $k$-Traveling Salesman Problem ($k$-TSP) generalizes the classical
+Traveling Salesman Problem: given $n$ cities with a home city and a fixed value
+$k$ ($1<k\le n$), one must select exactly $k$ cities and order them into a single
+closed tour of minimum length, so that the problem couples a selection decision
+with an ordering decision. We present a reproducible comparison of ten solution
+methods for the $k$-TSP, built on a common local-search core: a greedy
+cheapest-insertion heuristic, GRASP, a genetic algorithm, the Nearest Neighbor and
+Nearest, Farthest and Random Insertion heuristics, Simulated Annealing, Tabu Search,
+and a proposed Deterministic Cheapest-Insertion Heuristic (DCIH). The methods are
+evaluated on the 76 TSPLIB instances and the short-/long-run time protocol of
+Pandiri and Singh (2020), using the Lin--Kernighan--Helsgaun solver (LKH-3) as the
+best-known-solution reference and the two-tailed Wilcoxon signed-rank test for the
+statistical analysis. Averaged over all scenarios, the greedy heuristic and Tabu
+Search are the most robust of our methods and are significantly better than the
+GVNS of that study under both time budgets; under the short run the greedy heuristic
+also matches or exceeds the HH\_GREEDY hyper-heuristic, while the randomized
+hyper-heuristic remains the strongest overall. The results show that simple,
+reproducible heuristics are competitive with dedicated metaheuristics on this
+benchmark.}
+
+\keywords{$k$-traveling salesman problem, heuristics, metaheuristics, tabu search,
+TSPLIB benchmark, Wilcoxon signed-rank test}
+
+\maketitle
+
+\input{body.tex}
+
+\backmatter
+
+\bmhead{Statements and Declarations}
+
+\noindent\textbf{Competing interests.} The authors declare that they have no
+competing interests.
+
+\noindent\textbf{Funding.} The authors received no specific funding for this work.
+
+\noindent\textbf{Data and code availability.} The benchmark instances are the
+publicly available TSPLIB instances used by Pandiri and Singh (2020). The source
+code and the scripts that regenerate every table and figure are available in the
+project repository.
+
+\noindent\textbf{Author contributions.} N.\ Barrientos designed and implemented the
+methods and experiments and drafted the manuscript. G.\ Gatica supervised the work
+and reviewed the manuscript. Both authors read and approved the final version.
+
+\bibliography{sn-bibliography}
+
+\end{document}

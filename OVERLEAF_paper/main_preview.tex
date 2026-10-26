@@ -1,0 +1,41 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  VISTA PREVIA RÁPIDA (clase genérica) -- NO es la versión de envío.
+%  Compila al instante en un proyecto Overleaf en blanco (no necesita la
+%  plantilla Springer). Úsala para leer/revisar el contenido.
+%  Para el ENVÍO a OPSEARCH usa sn-article.tex con la plantilla Springer
+%  Nature (ver LEEME_PAPER.md).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+
+\title{Heuristic Approaches for the $k$-Traveling Salesman Problem:\\
+A Reproducible Comparison on the TSPLIB Benchmark}
+\author{Nicol\'as Barrientos \and Gustavo Gatica\\[2pt]
+\small Facultad de Ingenier\'ia, Universidad Andr\'es Bello, Santiago, Chile}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\noindent The $k$-Traveling Salesman Problem ($k$-TSP) generalizes the TSP:
+given $n$ cities with a home city and a fixed $k$ ($1<k\le n$), one selects
+exactly $k$ cities and orders them into a single closed tour of minimum length.
+We compare ten methods on the 76 TSPLIB instances and the short-/long-run time
+protocol of Pandiri and Singh (2020), using LKH-3 as the best-known-solution
+reference and the Wilcoxon signed-rank test. The greedy cheapest-insertion
+heuristic and Tabu Search are the most robust of our methods and are significantly
+better than GVNS under both time budgets. \emph{(This is a quick-preview build; the
+submission version is \texttt{sn-article.tex} with the Springer template.)}
+\end{abstract}
+
+\input{body.tex}
+
+\bibliographystyle{plainnat}
+\bibliography{sn-bibliography}
+\end{document}

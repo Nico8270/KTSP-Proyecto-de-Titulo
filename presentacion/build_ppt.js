@@ -104,8 +104,8 @@ s.addText("Specific objectives",{x:0.6,y:3.0,w:12,h:0.4,fontFace:BODY_FONT,fontS
 bullets(s,0.6,3.45,12.1,[
  "Formulate the k-TSP mathematically (node selection, degree and subtour-elimination constraints).",
  "Implement ten techniques: Greedy, GRASP, GA, Nearest Neighbor, Nearest / Farthest / Random Insertion, Simulated Annealing, Tabu Search, and the proposed DCIH.",
- "Evaluate solution quality (relative GAP) against LKH-3 best-known values on 38 TSPLIB instances × three values of k.",
- "Complement with anytime benchmarking (progress, ERT, ECDF, global ranking) on a machine-independent time axis.",
+ "Evaluate solution quality (relative GAP) against LKH-3 best-known values on the 76 TSPLIB instances of Pandiri & Singh × three values of k.",
+ "Compare statistically (Wilcoxon signed-rank) against the published GVNS and hyper-heuristics of Pandiri & Singh.",
  "Release everything so every table and figure regenerates with a single command.",
 ],14);
 foot(s);
@@ -115,7 +115,7 @@ s=p.addSlide(); bgLight(s); header(s,"3 · Methodology","Work Methodology");
 const stages=[["a","Data design","Uniform ADTs for TSPLIB and synthetic instances; tour-based encoding of the k selected nodes."],
  ["b","Mathematical model","Single-tour, node-selection formulation with total-length objective and MTZ subtour elimination."],
  ["c","Heuristic resolution","Ten methods over a shared core of vectorized primitives (2-opt, in/out exchange, cheapest insertion)."],
- ["d","Experimental evaluation","38 TSPLIB instances × 3 values of k; full trajectory logged for the anytime analysis."]];
+ ["d","Experimental evaluation","76 TSPLIB instances × 3 values of k; short/long-run time limits (0.05n, 0.2n s), 10 runs, Wilcoxon test."]];
 let yy=1.8;
 stages.forEach(st=>{ chip(s,0.7,yy,st[0],NAVY);
   s.addText(st[1],{x:1.35,y:yy-0.03,w:4.0,h:0.5,fontFace:BODY_FONT,fontSize:15,bold:true,color:MAROON,margin:0});
@@ -168,76 +168,77 @@ eqs.forEach(e=>{
 foot(s);
 
 // ============ 8 — INSTANCES & QUARTILES (NEW) ============
-s=p.addSlide(); bgLight(s); header(s,"6 · Benchmark","Instances and Quartiles of k");
+s=p.addSlide(); bgLight(s); header(s,"6 · Benchmark","Benchmark and Protocol (Pandiri & Singh)");
 bullets(s,0.6,1.7,6.6,[
- "38 standard TSPLIB instances (n from 48 to 442 cities).",
- "Each instance is tested at three values of k, as quartiles of its size n.",
- "This shows how the methods behave as we visit few or many cities.",
- "38 instances × 3 quartiles = 114 test cases, each compared to LKH-3.",
-],15.5);
-const quart=[["Q1","k = ⌊n/4⌋","visit ~25% of cities","selection dominates"],
- ["Q2","k = ⌊n/2⌋","visit ~50% of cities","balanced"],
- ["Q3","k = ⌊3n/4⌋","visit ~75% of cities","close to an ordinary TSP"]];
-let qy=1.8;
+ "76 standard TSPLIB instances (n from 14 to 783 cities).",
+ "Each instance is tested at three values of k (fractions of its size n).",
+ "Two wall-clock time limits: short run 0.05·n s and long run 0.2·n s; 10 runs each.",
+ "76 instances × 3 values of k = 228 test cases, each compared to LKH-3.",
+],15);
+const quart=[["Small","k = ⌊n/4⌋","visit ~25% — selection dominates"],
+ ["Medium","k = ⌊n/2⌋","visit ~50% — balanced"],
+ ["Large","k = ⌊3n/4⌋","visit ~75% — close to an ordinary TSP"]];
+let qy=1.85;
 quart.forEach(q=>{
-  s.addShape(p.ShapeType.roundRect,{x:7.5,y:qy,w:5.3,h:1.35,rectRadius:0.08,fill:{color:LIGHT}});
-  s.addText(q[0],{x:7.7,y:qy+0.1,w:1.0,h:1.1,fontFace:TITLE_FONT,fontSize:30,bold:true,color:MAROON,valign:"middle",align:"center",margin:0});
-  s.addText([{text:q[1],options:{fontFace:"Cambria",fontSize:16,italic:true,color:NAVY,breakLine:true}},
-             {text:q[2]+" — "+q[3],options:{fontFace:BODY_FONT,fontSize:12,color:DARK}}],
-    {x:8.8,y:qy+0.1,w:3.9,h:1.15,valign:"middle",paraSpaceAfter:4,margin:0});
-  qy+=1.5;
+  s.addShape(p.ShapeType.roundRect,{x:7.5,y:qy,w:5.3,h:1.3,rectRadius:0.08,fill:{color:LIGHT}});
+  s.addText(q[0],{x:7.7,y:qy+0.1,w:1.9,h:1.1,fontFace:TITLE_FONT,fontSize:20,bold:true,color:MAROON,valign:"middle",align:"center",margin:0});
+  s.addText([{text:q[1],options:{fontFace:"Cambria",fontSize:15,italic:true,color:NAVY,breakLine:true}},
+             {text:q[2],options:{fontFace:BODY_FONT,fontSize:11.5,color:DARK}}],
+    {x:9.5,y:qy+0.1,w:3.2,h:1.1,valign:"middle",paraSpaceAfter:4,margin:0});
+  qy+=1.45;
 });
 foot(s);
 
 // ============ 9 — REFERENCE TABLE (GAP SUMMARY) ============
-s=p.addSlide(); bgLight(s); header(s,"7 · Overview","Reference Result: Average GAP vs LKH-3");
-const gap=[["Greedy","7.57","15.26","14.95"],["GRASP","18.03","19.57","17.39"],["GA","29.74","22.50","15.60"],
- ["NN","22.38","20.04","15.56"],["NI","20.47","21.74","21.66"],["FI","98.23","55.67","31.63"],
- ["RI","48.74","28.18","16.11"],["SA","15.72","17.81","17.89"],["TS","9.36","13.63","14.48"],["DCIH","19.83","23.19","20.36"]];
-const best=new Set(["Greedy","TS"]);
-const rows=[[
-  {text:"Method",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"left"}},
-  {text:"Q1 GAP%",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}},
-  {text:"Q2 GAP%",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}},
-  {text:"Q3 GAP%",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}}]];
-gap.forEach((r,i)=>{ const hl=best.has(r[0]); const fill=hl?"F3E1E4":(i%2?"FFFFFF":"F4F5F7");
-  rows.push([{text:r[0],options:{bold:hl,color:hl?MAROON:DARK,fill:{color:fill},align:"left"}},
-    {text:r[1],options:{color:DARK,fill:{color:fill},align:"center"}},
-    {text:r[2],options:{color:DARK,fill:{color:fill},align:"center"}},
-    {text:r[3],options:{color:DARK,fill:{color:fill},align:"center"}}]);});
-s.addTable(rows,{x:0.6,y:1.75,w:7.4,colW:[2.6,1.6,1.6,1.6],rowH:0.36,fontFace:BODY_FONT,fontSize:12.5,
-  border:{type:"solid",color:"D7DBE0",pt:0.5},valign:"middle"});
-bullets(s,8.4,1.9,4.4,[
- "38 instances × three values of k, vs LKH-3 BKS.",
- "Greedy and Tabu Search give the lowest average GAP.",
- "GA improves for large k (Q3).",
+s=p.addSlide(); bgLight(s); header(s,"7 · Results","Mean GAP vs LKH-3, by Scenario");
+s.addImage({path:"Fig1_gap_scenario.png",x:0.5,y:1.75,w:8.3,h:3.4});
+bullets(s,9.0,1.9,3.9,[
+ "Greedy and Tabu Search are the most robust of our methods.",
+ "Both clearly beat the GVNS of Pandiri & Singh.",
+ "GA improves for large k under the long run.",
  "Farthest Insertion is clearly the weakest.",
-],14);
-s.addText([{text:"Q1: ",options:{}},{text:"k",options:{italic:true}},{text:"≈",options:{}},{text:"n",options:{italic:true}},{text:"/4    Q2: ",options:{}},{text:"k",options:{italic:true}},{text:"≈",options:{}},{text:"n",options:{italic:true}},{text:"/2    Q3: ",options:{}},{text:"k",options:{italic:true}},{text:"≈3",options:{}},{text:"n",options:{italic:true}},{text:"/4   ·   lower is better",options:{}}],
- {x:0.6,y:6.35,w:7.6,h:0.35,fontFace:BODY_FONT,fontSize:11,italic:false,color:MUTED,margin:0});
+],13);
+s.addText("Solid bars: our methods. Hatched bars (*): GVNS and hyper-heuristics of Pandiri & Singh (2020). Lower is better.",
+ {x:0.6,y:5.4,w:8.2,h:0.5,fontFace:BODY_FONT,fontSize:11,italic:true,color:MUTED,margin:0});
 foot(s);
 
-// ============ 10 — COMPLETE TABLE (Q2, split in two slides) (NEW) ============
-const q2all=JSON.parse(fs.readFileSync("_q2_rows.json","utf8"));
-const head=["Inst.","n","k","Grd","GRA","GA","NN","NI","FI","RI","SA","TS","DCIH","LKH-3"];
-function tableSlide(part, subtitle){
-  const sl=p.addSlide(); bgLight(sl); header(sl,"8 · Full results","Complete Results — per instance (Q2) "+subtitle);
-  const tr=[head.map(h=>({text:h,options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}}))];
-  part.forEach((r,i)=>{ const bks=r[r.length-1]; const fill=i%2?"FFFFFF":"F4F5F7";
-    tr.push(r.map((c,ci)=>{ const isB=ci>=3&&ci<r.length-1&&c===bks;
-      return {text:c,options:{color:isB?MAROON:DARK,bold:isB,fill:{color:fill},align:ci===0?"left":"center"}};}));});
-  sl.addTable(tr,{x:0.35,y:1.6,w:12.6,rowH:0.24,fontFace:BODY_FONT,fontSize:9.5,
-    border:{type:"solid",color:"E1E4E8",pt:0.4},valign:"middle",autoPage:false,
-    colW:[0.95,0.5,0.5,1.02,1.02,1.02,1.02,1.02,1.02,1.02,1.02,1.02,1.05,1.1]});
-  sl.addText("Total tour length per method for Q2 (k ≈ n/2). Bold = matches the LKH-3 best-known value. Full Q1/Q3 tables in the thesis.",
-   {x:0.35,y:H-0.62,w:12.4,h:0.28,fontFace:BODY_FONT,fontSize:9,italic:true,color:MUTED,margin:0});
-  foot(sl);
-}
-tableSlide(q2all.slice(0,19), "— part 1/2");
-tableSlide(q2all.slice(19),  "— part 2/2");
+// ============ 10 — COMPARISON WITH THE STATE OF THE ART ============
+s=p.addSlide(); bgLight(s); header(s,"8 · Comparison","Comparison with the State of the Art");
+const rankRows=[["HH_RAND*","6.2"],["HH_GREEDY*","7.3"],["Greedy","8.1"],["TS","8.8"],["SA","11.9"],
+ ["GA","12.8"],["GRASP","13.6"],["GVNS*","16.2"],["DCIH","17.5"],["NI","18.3"],["NN","18.5"],["RI","25.3"],["FI","64.6"]];
+const mine=new Set(["Greedy","TS"]);
+const rr=[[{text:"Method",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"left"}},
+  {text:"Mean GAP%",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}}]];
+rankRows.forEach((r,i)=>{ const hl=mine.has(r[0]); const fill=hl?"F3E1E4":(i%2?"FFFFFF":"F4F5F7");
+  rr.push([{text:r[0],options:{bold:hl,color:hl?MAROON:DARK,fill:{color:fill},align:"left"}},
+    {text:r[1],options:{bold:hl,color:hl?MAROON:DARK,fill:{color:fill},align:"center"}}]);});
+s.addTable(rr,{x:0.6,y:1.75,w:5.0,colW:[3.3,1.7],rowH:0.33,fontFace:BODY_FONT,fontSize:12,
+  border:{type:"solid",color:"D7DBE0",pt:0.5},valign:"middle"});
+bullets(s,6.1,1.85,6.7,[
+ "Global mean GAP over all 76 instances × 3 k × SR/LR. Lower is better.",
+ "Our Greedy (8.1%) and Tabu Search (8.8%) rank just behind the two hyper-heuristics of Pandiri & Singh.",
+ "Both clearly beat their GVNS (16.2%).",
+ "Our best method matches or beats the best of Pandiri & Singh in 103 / 228 short-run cases, and HH_GREEDY in 123 / 228.",
+],13.5);
+s.addText("* Published results of Pandiri & Singh (2020) on the same benchmark.",
+ {x:0.6,y:6.5,w:9,h:0.3,fontFace:BODY_FONT,fontSize:11,italic:true,color:MUTED,margin:0});
+foot(s);
+
+// ============ 10b — STATISTICAL SIGNIFICANCE (WILCOXON) ============
+s=p.addSlide(); bgLight(s); header(s,"9 · Statistics","Statistical Significance (Wilcoxon)");
+s.addImage({path:"Fig2_boxplot_gap.png",x:0.5,y:1.75,w:8.1,h:3.3});
+bullets(s,8.8,1.9,4.1,[
+ "Two-tailed Wilcoxon signed-rank test on the paired per-instance gaps.",
+ "Greedy and Tabu Search are significantly better than GVNS (p < 0.05), SR and LR.",
+ "In the short run, Greedy even beats HH_GREEDY; TS ties it.",
+ "HH_RAND stays strongest, especially in the long run.",
+],12.5);
+s.addText("Distribution of the per-instance gap (long run), clipped at 80%. * = Pandiri & Singh.",
+ {x:0.6,y:5.3,w:8.0,h:0.4,fontFace:BODY_FONT,fontSize:11,italic:true,color:MUTED,margin:0});
+foot(s);
 
 // ============ 11 — HEURISTICS 1/3 ============
-s=p.addSlide(); bgLight(s); header(s,"9 · Methods (1/3)","Construction Heuristics");
+s=p.addSlide(); bgLight(s); header(s,"10 · Methods (1/3)","Construction Heuristics");
 const cons=[["Greedy (cheapest insertion)","Insert the node of smallest marginal cost until k; 2-opt refinement; deterministic restarts."],
  ["Nearest Neighbor (NN)","Extend the tour to the nearest unvisited node until k; then local search."],
  ["Nearest / Farthest Insertion","Insert the node closest to (NI) or farthest from (FI) the tour at its cheapest position."],
@@ -254,7 +255,7 @@ s.addText("All share a common core: 2-opt, in/out exchange and cheapest insertio
 foot(s);
 
 // ============ 12 — HEURISTICS 2/3 ============
-s=p.addSlide(); bgLight(s); header(s,"10 · Methods (2/3)","Metaheuristics");
+s=p.addSlide(); bgLight(s); header(s,"11 · Methods (2/3)","Metaheuristics");
 const meta=[["GRASP / multi-start","Randomized greedy construction + local search; best over many restarts."],
  ["Genetic Algorithm (GA)","Encodes subset + order; tournament, subset-aware crossover, mutation, elitism, 2-opt."],
  ["Simulated Annealing (SA)","Accepts worsening moves with probability exp(−Δ/T); geometric cooling escapes local optima."],
@@ -269,7 +270,7 @@ s.addText("Tabu Search is the best of the metaheuristics in average GAP.",
 foot(s);
 
 // ============ 13 — HEURISTICS 3/3 (DCIH) ============
-s=p.addSlide(); bgLight(s); header(s,"11 · Methods (3/3)","DCIH — the Proposed Heuristic");
+s=p.addSlide(); bgLight(s); header(s,"12 · Methods (3/3)","DCIH — the Proposed Heuristic");
 s.addShape(p.ShapeType.roundRect,{x:0.6,y:1.75,w:6.0,h:4.5,rectRadius:0.1,fill:{color:LIGHT}});
 s.addText("Deterministic Cheapest-Insertion Heuristic",{x:0.85,y:1.95,w:5.5,h:0.7,fontFace:BODY_FONT,fontSize:16,bold:true,color:MAROON,margin:0});
 s.addText([{text:"Phase 1 — Selection + ordering:  ",options:{bold:true,breakLine:true}},
@@ -288,42 +289,54 @@ bullets(s,7.0,1.95,5.8,[
 foot(s);
 
 // ============ 14 — RESULTS 1/2 ============
-s=p.addSlide(); bgLight(s); header(s,"12 · Results (1/2)","End-of-Run Comparison");
-const stt=[["≈12.5%","best avg GAP","Greedy & Tabu Search"],["1st","most frequent\nwinner (large k)","Genetic Algorithm"],["10","methods compared","vs LKH-3 BKS"]];
+s=p.addSlide(); bgLight(s); header(s,"13 · Results (1/2)","Overall Comparison");
+const stt=[["≈8%","best avg GAP (ours)","Greedy & Tabu Search"],["< GVNS","significantly better","Wilcoxon, p < 0.05"],["76","TSPLIB instances","× 3 k · SR & LR"]];
 let sx=0.7; stt.forEach(st=>{ s.addShape(p.ShapeType.roundRect,{x:sx,y:1.85,w:3.9,h:1.7,rectRadius:0.1,fill:{color:NAVY}});
   s.addText(st[0],{x:sx,y:2.0,w:3.9,h:0.8,align:"center",fontFace:TITLE_FONT,fontSize:34,bold:true,color:GOLD,margin:0});
   s.addText(st[1],{x:sx+0.2,y:2.8,w:3.5,h:0.5,align:"center",fontFace:BODY_FONT,fontSize:13,color:WHITE,margin:0});
   s.addText(st[2],{x:sx+0.2,y:3.2,w:3.5,h:0.3,align:"center",fontFace:BODY_FONT,fontSize:11,italic:true,color:"CADCFC",margin:0});
   sx+=4.2; });
 bullets(s,0.7,3.95,12.0,[
- "Greedy cheapest-insertion is the most robust on average; Tabu Search essentially ties it as best metaheuristic.",
- "The genetic algorithm closes the gap for large k (Q3) and wins on many individual instances.",
- "Farthest Insertion is the weakest: selecting distant nodes conflicts with the node-selection objective.",
- "DCIH is a deterministic, reproducible alternative of comparable quality.",
+ "Greedy cheapest-insertion is the most robust on average; Tabu Search is the best of our metaheuristics.",
+ "Both are significantly better than the GVNS of Pandiri & Singh, and competitive with their hyper-heuristics.",
+ "The genetic algorithm closes the gap for large k, especially under the long run.",
+ "Farthest Insertion is the weakest; DCIH is a deterministic, reproducible alternative of comparable quality.",
 ],15);
 foot(s);
 
 // ============ 15 — RESULTS 2/2 (ANYTIME) ============
-s=p.addSlide(); bgLight(s); header(s,"13 · Results (2/2)","Anytime Evaluation (Weise et al.)");
-s.addImage({path:"01_progreso_agregado.png",x:0.55,y:1.8,w:7.4,h:4.6});
-bullets(s,8.15,1.95,4.7,[
- "Machine-independent time = distance evaluations (scaled by n²).",
- "All methods over a common budget; early-converging methods appear flat.",
- "Global ranking (4 criteria): NN 1st, Greedy 2nd, TS 3rd, SA 4th, DCIH 5th.",
- "NN is fastest to a good tour but only mid-ranked in final quality — speed ≠ best.",
-],14.5);
+s=p.addSlide(); bgLight(s); header(s,"14 · Results (2/2)","Effect of the Time Budget (SR vs LR)");
+const srlrRows=[["Greedy","8.5","7.8"],["TS","9.4","8.2"],["SA","12.0","11.7"],["GA","14.6","11.0"],
+ ["GRASP","14.1","13.1"],["GVNS*","20.3","12.1"],["HH_RAND*","8.1","4.4"],["HH_GREEDY*","9.5","5.1"]];
+const tb=[[{text:"Method",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"left"}},
+  {text:"SR (0.05n s)",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}},
+  {text:"LR (0.2n s)",options:{bold:true,color:WHITE,fill:{color:NAVY},align:"center"}}]];
+srlrRows.forEach((r,i)=>{ const fill=i%2?"FFFFFF":"F4F5F7";
+  tb.push([{text:r[0],options:{color:DARK,fill:{color:fill},align:"left"}},
+    {text:r[1],options:{color:DARK,fill:{color:fill},align:"center"}},
+    {text:r[2],options:{color:MAROON,bold:true,fill:{color:fill},align:"center"}}]);});
+s.addTable(tb,{x:0.6,y:1.8,w:6.1,colW:[2.5,1.8,1.8],rowH:0.36,fontFace:BODY_FONT,fontSize:12.5,
+  border:{type:"solid",color:"D7DBE0",pt:0.5},valign:"middle"});
+bullets(s,7.0,1.95,5.8,[
+ "Mean GAP% averaged over the three k scenarios; lower is better.",
+ "More time (LR) helps the time-driven methods; the deterministic ones (NN, NI, FI, DCIH) do not change.",
+ "The genetic algorithm gains the most and becomes the best of our methods in the Large scenario under LR.",
+ "Greedy and Tabu Search stay the most robust across both budgets.",
+],13);
+s.addText("* Published results of Pandiri & Singh (2020).",
+ {x:0.6,y:6.4,w:9,h:0.3,fontFace:BODY_FONT,fontSize:11,italic:true,color:MUTED,margin:0});
 foot(s);
 
 // ============ 16 — CONCLUSIONS ============
 s=p.addSlide(); s.background={color:NAVY};
-s.addText("14 · CONCLUSIONS",{x:0.6,y:0.45,w:12,h:0.3,fontFace:BODY_FONT,fontSize:12,bold:true,color:GOLD,charSpacing:2,margin:0});
+s.addText("15 · CONCLUSIONS",{x:0.6,y:0.45,w:12,h:0.3,fontFace:BODY_FONT,fontSize:12,bold:true,color:GOLD,charSpacing:2,margin:0});
 s.addText("Conclusions and Future Work",{x:0.6,y:0.72,w:12,h:0.8,fontFace:TITLE_FONT,fontSize:28,bold:true,color:WHITE,margin:0});
 s.addText("Conclusions",{x:0.6,y:1.75,w:6,h:0.4,fontFace:BODY_FONT,fontSize:16,bold:true,color:GOLD,margin:0});
 s.addText([
- {text:"Greedy and Tabu Search are the most robust; TS is the best metaheuristic.",options:{bullet:{indent:14},breakLine:true,paraSpaceAfter:8}},
+ {text:"Greedy and Tabu Search are the most robust; both beat GVNS significantly (Wilcoxon).",options:{bullet:{indent:14},breakLine:true,paraSpaceAfter:8}},
+ {text:"Competitive with the Pandiri & Singh hyper-heuristics on their own benchmark and protocol.",options:{bullet:{indent:14},breakLine:true,paraSpaceAfter:8}},
  {text:"GA wins for large k; Farthest Insertion is the weakest for the k-TSP.",options:{bullet:{indent:14},breakLine:true,paraSpaceAfter:8}},
- {text:"DCIH: deterministic, reproducible, competitive quality.",options:{bullet:{indent:14},breakLine:true,paraSpaceAfter:8}},
- {text:"Anytime view separates 'fast' (NN) from 'best' (Greedy/TS).",options:{bullet:{indent:14}}},
+ {text:"DCIH: deterministic, reproducible, competitive quality.",options:{bullet:{indent:14}}},
 ],{x:0.6,y:2.2,w:6.1,h:3.9,fontFace:BODY_FONT,fontSize:15,color:WHITE,valign:"top",margin:0});
 s.addText("Future work",{x:7.0,y:1.75,w:6,h:0.4,fontFace:BODY_FONT,fontSize:16,bold:true,color:GOLD,margin:0});
 s.addText([
@@ -335,11 +348,11 @@ s.addText([
 foot(s);
 
 // ============ 17 — REFERENCES ============
-s=p.addSlide(); bgLight(s); header(s,"15 · References","Selected References");
+s=p.addSlide(); bgLight(s); header(s,"16 · References","Selected References");
 bullets(s,0.6,1.75,12.1,[
- "Pandiri & Singh (2020). The k-TSP benchmark. OPSEARCH.",
+ "Pandiri & Singh (2020). Two multi-start heuristics for the k-TSP. OPSEARCH.",
  "Helsgaun (2017). LKH-3: extension of the Lin–Kernighan–Helsgaun TSP solver.",
- "Weise et al. (2014). Benchmarking optimization algorithms: an open-source framework for the TSP. IEEE CIM.",
+ "Knox (1994). Tabu search performance on the symmetric TSP (Wilcoxon test). Computers & OR.",
  "Rosenkrantz, Stearns & Lewis (1977). An analysis of several heuristics for the TSP. SIAM J. Computing.",
  "Feo & Resende (1995). GRASP. J. of Global Optimization.",
  "Kirkpatrick, Gelatt & Vecchi (1983). Optimization by simulated annealing. Science.",

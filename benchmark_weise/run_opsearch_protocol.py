@@ -170,6 +170,7 @@ def main():
                          "(replace rows for the instances/criteria just run)")
     ap.add_argument("--outdir", default=HERE)
     args = ap.parse_args()
+    os.makedirs(args.outdir, exist_ok=True)
 
     names = list(inst.OFFICIAL_KTSP.keys())
     if args.smoke:

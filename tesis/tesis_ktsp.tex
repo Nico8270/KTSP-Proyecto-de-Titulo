@@ -21,6 +21,8 @@
 \usepackage{enumitem}
 \usepackage{setspace}
 \usepackage{url}
+\usepackage{longtable}
+\usepackage{pdflscape}
 \usepackage[hidelinks]{hyperref}
 \usepackage{lmodern}
 \usepackage{microtype}          % mejor espaciado; evita texto pegado al margen
@@ -135,24 +137,26 @@ Neighbor and the Nearest, Farthest and Random Insertion construction heuristics,
 Simulated Annealing, Tabu Search, and the proposed deterministic heuristic
 \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for
 solution quality, the best-known values (BKS) obtained by the
-Lin--Kernighan--Helsgaun solver (LKH-3) on standard benchmark instances are used. Experiments on 38 standard TSPLIB instances, across three values
-of $k$ ($\approx n/4$, $n/2$, $3n/4$), evaluate solution quality (relative GAP)
-and the \emph{anytime} behavior of the methods
-through progress curves, ECDF, estimated running time (ERT) and an aggregated
-global ranking on a machine-independent time axis.
+Lin--Kernighan--Helsgaun solver (LKH-3) is used. The methods are evaluated on the
+\textbf{76 TSPLIB instances} and the short-/long-run time protocol of Pandiri \&
+Singh~\cite{pandiri2020} ($0.05\,n$ and $0.2\,n$ seconds, ten runs per case), across
+three values of $k$ ($\lfloor n/4\rfloor$, $\lfloor n/2\rfloor$, $\lfloor 3n/4\rfloor$),
+and compared statistically against the published GVNS and hyper-heuristic results
+of that study using the two-tailed Wilcoxon signed-rank test.
 
-The results show that the greedy cheapest-insertion baseline and Tabu Search
-attain the lowest average GAP overall, with Tabu Search the best of the
-metaheuristics; that the genetic algorithm becomes the most frequent per-instance
-winner for large $k$; that Farthest Insertion is the weakest method because
-selecting distant nodes conflicts with the node-selection objective; and that the
-proposed DCIH offers a deterministic, fully reproducible alternative of
-comparable quality.
+The results show that the greedy cheapest-insertion baseline and Tabu Search are
+the most robust of our methods and are \emph{significantly better than the GVNS} of
+Pandiri \& Singh under both time budgets; that under the short run the greedy
+heuristic also matches or exceeds their HH\_GREEDY hyper-heuristic, while the
+randomized hyper-heuristic remains the strongest overall; that the genetic
+algorithm is most competitive for large $k$ under the long run; that Farthest
+Insertion is the weakest method because selecting distant nodes conflicts with the
+node-selection objective; and that the proposed DCIH offers a deterministic, fully
+reproducible alternative of comparable quality.
 
 \vspace{0.3cm}
-\noindent\textbf{Keywords:} anytime benchmarking, genetic algorithms, GRASP,
-greedy heuristics, $k$-TSP, Lin--Kernighan--Helsgaun, simulated annealing,
-tabu search, TSPLIB.
+\noindent\textbf{Keywords:} $k$-TSP, genetic algorithms, GRASP, greedy heuristics,
+Lin--Kernighan--Helsgaun, simulated annealing, tabu search, TSPLIB, Wilcoxon test.
 
 \clearpage
 
@@ -221,12 +225,11 @@ the best-known values obtained with the LKH-3 solver.
   Neighbor and the Nearest, Farthest and Random Insertion heuristics, Simulated
   Annealing, Tabu Search, and the proposed deterministic heuristic DCIH.
   \item To evaluate solution quality against the best-known values (BKS) obtained
-  by LKH-3 on the $k$-TSP benchmark instances of Pandiri \& Singh, using the
-  relative GAP as the quality metric.
-  \item To complement the end-of-run comparison with an \emph{anytime}
-  benchmarking analysis (progress curves, ERT, ECDF and an aggregated global
-  ranking) on a machine-independent time axis, following the methodology of
-  Weise \textit{et~al.}
+  by LKH-3 on the 76 $k$-TSP benchmark instances of Pandiri \& Singh, under their
+  short-/long-run time protocol, using the relative GAP as the quality metric.
+  \item To compare the methods statistically against the published GVNS and
+  hyper-heuristic results of Pandiri \& Singh using the two-tailed Wilcoxon
+  signed-rank test.
   \item To release the whole implementation as a reproducible repository so that
   every table and figure can be regenerated with a single command.
 \end{enumerate}
@@ -249,26 +252,27 @@ study reported in Chapter~\ref{chap:study}:
   Python over a common core of vectorized primitives (2-opt, in/out exchange and
   cheapest insertion), so that all methods share the same local-search machinery
   and are therefore comparable.
-  \item \textbf{Experimental evaluation.} Each method was run on 38 TSPLIB
-  instances for three values of $k$, and its solutions were compared against the
-  LKH-3 best-known values. Beyond the final result, every run recorded its full
-  optimization trajectory to enable the anytime analysis.
+  \item \textbf{Experimental evaluation.} Each method was run on the 76 TSPLIB
+  instances for three values of $k$, under the short-run ($0.05\,n$ s) and
+  long-run ($0.2\,n$ s) time limits of Pandiri \& Singh, with ten runs per
+  stochastic method. Solutions were compared against the LKH-3 best-known values
+  and analysed statistically with the Wilcoxon signed-rank test.
 \end{enumerate}
 
 \noindent\textbf{Tools and reproducibility.} The whole project was developed and
 executed locally in Visual Studio Code, with the implementation versioned in a
 private GitHub repository so that every experiment corresponds to a tracked
-commit. The code is written in Python~3.10 with \texttt{numpy}, \texttt{pandas}
-and \texttt{matplotlib}; the official LKH-3 binary is compiled and run locally to
-obtain the reference values. Because the primary runtime measure is the
-\emph{machine-independent} number of distance evaluations, the comparison does not
-depend on the specific hardware, which further supports replication.
+commit. The code is written in Python~3.10 with \texttt{numpy}, \texttt{pandas},
+\texttt{scipy} and \texttt{matplotlib}; the official LKH-3 binary is compiled and
+run locally to obtain the reference values. Because the protocol uses wall-clock
+time limits, the reported runs correspond to a single fixed machine and the time
+budgets scale with the instance size exactly as in Pandiri \& Singh.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.98\textwidth]{metodologia.png}
 \caption{Work methodology: the four stages of the study, from data design to the
-experimental (anytime) evaluation.}
+experimental evaluation under the Pandiri \& Singh time protocol.}
 \label{fig:metodologia}
 \end{figure}
 
@@ -277,8 +281,9 @@ The core results of this thesis were written up as a scientific paper
 (reproduced in Chapter~\ref{chap:study}), which condenses the mathematical model,
 the ten solution techniques and the experimental comparison, and constitutes the
 core scientific contribution of this work. The paper is being prepared for
-submission to a conference on operations research and combinatorial optimization
-once the final revisions are completed.
+submission to a journal on operations research and combinatorial optimization,
+following the benchmark and experimental protocol of Pandiri \&
+Singh~\cite{pandiri2020}, once the final revisions are completed.
 
 \section{Structure of the Document}
 The remainder of this thesis is organized as follows. \textbf{Chapter~1} (this
@@ -286,9 +291,10 @@ chapter) presented the context, the general and specific objectives, the work
 methodology and the dissemination of the results. \textbf{Chapter~2} contains the
 core of the work --- the paper reproduced as a chapter ---: the problem statement
 and related work, the data representation and the mathematical model of the
-$k$-TSP, the ten solution techniques, the experimental design based on TSPLIB
-instances and the LKH-3 reference, the results (end-of-run and \emph{anytime}
-evaluation) and the analysis of the generated tours. Finally, \textbf{Chapter~3}
+$k$-TSP, the ten solution techniques, the experimental design based on the 76
+TSPLIB instances and the LKH-3 reference under the Pandiri \& Singh time protocol,
+the results and the statistical comparison with the state of the art, and the
+analysis of the generated tours. Finally, \textbf{Chapter~3}
 draws the conclusions, summarizes the contributions and outlines future work. The
 bibliography closes the document.
 
@@ -484,31 +490,35 @@ TS & Metaheuristic & No & best non-tabu move $+$ memory \\
 \end{table}
 
 \section{Benchmarks and Evaluation}
-Experiments use 38 standard TSPLIB instances and follow the $k$-TSP benchmark of
-Pandiri \& Singh~\cite{pandiri2020}. To study how the number of visited nodes
-affects the methods, each instance is evaluated at \emph{three values of $k$},
-expressed as quartiles of the instance size $n$: \textbf{Q1} with
-$k=\lfloor n/4\rfloor$ (visit about a quarter of the cities, where the
-\emph{selection} decision dominates), \textbf{Q2} with $k=\lfloor n/2\rfloor$
-(visit about half), and \textbf{Q3} with $k=\lfloor 3n/4\rfloor$ (visit about three
-quarters, where the problem approaches an ordinary TSP over the selected subset).
-Thus every instance contributes three test cases and the 38 instances yield 114
-(instance, $k$) pairs in total. Each result is compared against the
-best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} for the corresponding
-quartile, and the relative GAP is computed as
-$\mathrm{GAP}\%=100\,(\text{length}-\text{BKS})/\text{BKS}$.
+To make the results directly comparable with the state of the art, the experiments
+follow the \emph{exact} experimental protocol of Pandiri \&
+Singh~\cite{pandiri2020}. The benchmark comprises the \textbf{76 TSPLIB instances}
+of that study, with sizes from $n=14$ to $n=783$. To study how the number of
+visited nodes affects the methods, each instance is evaluated at \emph{three values
+of $k$}: a \textbf{Small} scenario with $k=\lfloor n/4\rfloor$ (visit about a
+quarter of the cities, where the \emph{selection} decision dominates), a
+\textbf{Medium} scenario with $k=\lfloor n/2\rfloor$ (visit about half), and a
+\textbf{Large} scenario with $k=\lfloor 3n/4\rfloor$ (visit about three quarters,
+where the problem approaches an ordinary TSP over the selected subset). The 76
+instances therefore yield $76\times 3 = 228$ (instance, $k$) test cases.
 
-Because end-of-run results alone can hide which method is preferable under a given
-budget, the comparison is complemented with the \emph{anytime} benchmarking
-procedure of Weise \textit{et~al.}~\cite{weise2014benchmarking}. Wall-clock time is
-replaced by a \emph{machine-independent} measure --- the number of \emph{distance
-evaluations} (DE), i.e.\ accesses to the distance matrix. Every run emits log
-points $(\mathrm{DE},\text{length})$ each time it improves its incumbent, and
-quality is the normalized error $F=\text{length}/\text{BKS}-1$. To aggregate
-across instances of different size, the DE axis is scaled by $n^2$. Each
-stochastic method (Greedy, GRASP, GA, RI, SA, TS) is run $10$ times per instance
-and quartile; the deterministic methods (NN, NI, FI, DCIH) are run once. All
-methods share a budget of $15\,n^2$ distance evaluations.
+Following Pandiri \& Singh, two \emph{wall-clock} termination criteria are used for
+every method: a \textbf{short run} (SR) that stops after $0.05\,n$ seconds and a
+\textbf{long run} (LR) that stops after $0.2\,n$ seconds. Each stochastic method
+(Greedy, GRASP, GA, RI, SA, TS) is executed \textbf{ten} independent times per case
+and the best tour is reported; the deterministic constructions (NN, NI, FI, DCIH)
+are run once, as repeated runs would return the identical tour. Each result is
+compared against the best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} for
+the corresponding instance and value of $k$, and the relative gap is computed as
+$\mathrm{GAP}\%=100\,(\text{length}-\text{BKS})/\text{BKS}$ (lower is better; a gap
+of $0$ means the method matches LKH-3).
+
+For the statistical comparison between algorithms we use the two-tailed
+\textbf{Wilcoxon signed-rank test}~\cite{knox1994} on the paired per-instance gaps,
+the non-parametric paired test recommended for comparing two algorithms over many
+instances. This directly addresses the absence of a statistical analysis in the
+earlier version of this study and matches the test used by Pandiri \&
+Singh~\cite{pandiri2020}.
 
 \subsection*{Experimental Environment and Reproducibility}
 All experiments were developed and executed locally in Visual Studio Code, with
@@ -518,20 +528,20 @@ with \texttt{numpy}, \texttt{pandas} and \texttt{matplotlib}; the official LKH-3
 binary is compiled and run locally to obtain the reference (BKS) values. The ten
 methods are implemented over a shared core of vectorized primitives, and the whole
 pipeline --- instance loading, execution of the methods, computation of the
-relative GAP, and generation of every table and figure --- is automated so that
-the results can be regenerated with a single command. Because the primary runtime
-measure is the \emph{machine-independent} number of distance evaluations, the
-reported comparison does not depend on the specific hardware, which is a key
-requirement of the anytime methodology and further supports replication.
+relative GAP, the Wilcoxon test, and generation of every table and figure --- is
+automated so that the results can be regenerated with a single command. Because the
+protocol uses wall-clock time limits ($0.05\,n$ and $0.2\,n$ seconds), the reported
+runs correspond to a single, fixed machine, and the time budgets scale with the
+instance size exactly as in Pandiri \& Singh~\cite{pandiri2020}.
 
 \paragraph{Repository structure.}
 The repository is organized as follows: \texttt{ktsp\_core.py} contains the ten
-methods and the shared local-search primitives; \texttt{instances.py} loads the
-TSPLIB (or synthetic) instances and the LKH-3 reference values; \texttt{metrics.py}
-implements the anytime metrics (progress, ERT, ECDF, ranking);
-\texttt{run\_benchmark.py} runs the full experiment and regenerates the figures and
-tables; and \texttt{ktsp\_experimento.py} produces the per-instance comparison. A
-Jupyter notebook reproduces the LKH-3 reference computation.
+methods and the shared local-search primitives; \texttt{instances.py} loads the 76
+TSPLIB instances and the LKH-3 reference values; \texttt{run\_opsearch\_protocol.py}
+runs the full short-/long-run protocol over the 76 instances and the three $k$
+scenarios and regenerates the result tables; and \texttt{wilcoxon\_test.py} performs
+the Wilcoxon signed-rank analysis. A Jupyter notebook reproduces the LKH-3 reference
+computation.
 
 \paragraph{Parameters.}
 For a fair comparison, the parameters of the metaheuristics (tabu tenure, cooling
@@ -541,92 +551,78 @@ tuning would likely improve the results of the metaheuristics and is left as fut
 work (Section~\ref{sec:future} in Chapter~3).
 
 \section{Results}
-Table~\ref{tab:resumen_gap} summarizes the average relative GAP per method and
-quartile. Tables~\ref{tab:resultados_Q1}--\ref{tab:resultados_Q3} report the
-per-instance tour lengths for Q1, Q2 and Q3; values in bold match the LKH-3
-best-known value.
+Table~\ref{tab:gap} reports the mean relative GAP to the LKH-3 best-known solution
+over the 76 instances for every method, termination criterion (SR, LR) and $k$
+scenario, alongside the published results of Pandiri \& Singh~\cite{pandiri2020}
+(marked with~*). Figure~\ref{fig:gap_scenario} visualizes the same aggregates for
+the strongest methods.
 
-\input{_tab_resumen.tex}
+\input{_tab_opsearch.tex}
 
-Across the 38 instances, the greedy cheapest-insertion baseline and Tabu Search
-attain the lowest average GAP overall ($\approx 12.6\%$ and $\approx 12.5\%$),
-with Tabu Search the best of the metaheuristics; Simulated Annealing follows,
-ahead of GRASP and Nearest Neighbor. The genetic algorithm has a higher average
-GAP but is the most frequent per-instance winner (together with Greedy) and
-closes the gap for large $k$ (Q3). Among the construction heuristics, Farthest
-Insertion is clearly the weakest for the $k$-TSP: repeatedly inserting the node
-\emph{farthest} from the tour conflicts with the node-selection objective, which
-rewards choosing nodes that are cheap to include. DCIH remains a deterministic,
-reproducible alternative of quality comparable to GRASP and the insertion
-heuristics.
+Averaged over all six groups, the hyper-heuristics of Pandiri \&
+Singh~\cite{pandiri2020} remain the strongest (HH\_RAND $6.2\%$, HH\_GREEDY
+$7.3\%$), immediately followed by our greedy cheapest-insertion baseline ($8.1\%$)
+and Tabu Search ($8.8\%$). Both of these clearly outperform the GVNS of the same
+study ($16.2\%$). Simulated Annealing ($11.8\%$), the genetic algorithm ($12.8\%$)
+and GRASP ($13.6\%$) form a middle group, while DCIH ($17.5\%$) provides a fully
+deterministic alternative of quality comparable to the insertion constructions.
+Random Insertion and, especially, Farthest Insertion are the weakest: repeatedly
+inserting the node \emph{farthest} from the tour conflicts with the node-selection
+objective, which rewards choosing nodes that are cheap to include.
 
-The value of $k$ has a clear effect on the relative performance of the methods.
-For small $k$ (Q1), where the selection decision dominates, the greedy
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{Fig1_gap_scenario.png}
+\caption{Mean relative gap to LKH-3 (\%) by $k$ scenario, for the short run (left)
+and long run (right). Our methods (solid bars) are shown next to the published GVNS
+and hyper-heuristics of Pandiri \& Singh~\cite{pandiri2020} (hatched bars,~*).}
+\label{fig:gap_scenario}
+\end{figure}
+
+The value of $k$ has a clear effect on relative performance. For small $k$
+(Small scenario), where the selection decision dominates, the greedy
 cheapest-insertion baseline and Tabu Search are the strongest, because choosing a
-few cheap-to-include nodes and refining them locally is highly effective, whereas
-the genetic algorithm --- which spends part of its budget exploring subsets --- is
-comparatively weak. As $k$ grows (Q2 and especially Q3), the selection problem
-becomes less binding (a larger fraction of the nodes must be visited) and the
-problem approaches an ordinary TSP over the selected subset; there the genetic
-algorithm and the other trajectory-based metaheuristics close the gap and the GA
-becomes the most frequent per-instance winner. This behaviour, visible both in
-Table~\ref{tab:resumen_gap} and in the per-instance
-Tables~\ref{tab:resultados_Q1}--\ref{tab:resultados_Q3}, is consistent with the
-intuition that the difficulty of the $k$-TSP shifts from \emph{selection} to
-\emph{ordering} as $k$ increases.
+few cheap-to-include nodes and refining them locally is highly effective. As $k$
+grows (Medium and especially Large), the selection problem becomes less binding and
+the problem approaches an ordinary TSP over the selected subset; there the genetic
+algorithm closes the gap and, under the long run, becomes the best of our methods
+in the Large scenario (its mean gap falls from $11.0\%$ in the short run to $8.7\%$
+in the long run). The deterministic constructions (NN, NI, FI, DCIH) do not change
+between SR and LR, since they build a single tour and cannot exploit additional
+time.
 
-\input{_tab_q1.tex}
-\input{_tab_q2.tex}
-\input{_tab_q3.tex}
+\section{Statistical Comparison with the State of the Art}
+Table~\ref{tab:wilcoxon} reports the two-tailed Wilcoxon signed-rank test between
+our two strongest methods and the three approaches of Pandiri \&
+Singh~\cite{pandiri2020}, paired on the per-instance gap. Both the greedy
+cheapest-insertion baseline and Tabu Search are \emph{significantly better than
+GVNS} under both termination criteria ($p<0.05$). Under the short run, the greedy
+heuristic is even significantly better than HH\_GREEDY, and Tabu Search is
+statistically on par with it; the randomized hyper-heuristic HH\_RAND remains ahead.
+Under the long run, with more time available, the hyper-heuristics pull clearly
+ahead of our single-core methods.
 
-\section{Anytime Evaluation}
-From the logged trajectories we build three standard views. The
-\textbf{progress curves} (Figure~\ref{fig:progress}) show the median best-so-far
-error $F$ versus the scaled DE; all methods are drawn over a common budget, so a
-method that converges early appears as a flat line. The \textbf{ECDF}
-(Figure~\ref{fig:ecdf}) shows the fraction of runs that reach the target error
-$F_t=20\%$ as a function of the scaled DE, and the \textbf{ERT}
-(Figure~\ref{fig:ert}) reports the estimated running time to reach each target
-error. Aggregating four criteria (final $F$, area under the progress and ECDF
-curves, and ERT at $20\%$) by the median rank yields the global ranking of
-Table~\ref{tab:anytime_ranking}.
+\input{_tab_wilcoxon.tex}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.9\textwidth]{01_progreso_agregado.png}
-\caption{Anytime progress curves aggregated over the 38 TSPLIB instances and the
-three quartiles of $k$: median error $F$ (\%) versus the machine-independent time
-(distance evaluations scaled by $n^2$). Lower and earlier is better.}
-\label{fig:progress}
-\end{figure}
+Counting per-case wins and ties, the best of our ten methods matches or beats the
+best of the three Pandiri methods in $103$ of the $228$ short-run cases ($45\%$)
+and, against HH\_GREEDY alone, in $123$ of $228$ cases ($54\%$). Figure~\ref{fig:box}
+shows the distribution of the per-instance gap under the long run: the greedy
+baseline and Tabu Search have the tightest distributions among our methods, close
+to those of the hyper-heuristics, whereas Farthest and Random Insertion show long
+upper tails. Overall, these results show that simple, reproducible heuristics built
+on a common local-search core are competitive with dedicated metaheuristics on this
+benchmark, and that they decisively outperform the GVNS baseline.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.9\textwidth]{02_ecdf_agregado.png}
-\caption{Aggregated ECDF for the target error $F_t=20\%$: fraction of runs that
-reach a tour within $20\%$ of the LKH-3 reference as a function of the scaled
-distance evaluations.}
-\label{fig:ecdf}
+\includegraphics[width=\textwidth]{Fig2_boxplot_gap.png}
+\caption{Distribution of the per-instance relative gap to LKH-3 under the long run,
+aggregated over the three $k$ scenarios (whiskers without outliers; values clipped
+at $80\%$ for readability). Methods marked~* are those of Pandiri \&
+Singh~\cite{pandiri2020}.}
+\label{fig:box}
 \end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.9\textwidth]{03_ert_vs_meta.png}
-\caption{Median ERT (scaled distance evaluations, $\mathrm{DE}/n^2$) to reach each
-target error $F_t$ (from $35\%$ down to $15\%$; more demanding to the right).}
-\label{fig:ert}
-\end{figure}
-
-\input{_tab_ranking.tex}
-
-Under a fixed machine-independent budget, Nearest Neighbor ranks first because it
-reaches a good tour with far fewer distance evaluations than any other method, so
-it dominates the ERT and ECDF criteria; the greedy baseline, Tabu Search and
-Simulated Annealing follow, and DCIH provides a competitive \emph{deterministic}
-trajectory with no variance across runs. Farthest Insertion ranks last. The
-contrast between the anytime ranking (which rewards fast convergence) and the
-end-of-run GAP (which rewards final quality) is exactly the kind of insight the
-anytime methodology is designed to expose~\cite{weise2014benchmarking}.
 
 \section{Analysis of the Generated Tours}
 The tours produced for the $k$-TSP are single closed loops through the depot over
@@ -651,31 +647,32 @@ This thesis implemented and compared ten methods for the $k$-Traveling Salesman
 Problem --- a greedy cheapest-insertion heuristic, a GRASP/multi-start scheme, a
 genetic algorithm, the Nearest Neighbor and the Nearest, Farthest and Random
 Insertion heuristics, Simulated Annealing, Tabu Search, and the proposed
-deterministic heuristic DCIH --- and evaluated them on 38 TSPLIB instances across
-three values of $k$, using the best-known values obtained by LKH-3 as the quality
-reference. Beyond the end-of-run comparison, the study adopted the anytime
-benchmarking methodology of Weise \textit{et~al.}, reporting progress curves,
-ERT, ECDF and an aggregated global ranking on a machine-independent time axis.
+deterministic heuristic DCIH --- and evaluated them on the 76 TSPLIB instances of
+Pandiri \& Singh~\cite{pandiri2020} across three values of $k$, under their
+short-run ($0.05\,n$ s) and long-run ($0.2\,n$ s) time protocol, using the
+best-known values obtained by LKH-3 as the quality reference and the two-tailed
+Wilcoxon signed-rank test for the statistical comparison against the published
+GVNS and hyper-heuristic results of that study.
 
 \section{Main Conclusions}
 \begin{itemize}[leftmargin=*]
-  \item The greedy cheapest-insertion baseline is the most robust method on
-  average across the whole range of $k$, and \textbf{Tabu Search is the best of
-  the metaheuristics}, essentially tying the baseline in average GAP.
-  \item The genetic algorithm matches the baseline and becomes the most frequent
-  per-instance winner only for large $k$ (Q3), consistent with its slower but
-  continuing convergence observed in the progress curves.
+  \item The greedy cheapest-insertion baseline and \textbf{Tabu Search} are the
+  most robust of our methods across the whole range of $k$, and both are
+  \textbf{significantly better than the GVNS} of Pandiri \& Singh under both time
+  budgets (Wilcoxon, $p<0.05$).
+  \item Under the short run, the greedy heuristic is even significantly better than
+  the HH\_GREEDY hyper-heuristic, and Tabu Search is statistically on par with it;
+  the randomized hyper-heuristic HH\_RAND remains the strongest overall, especially
+  under the long run.
+  \item The genetic algorithm is most competitive for large $k$ and, under the long
+  run, becomes the best of our methods in the Large scenario, consistent with its
+  slower but continuing convergence.
   \item \textbf{Farthest Insertion is the weakest} method for the $k$-TSP:
   selecting the nodes farthest from the tour conflicts with the node-selection
   objective, which rewards cheap-to-include nodes.
   \item The proposed \textbf{DCIH} provides a deterministic, fully reproducible
   alternative of quality comparable to GRASP and the insertion heuristics ---
   useful whenever reproducibility matters more than winning by chance.
-  \item The anytime analysis revealed a distinction that end-of-run tables hide:
-  under a limited budget, the very cheap Nearest Neighbor dominates the
-  \emph{speed} criteria (ERT, ECDF) even though it is only mid-ranked in final
-  quality. Separating ``fast'' from ``best'' is precisely the value of the anytime
-  methodology.
 \end{itemize}
 
 \section{Contributions}
@@ -683,8 +680,9 @@ The main contributions of this work are: (i)~a reproducible, openly documented
 repository in which every table and figure can be regenerated with a single
 command; (ii)~a uniform implementation of ten $k$-TSP methods over a shared
 local-search core, enabling a fair comparison; (iii)~the proposed deterministic
-DCIH heuristic; and (iv)~an anytime, machine-independent evaluation of the methods
-against the LKH-3 reference.
+DCIH heuristic; and (iv)~a statistical evaluation of the methods under the Pandiri
+\& Singh time protocol against both the LKH-3 reference and the published state of
+the art.
 
 \section{Future Work}\label{sec:future}
 Several directions remain open. First, more powerful metaheuristics --- such as
@@ -703,6 +701,28 @@ framework to larger TSPLIB instances and to related selective-routing problems
 % ============================================================================
 %  BIBLIOGRAPHY (50 references)
 % ============================================================================
+\clearpage
+\appendix
+\chapter{Per-instance results}\label{app:tables}
+This appendix reports the per-instance tour length obtained by each method under the
+Pandiri \& Singh protocol, for the three $k$ scenarios (Small $k=\lfloor n/4\rfloor$,
+Medium $k=\lfloor n/2\rfloor$, Large $k=\lfloor 3n/4\rfloor$) and the two termination
+criteria (short run $0.05n$ s and long run $0.2n$ s). For the stochastic methods the
+best of the ten runs is reported. The LKH-3 column is the best-known value (BKS);
+values in \textbf{bold} match it.
+
+\begin{landscape}
+\section{Short run (SR)}
+\input{_tab_app_SR_Small.tex}
+\input{_tab_app_SR_Medium.tex}
+\input{_tab_app_SR_Large.tex}
+\section{Long run (LR)}
+\input{_tab_app_LR_Small.tex}
+\input{_tab_app_LR_Medium.tex}
+\input{_tab_app_LR_Large.tex}
+\end{landscape}
+
+\clearpage
 \input{_bibliografia.tex}
 
 \end{document}

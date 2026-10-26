@@ -1,0 +1,1060 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% ---------------------- PREÁMBULO ----------------------
+\usepackage{cite}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,arrows.meta}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{listings}
+\usepackage[most]{tcolorbox} % opcional, pero recomendado
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{threeparttable}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{tabularx} % tablas adaptables al ancho
+\usepackage{booktabs} % reglas bonitas en tablas
+\usepackage{siunitx}  % alineación numérica
+\usepackage{caption}
+\usetikzlibrary{arrows.meta,positioning,decorations.pathreplacing,matrix}
+\usepackage{placeins}   % para \FloatBarrier
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usetikzlibrary{arrows.meta,positioning,decorations.pathreplacing}
+\usepackage{tabularx}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\usepackage{needspace}   % reservar espacio antes de un bloque grande
+\allowdisplaybreaks[0]   % NO partir ecuaciones multi-línea entre páginas
+\interdisplaylinepenalty=10000
+
+
+\setlength{\jot}{6pt}        % Más espacio vertical entre líneas en align
+
+% --- AJUSTES PARA EVITAR SOLAPES ---
+\usepackage{microtype}     % mejor espaciado y cortes
+\usepackage[bottom]{footmisc}
+% \usepackage{stfloats}  (removido: conflicto con dblfloatfix)
+\usepackage{dblfloatfix}   % floats a dos columnas fiables
+\usepackage{balance}
+\usepackage{etoolbox}
+\appto\sloppy{}            % más permisivo con los cortes
+\emergencystretch=3em      % evita overfull hboxes
+\allowdisplaybreaks[2]     % permite partir ecuaciones si hace falta
+\raggedbottom              % evita estirar vertical en exceso
+
+% --- Código en una sola página y sin desbordes ---
+\usepackage{listings}
+\usepackage{courier}
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  breakatwhitespace=true,
+  frame=single,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  tabsize=2
+}
+
+\sisetup{table-number-alignment=center,round-mode=places,round-precision=2}
+\renewcommand{\arraystretch}{1.2} % más aire entre filas
+\captionsetup{font=small,labelfont=bf}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{4pt}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\graphicspath{{./}}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% ---------------------- DOCUMENTO ----------------------
+
+\title{Heuristic Approaches for the $k$-Traveling Salesman Problem: A Reproducible Comparison\thanks{}}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Nicolás Barrientos}
+\IEEEauthorblockA{\textit{Facultad de Ingeniería} \\
+\textit{Universidad Andrés Bello}\\
+Santiago de Chile, Chile \\
+n.barrientossabaleta@uandresbello.edu}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Gustavo Gatica}
+\IEEEauthorblockA{\textit{Facultad de Ingeniería} \\
+\textit{Universidad Andrés Bello}\\
+Santiago de Chile, Chile \\
+ggatica@unab.cl}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Daniel Morillo-Torres}
+\IEEEauthorblockA{\textit{Facultad de Ingeniería} \\
+\textit{Pontificia Universidad Javeriana Cali}\\
+Cali, Colombia \\
+daniel.morillo@javerianacali.edu.co}
+\and
+\IEEEauthorblockN{4\textsuperscript{th} Rodrigo Linfati}
+\IEEEauthorblockA{\textit{Departamento de Ingeniería Industrial} \\
+\textit{Universidad del Bío-Bío}\\
+Concepción, Chile \\
+rlinfati@ubiobio.cl}
+}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The $k$-Traveling Salesman Problem ($k$-TSP) is a generalization of the classical Traveling Salesman Problem (TSP). Given a set of $n$ cities that includes a home city (depot) and a fixed value $k$ with $1 < k \le n$, the $k$-TSP seeks a single tour of minimum total length that starts and ends at the home city and visits \emph{exactly} $k$ cities (the home city included), chosen from the $n$ available. Solving it therefore involves two coupled decisions: \emph{which} $k$ cities to visit and in \emph{which order}.
+
+This work presents a repository and an experimental implementation of several optimization techniques for the $k$-TSP, including a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion construction heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). As the reference for solution quality we use the best-known values (BKS) obtained by the Lin--Kernighan--Helsgaun solver (LKH-3) on standard $k$-TSP benchmark instances.
+
+We describe the data representation, the mathematical model, and an experimental design based on TSPLIB instances. Experiments on 38 TSPLIB instances, across three values of $k$ (about $n/4$, $n/2$, and $3n/4$), compare ten methods against the LKH-3 best-known values: the greedy cheapest-insertion heuristic and Tabu Search are the most robust on average across all three values of $k$ (Tabu Search being the best of the metaheuristics), Simulated Annealing follows, the genetic algorithm becomes the most frequent per-instance winner when $k$ is large, Farthest Insertion is the weakest for the $k$-TSP, and DCIH offers a deterministic, reproducible alternative of comparable quality throughout.
+\end{abstract}
+
+\begin{IEEEkeywords}
+combinatorial optimization, genetic algorithms, GRASP, greedy heuristics,
+$k$-TSP, Lin--Kernighan--Helsgaun, node selection, simulated annealing,
+tabu search, TSPLIB.
+\end{IEEEkeywords}
+
+% ===================== 1. INTRODUCCIÓN =====================
+\section{Introduction}
+
+The \textbf{$k$-TSP} is a generalization of the classical \textit{Traveling Salesman Problem} (TSP) and has been studied in the combinatorial optimization literature \cite{venkatesh2018,pandiri2020,ene2017,blanchard2023}. Unlike the standard TSP, in which a single salesman must visit \emph{all} the cities, in the $k$-TSP the salesman visits only a \emph{subset} of exactly $k$ cities (including a fixed home city) and the remaining $n-k$ cities are left unvisited. The objective is to minimize the total length of the single resulting tour.
+
+\vspace{2pt}
+Formally, given $n$ cities with a designated home city (depot) and a fixed value $k$ with $1 < k \le n$, a feasible solution is obtained by first \emph{selecting} which $k$ cities to include (the home city among them) and then determining a \emph{circular ordering} of those $k$ cities \cite{venkatesh2018}. This dual (selection $+$ ordering) nature is what distinguishes the $k$-TSP from the standard TSP and is the source of its combinatorial difficulty.
+
+\vspace{2pt}
+This problem belongs to the NP-hard class: choosing a subset of $k$ nodes among $n$ and then ordering them yields a search space that grows combinatorially, making exhaustive enumeration intractable for medium and large instances \cite{lawler1985}. Hence the need for heuristic and metaheuristic techniques, an area in which the TSP and its variants have seen remarkable algorithmic progress \cite{rego2011tsp}.
+
+\vspace{2pt}
+The $k$-TSP also sits within the broader family of \emph{TSP with profits} and selective routing problems \cite{feillet2005profits}. In particular, it is the unit-prize special case of the Quota TSP, itself a variant of the Prize-Collecting TSP introduced by Balas \cite{balas1989pctsp}: when every node carries a unit prize and the quota equals $k$, collecting the quota is exactly visiting $k$ nodes \cite{bienstock1993pctsp}. A recent systematic survey of TSP variants places these selective problems in a common definitional framework \cite{tspt3co2025}.
+
+\vspace{2pt}
+Beyond the selective-routing framing, a large body of work targets the classical TSP itself. Exact methods based on integer programming and dynamic programming solve it optimally but scale poorly with $n$~\cite{dantzig1954,bellman1962,heldkarp1962,karp1972}, which motivated decades of research on construction heuristics and local search~\cite{lin1965,christofides1976,bentley1992,johnson1997,laporte1992}. Representative metaheuristic families include tabu search~\cite{glover1986,gloverlaguna1997,knox1994}, simulated annealing~\cite{cerny1985}, ant colony optimization~\cite{dorigo1997acs}, variable neighborhood search~\cite{mladenovic1997vns} and iterated local search based on large-step Markov chains~\cite{martin1991}, as well as evolutionary approaches designed specifically for the TSP~\cite{potvin1996}; broad overviews and design principles are given in~\cite{blumroli2003,talbi2009}. Comprehensive treatments of the TSP and its variants~\cite{gutin2007book}, near-optimal exact solvers~\cite{applegate2006concorde} and polynomial-time approximation schemes for the Euclidean case~\cite{arora1998} complete this landscape, within which node-selection variants such as the multiple TSP~\cite{bektas2006} and the $k$-TSP naturally arise.
+
+\vspace{2pt}
+The main \textbf{motivation} for studying the $k$-TSP lies in applications where only a subset of locations must be served under a budget on the number of stops: selective sampling, prize-collecting routing, surveillance with limited visits, and resource-constrained logistics \cite{vansteenwegen2011top,blanchard2023}. Solving it efficiently reduces cost and improves resource utilization.
+
+\vspace{2pt}
+The \textbf{general objective} of this work is to develop a repository that models, solves, and compares $k$-TSP instances using standard TSPLIB instances and synthetic benchmarks. The \textbf{specific objectives} are:
+\begin{itemize}
+    \item To formulate the problem mathematically, incorporating node-selection, degree, and subtour-elimination constraints for a single tour over a chosen subset.
+    \item To implement several solution techniques: a greedy cheapest-insertion constructive heuristic, a GRASP/multi-start scheme, a genetic algorithm, the classical Nearest Neighbor and Nearest/Farthest/Random Insertion heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}.
+    \item To evaluate solution quality against the best-known values (BKS) obtained by LKH-3~\cite{Helsgaun,lin1973} on the $k$-TSP benchmark instances of Pandiri \& Singh~\cite{pandiri2020}.
+\end{itemize}
+
+In the following sections we present the \textbf{data representation (ADT)} used in the repository, the \textbf{mathematical model} with its constraints, the \textbf{solution techniques} considered, and finally the \textbf{experiments and benchmarks} designed to evaluate the proposals. This thread gives coherence to the later sections and facilitates a clear understanding of the study.
+
+\section{Materials and Methods}
+The methodology was structured in four stages: data design, mathematical model, heuristic resolution, and experimental evaluation.
+
+\subsection{Data Representation (ADT)}
+
+A \emph{tour-based} encoding is used for the $k$-TSP: each solution is a single circular sequence of exactly $k$ nodes that includes the home city (depot). The unvisited $n-k$ nodes are not part of the tour. The distance matrix is Euclidean (or as given by the instance via its \texttt{EDGE\_WEIGHT\_TYPE}).
+
+\paragraph{Conceptual model.}
+The $k$-TSP is considered with:
+(i) selection of exactly $k$ nodes including the home city,
+(ii) a single closed tour over the selected subset, and
+(iii) a \textbf{total tour length (SUM)} objective to be minimized.
+
+\paragraph{Solution Techniques.}
+\begin{itemize}
+  \item \textbf{Greedy (cheapest insertion):} build the tour from the home city by repeatedly inserting the node with the smallest marginal insertion cost until $k$ nodes are reached. This greedy construction yields a feasible tour that is then refined, as a separate post-processing step, by 2-opt local search. Several deterministic restarts keep the best tour.
+  \item \textbf{GRASP / multi-start:} randomized greedy construction (nearest nodes to the home city with controlled noise) followed by local search over the 2-opt and in/out-exchange neighbourhoods; the best tour over many restarts is retained.
+  \item \textbf{Genetic Algorithm (GA):} an individual encodes the \emph{selected subset and its order}; tournament selection, a subset-aware crossover, swap/in--out mutation, elitism, and 2-opt local improvement.
+  \item \textbf{Classical construction heuristics (NN, NI, FI, RI):} the Nearest Neighbor tour and the Nearest, Farthest, and Random Insertion heuristics, all refined by 2-opt and in/out exchange, as standard well-understood baselines.
+  \item \textbf{Simulated Annealing (SA):} a single-solution metaheuristic with Metropolis acceptance over the 2-opt and in/out neighbourhoods, complementing the population-based GA.
+  \item \textbf{Tabu Search (TS):} a memory-based local search that always moves to the best non-tabu neighbour and forbids recently used moves for a fixed tenure, with an aspiration criterion.
+  \item \textbf{DCIH (Deterministic Cheapest-Insertion Heuristic):} the proposed \emph{deterministic} heuristic. It selects the $k$ nodes by minimum marginal insertion cost and refines with 2-opt plus an in/out node exchange, with ties broken by node index so the result is fully reproducible (described below in Section~\ref{sec:soltech}).
+\end{itemize}
+The best-known values (BKS) obtained by LKH-3 on the $k$-TSP benchmark serve as the quality reference (Section~\ref{sec:soltech}).
+
+\paragraph{Experimental protocol.}
+\begin{enumerate}[label=\roman*)]
+  \item \textbf{Instances:} small and medium TSPLIB instances; following the $k$-TSP benchmark of Pandiri \& Singh~\cite{pandiri2020}, three values of $k$ are evaluated per instance, namely $k=\lfloor n/4\rfloor$ (Q1), $k=\lfloor n/2\rfloor$ (Q2), and $k=\lfloor 3n/4\rfloor$ (Q3).
+  \item \textbf{Parameters:} time budgets per heuristic (e.g., GRASP $12$\,s, GA $20$\,s), population size, and a fixed seed for the stochastic methods (GRASP, GA, RI, SA, TS). The deterministic methods (NN, NI, FI, DCIH) use no seed.
+  \item \textbf{Metrics:} total tour length (SUM) and the relative GAP against the LKH-3 best-known value (BKS).
+  \item \textbf{Comparison:} the relative GAP is computed against the best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} for each instance and value of $k$.
+  \item \textbf{Analysis:} comparative tables and relative GAP across methods, instances, and values of $k$.
+  \item \textbf{Environment:} hardware/OS, Python version, and libraries, to ensure replicability.
+\end{enumerate}
+
+\paragraph{Execution flow.}
+For each instance: (a) load/generate coordinates and distances; (b) set $k$ and seed;
+(c) run Greedy, GRASP, GA, NN, NI, FI, RI, SA, TS, and DCIH within their budgets; (d) collect total tour length;
+(e) compute the relative GAP against the BKS and export results to CSV/LaTeX.
+
+% ===================== 2. REPRESENTATION (ADT) =====================
+\Needspace{14\baselineskip}
+\begingroup
+\interdisplaylinepenalty=10000
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+
+\subsection{Data Structures and Genotype Encoding}
+
+The data representation is the structural foundation of the repository and ensures \textbf{clarity}, \textbf{maintainability}, and \textbf{reproducibility}. Abstract Data Types (ADT) organize uniformly both standard TSPLIB instances and synthetic benchmarks generated with a fixed seed.
+
+The structure considers:
+
+\begin{itemize}
+    \item \textbf{Instance}: defined by the number of nodes $n$, the number of nodes to visit $k$, and the home city $\mathrm{home}=0$. Each instance is described by:
+    \begin{itemize}
+        \item \texttt{coords} $(n\times 2)$: Euclidean coordinates.
+        \item Cost matrix $C\in\mathbb{R}^{n\times n}$.
+        \item \texttt{seed} ($=42$): fixed seed for stochastic methods.
+        \item \textbf{Metadata}: name, size, \texttt{EDGE\_WEIGHT\_TYPE}, and value of $k$.
+    \end{itemize}
+
+    \item \textbf{Tour}: a single circular sequence of exactly $k$ nodes that includes the home city. By convention it is stored as a list $[\,0,\,v_1,\,v_2,\,\dots,\,v_{k-1}\,]$ and closed implicitly from the last node back to $0$.
+
+    \item \textbf{Selection $S$}: the set of $k$ visited nodes, $S\subseteq V$, with $0\in S$ and $|S|=k$. The complement $V\setminus S$ is the set of $n-k$ unvisited nodes.
+
+    \item \textbf{Genotype}: a representation that jointly encodes \emph{which} nodes are selected and in \emph{what order} they are visited.
+\end{itemize}
+
+\paragraph{Genotype structure.}
+A solution is encoded as an ordered list of $k$ distinct node identifiers, the first being the home city:
+\[
+  X=[\,0,\,v_1,\,v_2,\,\dots,\,v_{k-1}\,],\qquad
+  v_t\in V\setminus\{0\},\ \ v_s\neq v_t .
+\]
+There are no route separators (there is a single tour) and no assignment labels (there is a single salesman). The two coupled decisions of the $k$-TSP are captured directly: the \emph{set} $\{v_1,\dots,v_{k-1}\}$ is the selection, and its \emph{sequence} is the order.
+
+\paragraph{Validity criteria.}
+A genotype $X$ is feasible if and only if:
+\begin{enumerate}
+  \item \emph{Cardinality:} $|X|=k$.
+  \item \emph{Home inclusion:} $0\in X$ (placed first by convention).
+  \item \emph{No duplicates:} every node appears at most once.
+  \item \emph{Domain:} each entry lies in $\{0,\dots,n-1\}$.
+\end{enumerate}
+These four checks are exactly those implemented by the validation routine in the repository.
+
+\paragraph{Genotype $\rightarrow$ phenotype mapping.}
+Decoding is direct: the phenotype is the closed tour
+\[
+  X=[\,0,\,v_1,\,\dots,\,v_{k-1}\,]\ \Longrightarrow\
+  T=(0\to v_1\to\cdots\to v_{k-1}\to 0),
+\]
+with length $\mathrm{Cost}(T)=d(0,v_1)+\sum_{t=1}^{k-2} d(v_t,v_{t+1})+d(v_{k-1},0)$.
+
+\paragraph{Repair of infeasible genotypes.}
+Stochastic operators (in GA) may produce a list with the wrong cardinality or with duplicates. Repair restores feasibility deterministically:
+\begin{enumerate}
+  \item \emph{Duplicate removal:} keep the first occurrence of each node, drop the rest.
+  \item \emph{Home enforcement:} if $0$ is absent, prepend it (and drop the last node if needed to keep $|X|=k$).
+  \item \emph{Completion:} if $|X|<k$, add nodes from $V\setminus S$ chosen by minimum-cost insertion until $|X|=k$; if $|X|>k$, remove the non-home node whose deletion least increases\,/\,most decreases the length.
+\end{enumerate}
+
+\paragraph{Extended example $(n=8,\ k=4)$.}
+Suppose $V=\{0,\dots,7\}$ and the selection is $\{0,3,5,7\}$:
+\[
+  X=[\,0,\,3,\,7,\,5\,]\ \Longrightarrow\ T=(0\to 3\to 7\to 5\to 0).
+\]
+The four nodes $\{1,2,4,6\}$ are \emph{not visited}. If an operator produced $X=[\,0,3,7,3\,]$ (duplicate $3$, node count after dedup $=3<k$), repair removes the second $3$ and inserts the cheapest available node from $\{1,2,4,5,6\}$ at its best position to restore $|X|=4$.
+
+\subsection*{Fitness Evaluation}
+
+\paragraph{Objective.} For a feasible tour $T=(0,v_1,\dots,v_{k-1},0)$ over the selected subset, the single objective is the total length:
+\[
+  F(T)=\mathrm{Cost}(T)=\sum_{t=0}^{k-1} d\bigl(u_t,u_{t+1}\bigr),
+\]
+where $(u_0,\dots,u_k)=(0,v_1,\dots,v_{k-1},0)$. The $k$-TSP minimizes $F(T)$; there is no min--max term, because there is a single route.
+
+\paragraph{Conversion to fitness (for selection in GA).}
+For tournament selection we transform the cost into a positive fitness,
+\[
+  \mathrm{fitness}(T)=\frac{1}{1+F(T)},
+\]
+so that shorter tours obtain higher fitness. The feasibility of $T$ is guaranteed by the repair step, so no penalty term is required; if an unrepaired infeasibility ever reached evaluation it would be discarded.
+
+\endgroup
+\FloatBarrier
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Genotipo-Fenotipo_V14.png}
+    \caption{Genotype$\rightarrow$phenotype flow for the $k$-TSP: the genotype encodes the selected subset of $k$ nodes and their order; decoding closes the sequence into a single tour through the home city, which is then evaluated by its total length $F(T)$ and refined by local search.}
+    \label{fig:Genotipo_Fenotipo}
+\end{figure}
+
+% ===================== 3. MATHEMATICAL MODEL =====================
+\subsection{Mathematical Modeling}
+
+The $k$-TSP must choose \emph{which} $k$ nodes to visit and \emph{in which order}, which makes the search space combinatorial: the number of candidate subsets is $\binom{n-1}{k-1}$ and each admits $(k-1)!/2$ distinct tours. For example, for $n=100$ and $k=50$ the number of subsets alone exceeds $10^{28}$, so exhaustive enumeration is intractable and heuristic/metaheuristic methods are required. Even for the standard TSP, exact resolution of large instances relies on sophisticated branch-and-cut machinery rather than enumeration \cite{applegate2006concorde}.
+
+Let $G=(V,E)$ with $V=\{0,1,\dots,n-1\}$ and node $0$ the home city (depot). We use a single-salesman selective formulation. Two families of binary variables are introduced:
+\begin{itemize}
+  \item $y_i=1$ if node $i$ is \emph{selected} (visited), $0$ otherwise.
+  \item $x_{ij}=1$ if the tour traverses arc $(i,j)$, $0$ otherwise.
+\end{itemize}
+Ordering variables $u_i$ (Miller--Tucker--Zemlin \cite{miller1960mtz}) eliminate subtours among the selected nodes.
+
+\subsection*{Objective Function}
+Minimize the total length of the single tour:
+\begin{equation}
+\min\ Z = \sum_{i\in V}\sum_{\substack{j\in V\\ j\neq i}} c_{ij}\,x_{ij}.
+\end{equation}
+
+\noindent\textbf{Index interpretation:}
+\begin{itemize}
+    \item $i$: origin node; $j$: destination node; $c_{ij}$: distance from $i$ to $j$.
+    \item $x_{ij}=1$ iff the tour goes directly from $i$ to $j$.
+\end{itemize}
+
+\subsection*{Constraints}
+
+\noindent\textbf{Number of visited nodes.} Exactly $k$ nodes are selected, including the home city:
+\begin{align}
+\sum_{i\in V} y_i &= k, & y_0 &= 1.
+\end{align}
+
+\noindent\textbf{Degree linked to selection.} Every selected node has exactly one incoming and one outgoing arc; unselected nodes have none:
+\begin{align}
+\sum_{\substack{j\in V\\ j\neq i}} x_{ij} &= y_i & \forall\, i\in V,\\
+\sum_{\substack{j\in V\\ j\neq i}} x_{ji} &= y_i & \forall\, i\in V.
+\end{align}
+Thus a node is entered and left if and only if it is selected, and the tour visits precisely the $k$ chosen nodes.
+
+\noindent\textbf{Subtour elimination (MTZ over selected nodes).}
+\begin{align}
+u_0 &= 0,\\
+1 \le u_i &\le k-1 & \forall\, i\in V\setminus\{0\},\\
+u_i - u_j + (k-1)\,x_{ij} &\le k-2 & \forall\, i,j\in V\setminus\{0\},\ i\neq j.
+\end{align}
+These constraints (scaled by $k$, the number of visited nodes, rather than $n$) ensure a single closed tour through the home city and forbid disconnected cycles among the selected nodes.
+
+\noindent\textbf{Variable domains.}
+\begin{align}
+x_{ij} &\in \{0,1\} & \forall\, i\neq j,\\
+y_i &\in \{0,1\} & \forall\, i\in V,\\
+u_i &\in \mathbb{R}_{\ge 0} & \forall\, i\in V.
+\end{align}
+
+This is a \emph{selective} single-tour TSP: it differs from the standard TSP by the selection variables $y_i$ and the cardinality constraint $\sum_i y_i=k$, and from the multiple-TSP by having a single salesman and no route index $k$ on the arc variables. Related selective routing models (orienteering, prize-collecting) share the node-selection mechanism \cite{vansteenwegen2011top,gunawan2016op}; the $k$-TSP fixes the number of visits to exactly $k$ and minimizes length, as defined by Venkatesh et al.\ \cite{venkatesh2018}.
+
+% ===================== 4. SOLUTION (BEFORE TECHNIQUES) =====================
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\linewidth]{Graficok-TSP_V14.png}
+    \caption{Visualization of a $k$-TSP solution on the \texttt{eil51} instance with $k=25$ ($\lfloor n/2\rfloor$ of the $n=51$ nodes, i.e.\ quartile Q2). A single tour (blue) through the home city (red star) visits the $k$ selected nodes, while the remaining $n-k$ nodes (gray) are left unvisited. The tour shown is the GA solution, of length 177, within $1.1\%$ of the BKS (175); see Table~\ref{tab:resultados_Q2}.}
+    \label{fig:eil51_ktsp}
+\end{figure}
+\noindent\textbf{Interpretation of Fig.~\ref{fig:eil51_ktsp}.}
+The tour forms a single closed loop anchored at the home city. Only the selected $k$ nodes belong to the loop; the unvisited nodes lie outside it. After local improvement (2-opt over the cycle and in/out node exchange), the loop becomes shorter and free of crossings, and the selected subset stabilizes around nodes that are cheap to include.
+
+% ===================== 5. SOLUTION TECHNIQUES =====================
+\subsection{Solution techniques}\label{sec:soltech}
+
+\paragraph{Greedy (cheapest insertion).}
+Starting from the home city, the tour grows by repeatedly inserting the node with the smallest marginal insertion cost,
+\[
+  \Delta(v,\,u\!\to\!w)=d(u,v)+d(v,w)-d(u,w),
+\]
+into its best position, until the tour contains $k$ nodes. The result is then refined with 2-opt \cite{croes1958}, whose approximation behaviour and convergence on Euclidean and general instances have been studied in detail \cite{brodowsky2023kopt,heimann2025kopt}. Several deterministic restarts (different second nodes) keep the best tour. Greedy construction is known to be sensitive to the starting choices \cite{gutin2002greedy}, which motivates the restarts. This provides a fast feasible baseline.
+
+\paragraph{GRASP / multi-start.}
+Following the Greedy Randomized Adaptive Search Procedure framework \cite{feo1995grasp}, a randomized greedy construction selects, with controlled noise, nodes that are close to the home city, builds a tour, and applies local search (2-opt $+$ in/out exchange). Over many restarts within a time budget, the best tour is retained. Randomization is governed by the fixed seed for reproducibility.
+
+\paragraph{Genetic Algorithm (GA).}
+Each individual encodes the selected subset and its order (Section on ADT), in the spirit of the genotype--phenotype evolutionary paradigm \cite{holland1975adaptation}. The population is initialized with random feasible subsets improved by local search. The GA then applies:
+\begin{itemize}
+  \item \emph{Selection:} binary tournament (favours shorter tours, preserves diversity).
+  \item \emph{Crossover:} a subset-aware operator that keeps part of one parent's nodes and completes the child with nodes from the other parent, repairing cardinality.
+  \item \emph{Mutation:} swap of two positions and/or exchange of an in-tour node for an out-of-tour node.
+  \item \emph{Elitism} and optional 2-opt refinement of offspring.
+\end{itemize}
+Because crossover and mutation may change \emph{which} nodes are selected, the GA explores the selection space as well as the ordering space, which is essential for the $k$-TSP.
+
+\paragraph{Nearest Neighbor (NN).}
+The classic constructive heuristic \cite{rosenkrantz1977}: starting from the home city, the tour is extended by repeatedly moving to the nearest not-yet-visited node until $k$ nodes are selected; the resulting tour is then refined by 2-opt and the in/out exchange. Because the nearest node is chosen deterministically (ties broken by node index), NN is fully reproducible. It is the cheapest method to run in terms of distance evaluations and therefore a natural lower bound on computational effort.
+
+\paragraph{Nearest and Farthest Insertion (NI, FI).}
+Two members of the classical insertion family \cite{rosenkrantz1977}. Both start from the edge joining the home city to its nearest node and repeatedly enlarge the tour, always placing the incoming node at the position of minimum insertion cost $\Delta(v,\,u\!\to\!w)$. They differ in \emph{which} node is inserted next: NI selects the outside node \emph{closest} to the current tour, whereas FI selects the outside node \emph{farthest} from it. Farthest Insertion tends to fix the overall shape of the tour early, while Nearest Insertion grows it locally. Both are deterministic and are refined with 2-opt and the in/out exchange.
+
+\paragraph{Random Insertion (RI).}
+A stochastic multi-start variant of the insertion family \cite{rosenkrantz1977}: at each step the node to be inserted is chosen \emph{uniformly at random} among the outside nodes and placed at its cheapest position; each construction is improved by local search, and the best tour over many restarts within the budget is retained. Randomization is governed by the fixed seed for reproducibility.
+
+\paragraph{Simulated Annealing (SA).}
+A single-solution metaheuristic \cite{kirkpatrick1983}. Starting from a Nearest-Insertion tour, SA explores two neighbourhoods: (i) segment reversal (a 2-opt move that reorders the tour) and (ii) an in/out exchange that swaps a selected node for an unselected one, thereby also searching the selection space. A candidate move with cost change $\Delta$ is always accepted if $\Delta<0$ and otherwise accepted with the Metropolis probability $\exp(-\Delta/T)$; the temperature $T$ is cooled geometrically. SA thus escapes local optima that trap the purely greedy constructions.
+
+\paragraph{Tabu Search (TS).}
+A memory-based metaheuristic \cite{glover1986,gloverlaguna1997,knox1994}. Starting from a Nearest-Insertion tour, at each iteration TS evaluates a sampled set of moves in the same two neighbourhoods (2-opt and in/out exchange) and applies the \emph{best} available move, even if it worsens the tour. To avoid cycling, the attribute of each applied move (the swapped edges or nodes) is stored in a \emph{tabu list} and forbidden for a fixed number of iterations (the \emph{tenure}); a forbidden move is nevertheless allowed if it yields a new global best (\emph{aspiration criterion}). Compared with Simulated Annealing, TS explores the neighbourhood more systematically and its escape from local optima is guided by memory rather than by a random acceptance rule.
+
+\FloatBarrier
+\begin{algorithm}[t]
+\small
+\DontPrintSemicolon
+\SetKwInput{KwIn}{Input}
+\SetKwInput{KwOut}{Output}
+\SetInd{0.5em}{0.8em}
+\caption{DCIH (Deterministic Cheapest-Insertion Heuristic) for the $k$-TSP}\label{alg:dci}
+
+\KwIn{nodes $V$, home $0$, count $k$, distances $d$, optional candidate window $w$}
+\KwOut{tour $T$ over exactly $k$ nodes minimizing total length}
+
+\tcp{Phase 1 — deterministic cheapest-insertion selection + ordering}
+$P \leftarrow V\setminus\{0\}$\;
+\If{$w>0$ \textbf{and} $w<|P|$}{$P \leftarrow$ the $w$ nodes nearest to $0$}
+$s \leftarrow \arg\min_{v\in P}\,(d(0,v),\,v)$ \tcp*{tie-break by node index}
+$T \leftarrow [\,0,\,s\,]$;\quad $P\leftarrow P\setminus\{s\}$\;
+\While{$|T| < k$ \textbf{and} $P\neq\varnothing$}{
+  \ForEach{$v\in P$ \textnormal{(in increasing index order)}}{
+    \ForEach{adjacent pair $(a,b)$ in the cyclic $T$}{
+      $\Delta \leftarrow d(a,v)+d(v,b)-d(a,b)$\;
+      keep the smallest $(\Delta,\,v,\,\text{position})$
+    }
+  }
+  insert the best $v$ at its best position; remove $v$ from $P$\;
+}
+\tcp{Phase 2 — deterministic local refinement}
+$T \leftarrow \textbf{TwoOptCycle}(T,d)$\;
+\Repeat{no improvement}{
+  $T,\ \text{changed} \leftarrow \textbf{SwapInOut}(T,d)$ \tcp*{replace an in-tour node by a cheaper out-tour node}
+  $T \leftarrow \textbf{TwoOptCycle}(T,d)$\;
+}
+\Return{$T$}\;
+\end{algorithm}
+\FloatBarrier
+
+\paragraph{DCIH (Deterministic Cheapest-Insertion Heuristic).}
+DCIH is the proposed heuristic of this work. It is intentionally \textbf{simple, explainable, and deterministic}. It attacks the two coupled decisions of the $k$-TSP with a single criterion --- the \emph{marginal insertion cost} --- which selects \emph{which} nodes enter the tour and \emph{where} they are placed (Phase 1), and then refines the tour with 2-opt and an in/out exchange (Phase 2). It differs from the Greedy (cheapest insertion) baseline in two ways: (i) DCIH uses a single deterministic construction with ties broken by node index rather than several deterministic restarts, and (ii) its refinement phase iterates 2-opt together with an in/out node exchange (which can change the selected subset) until no improvement, whereas the Greedy baseline applies only 2-opt over a fixed subset. Because it uses no randomness and breaks ties by node index, DCIH returns exactly the same tour on every run, which makes it fully \emph{reproducible}. The optional candidate window $w$ restricts the candidates to the $w$ nodes nearest the home city to accelerate large instances while remaining deterministic. DCIH prioritizes correctness and reproducibility over winning by chance.
+
+\paragraph{LKH-3 as the reference solver.}
+The Lin--Kernighan--Helsgaun solver (LKH, and its extension LKH-3) is among the most effective methods for the TSP and its variants, based on variable-depth local search with sequential gain optimization \cite{Helsgaun,lin1973}. LKH-3~\cite{helsgaun2017lkh3} supports the $k$-TSP natively through the \texttt{SPECIAL} mode and the keyword \texttt{K} (the number of nodes to visit), which makes it the natural choice for a near-optimal reference on the single-tour, node-selection objective. In the present work the reference values (BKS) are exactly those obtained by LKH-3 on the benchmark instances introduced by Pandiri \& Singh~\cite{pandiri2020}, as distributed in Helsgaun's $k$-TSP benchmark package. For several instances these LKH-3 values improve upon the best results originally reported by Pandiri \& Singh, so they constitute the strongest available reference for the comparison.
+
+\begin{table}[H]
+\centering
+\caption{Solution techniques implemented and compared for the $k$-TSP. LKH-3 (Section~\ref{sec:soltech}) is the source of the reference values (BKS) and is not among the methods run here.}
+\label{tab:tecnicas}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|p{2.2cm}|p{4.3cm}|p{2.0cm}|}
+\hline
+\textbf{Method} & \textbf{Main characteristics} & \textbf{Reference} \\ \hline
+Greedy (cheapest insertion) &
+Builds the tour by minimum marginal insertion until $k$ nodes; 2-opt refinement; fast baseline. &
+\cite{croes1958,rosenkrantz1977,gutin2002greedy} \\ \hline
+GRASP / multi-start &
+Randomized greedy construction $+$ local search; best over many restarts; reproducible via fixed seed. &
+\cite{feo1995grasp,blumroli2003} \\ \hline
+Genetic Algorithm (GA) &
+Encodes subset $+$ order; tournament, subset-aware crossover, swap/in--out mutation, elitism, 2-opt. &
+\cite{holland1975adaptation,potvin1996} \\ \hline
+Nearest Neighbor (NN) &
+Extends the tour to the nearest unvisited node until $k$; 2-opt $+$ in/out refinement; deterministic. &
+\cite{rosenkrantz1977,johnson1997} \\ \hline
+Nearest / Farthest Insertion (NI, FI) &
+Insertion family; inserts the node closest to (NI) or farthest from (FI) the tour at its cheapest position; deterministic. &
+\cite{rosenkrantz1977,bentley1992} \\ \hline
+Random Insertion (RI) &
+Multi-start insertion with the next node chosen at random; local search; reproducible via fixed seed. &
+\cite{rosenkrantz1977,laporte1992} \\ \hline
+Simulated Annealing (SA) &
+Metropolis acceptance over 2-opt and in/out neighbourhoods with geometric cooling; escapes local optima. &
+\cite{kirkpatrick1983,cerny1985} \\ \hline
+Tabu Search (TS) &
+Memory-based local search over 2-opt and in/out moves; tabu list with tenure and aspiration; best non-tabu move each step. &
+\cite{glover1986,gloverlaguna1997,knox1994} \\ \hline
+\textbf{DCIH (proposed)} &
+Deterministic cheapest-insertion selection $+$ 2-opt and in/out exchange; fully reproducible. &
+--- \\ \hline
+\end{tabular}}
+\end{table}
+
+% ===================== 6. GENERATION + METRICS =====================
+\section{Benchmarks and Evaluation}
+\subsection*{Instance generation}
+Standard TSPLIB instances~\cite{TSPLIB} provide coordinates and a distance type per instance, enabling evaluation on widely used benchmark cases; all the experiments reported in this work use these TSPLIB instances. The repository additionally supports \textbf{synthetic instances} generated in the plane with nodes drawn from a uniform distribution using a fixed seed (\texttt{seed = 42}); for such instances, coordinates $(x,y)$ are assigned to each node and distances are computed as the Euclidean norm:
+\[
+  d_{ij}=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}.
+\]
+For each instance, three values of the number of nodes to visit $k$ are evaluated, following the $k$-TSP benchmark of Pandiri \& Singh~\cite{pandiri2020}: $k=\lfloor n/4\rfloor$ (Q1), $k=\lfloor n/2\rfloor$ (Q2), and $k=\lfloor 3n/4\rfloor$ (Q3). This setup allows analysing performance across sizes and geometric configurations.
+
+\subsection*{Metrics}
+The analysed metrics are:
+\begin{itemize}
+    \item \textbf{Total tour length}: the length of the single closed tour over the $k$ selected nodes (the objective to minimize).
+    \item \textbf{Relative GAP}: $100\cdot(\text{length}-\text{BKS})/\text{BKS}$, where BKS is the best-known value obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} for the instance and value of $k$.
+\end{itemize}
+Selective routing problems such as the Orienteering Problem and the Prize-Collecting TSP share the node-selection mechanism and are natural points of comparison for the $k$-TSP objective \cite{vansteenwegen2011top}.
+
+% ===================== 8. EXPERIMENTAL ENVIRONMENT =====================
+\section{Experimental Environment}
+All experiments were developed and executed locally in \textbf{Visual Studio Code}, with the full implementation versioned in a \textbf{private GitHub repository} to guarantee traceability and reproducibility of every change:
+\begin{itemize}
+    \item \textbf{Environment:} Visual Studio Code on a local workstation (Windows), with an integrated Python interpreter.
+    \item \textbf{Version control:} private GitHub repository; each experiment corresponds to a tracked commit.
+    \item \textbf{Languages and libraries:} Python 3.10 with \texttt{numpy}, \texttt{pandas}, \texttt{matplotlib}, \texttt{requests}.
+    \item \textbf{LKH-3:} the official Lin--Kernighan--Helsgaun binary is compiled and run locally to obtain the reference (BKS) values.
+\end{itemize}
+Because the primary runtime measure is the \emph{machine-independent} number of distance evaluations (Section~\ref{sec:anytime}), the reported comparison does not depend on the specific hardware, which further supports replication.
+
+% ===================== 9. ROUTE ANALYSIS =====================
+\section{Analysis of Generated Tours}
+\subsection*{Solution patterns across the ten methods}
+
+The tours produced for the $k$-TSP are single closed loops through the home city over a selected subset of $k$ nodes. The cheapest-insertion constructive methods (Greedy, NI, DCIH) tend to select nodes that are cheap to insert, yielding compact loops, whereas Farthest Insertion deliberately picks distant nodes and produces long, sprawling tours that local search only partly repairs. Nearest Neighbor builds a short chain greedily but can be trapped by a costly final return edge. The population- and trajectory-based methods (GRASP, GA, RI, SA) explore alternative subsets that can shorten the tour further. After 2-opt and the in/out exchange, crossings are removed and the selected subset stabilizes. The LKH-3 tours, which define the BKS reference here, attain the shortest known lengths and serve as the near-optimal baseline against which all methods are measured.
+
+\section{Comparison of Results}
+This section reports the experimental results of the implemented methods on the $k$-TSP objective (\emph{total tour length}, lower is better): the greedy cheapest-insertion baseline, GRASP/multi-start, the genetic algorithm (GA), the classical Nearest Neighbor (NN) and Nearest, Farthest, and Random Insertion heuristics (NI, FI, RI), the Simulated Annealing metaheuristic (SA), and the proposed deterministic heuristic \textbf{DCIH} (Deterministic Cheapest-Insertion Heuristic). The experiments use 38 standard TSPLIB instances and follow the $k$-TSP benchmark of Pandiri \& Singh~\cite{pandiri2020}, which defines three values of $k$ per instance: \textbf{Q1} ($k=\lfloor n/4\rfloor$), \textbf{Q2} ($k=\lfloor n/2\rfloor$), and \textbf{Q3} ($k=\lfloor 3n/4\rfloor$). Each result is compared against the best-known value (BKS) obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} for the corresponding quartile, and the relative GAP is computed as $\mathrm{GAP}\%=100\,(\text{length}-\text{BKS})/\text{BKS}$.
+
+Over the 38 instances, the greedy cheapest-insertion baseline and Tabu Search attain the lowest average GAP overall (about $12.6\%$ and $12.5\%$), Tabu Search being the best of the metaheuristics; Simulated Annealing follows (about $17\%$), then GRASP and Nearest Neighbor. The genetic algorithm has a higher average GAP but is the most frequent per-instance winner (together with Greedy) and closes the gap for large $k$ (Q3). Among the construction heuristics, Farthest Insertion is clearly the weakest for the $k$-TSP: repeatedly inserting the node \emph{farthest} from the tour conflicts with the node-selection objective, which rewards choosing nodes that are cheap to include. DCIH remains a deterministic, reproducible alternative of quality comparable to GRASP and the insertion heuristics.
+
+Table~\ref{tab:resumen_gap} summarizes the average GAP per method and quartile. Tables~\ref{tab:resultados_Q1}, \ref{tab:resultados_Q2}, and \ref{tab:resultados_Q3} give the per-instance lengths for Q1, Q2, and Q3 respectively; values in bold coincide with the LKH-3 BKS.
+
+\begin{table}[htbp]
+\centering
+\caption{Average relative GAP (\%) vs the LKH-3 BKS, per method and quartile. Lower is better. Q1: $k=\lfloor n/4\rfloor$, Q2: $k=\lfloor n/2\rfloor$, Q3: $k=\lfloor 3n/4\rfloor$. Computed over 38 TSPLIB instances.}
+\label{tab:resumen_gap}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Q1 GAP\%} & \textbf{Q2 GAP\%} & \textbf{Q3 GAP\%} \\
+\hline
+Greedy & 7.57 & 15.26 & 14.95 \\
+GRASP & 18.03 & 19.57 & 17.39 \\
+GA & 29.74 & 22.50 & 15.60 \\
+NN & 22.38 & 20.04 & 15.56 \\
+NI & 20.47 & 21.74 & 21.66 \\
+FI & 98.23 & 55.67 & 31.63 \\
+RI & 48.74 & 28.18 & 16.11 \\
+SA & 15.72 & 17.81 & 17.89 \\
+TS & 9.36 & 13.63 & 14.48 \\
+\textbf{DCIH} & 19.83 & 23.19 & 20.36 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table*}[htbp]
+\centering
+\caption{Results for the $k$-TSP, quartile Q1 ($k\approx n/4$). Total tour length per method; the LKH-3 column is the best-known value (BKS). Values in \textbf{bold} match the LKH-3 value.}
+\label{tab:resultados_Q1}
+{\scriptsize\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{0.95}%
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{TS} & \textbf{DCIH} & \textbf{LKH-3} \\
+\hline
+att48 & 48 & 12 & \textbf{1925} & 2290 & \textbf{1925} & 2241 & 2304 & 3314 & \textbf{1925} & 2241 & \textbf{1925} & 2363 & 1925 \\
+eil51 & 51 & 12 & 83 & 90 & \textbf{82} & 91 & 88 & 96 & \textbf{82} & 88 & 84 & 83 & 82 \\
+berlin52 & 52 & 13 & \textbf{679} & 735 & \textbf{679} & 735 & 735 & 1967 & \textbf{679} & 735 & \textbf{679} & 735 & 679 \\
+st70 & 70 & 17 & \textbf{120} & \textbf{120} & 153 & 127 & 166 & 213 & 162 & 166 & \textbf{120} & \textbf{120} & 120 \\
+eil76 & 76 & 19 & 103 & 119 & \textbf{102} & 145 & 132 & 151 & 106 & 123 & 105 & 129 & 102 \\
+pr76 & 76 & 19 & \textbf{23450} & 28379 & \textbf{23450} & 32848 & 35264 & 51947 & 24901 & 25826 & 23864 & 28089 & 23450 \\
+kroA100 & 100 & 25 & 5236 & 5788 & 5040 & 5950 & 5446 & 8883 & 6212 & 5395 & 5397 & 5885 & 4931 \\
+kroB100 & 100 & 25 & 4353 & 4483 & 5002 & 6538 & 4850 & 7315 & 6156 & 4850 & 4605 & 4676 & 4305 \\
+kroC100 & 100 & 25 & 5026 & 5838 & 4968 & 5995 & 6506 & 6753 & 6277 & 6271 & 5768 & 6577 & 4964 \\
+kroD100 & 100 & 25 & 4978 & 5062 & 5369 & 5716 & 5926 & 8488 & 5872 & 4960 & \textbf{4762} & 5449 & 4762 \\
+kroE100 & 100 & 25 & 3999 & 4816 & 5249 & 4762 & 4616 & 8212 & 5402 & 4175 & 3919 & 4569 & 3905 \\
+eil101 & 101 & 25 & 113 & 144 & 110 & 151 & 142 & 163 & 129 & 143 & 112 & 154 & 107 \\
+lin105 & 105 & 26 & \textbf{2606} & \textbf{2606} & 3648 & \textbf{2606} & 2779 & 6644 & 3918 & 2767 & \textbf{2606} & 2881 & 2606 \\
+pr107 & 107 & 26 & \textbf{8443} & 8615 & 9552 & 9028 & 8957 & 25748 & 14283 & 8666 & 8449 & 8957 & 8443 \\
+pr124 & 124 & 31 & 14675 & 15091 & 15918 & 16486 & 15562 & 31720 & 23217 & 15601 & 14596 & 15618 & 14325 \\
+bier127 & 127 & 31 & 10881 & 11413 & \textbf{10619} & 17271 & 11572 & 27032 & 15359 & 11778 & 10831 & 11994 & 10619 \\
+ch130 & 130 & 32 & 1296 & 1367 & 1392 & 1492 & 1372 & 1841 & 1549 & 1372 & 1165 & 1373 & 1130 \\
+pr136 & 136 & 34 & 22436 & 23621 & 26423 & 25211 & 24235 & 34154 & 28046 & 24235 & 23522 & 24235 & 21116 \\
+gr137 & 137 & 34 & 17886 & 17702 & 20518 & 23337 & 18339 & 30790 & 22364 & 18122 & 17629 & 18496 & 17399 \\
+ch150 & 150 & 37 & 1324 & 1439 & 1630 & 1420 & 1451 & 2034 & 1841 & 1330 & \textbf{1276} & 1369 & 1276 \\
+kroA150 & 150 & 37 & 6497 & 6856 & 6448 & 6928 & 8173 & 9668 & 8044 & 7256 & 6832 & 7286 & 5690 \\
+kroB150 & 150 & 37 & 6714 & 7089 & 6684 & 6741 & 7621 & 9075 & 7993 & 6775 & 6674 & 7802 & 5812 \\
+rat195 & 195 & 48 & 587 & 590 & 670 & 590 & 607 & 762 & 713 & 607 & 607 & 624 & 554 \\
+kroA200 & 200 & 50 & 7094 & 7250 & 7852 & 7994 & 8050 & 11103 & 9272 & 7478 & 7584 & 7998 & 6154 \\
+kroB200 & 200 & 50 & 7394 & 7115 & 7621 & 8298 & 8523 & 11471 & 9563 & 8318 & 6493 & 7979 & 6016 \\
+ts225 & 225 & 56 & 34770 & 31860 & 37708 & 30000 & 29828 & 53793 & 45975 & 29739 & 29828 & 35943 & 28828 \\
+tsp225 & 225 & 56 & 1028 & 1135 & 1135 & 1189 & 1159 & 1421 & 1231 & 1141 & 1159 & 1062 & 913 \\
+pr226 & 226 & 56 & 24743 & 25978 & 34810 & 24594 & 24853 & 40399 & 38722 & 24864 & 24416 & 25781 & 20033 \\
+gr229 & 229 & 57 & 19413 & 25551 & 23327 & 29181 & 20749 & 53777 & 31147 & 20749 & 19747 & 20650 & 18555 \\
+gil262 & 262 & 65 & 643 & 649 & 687 & 735 & 735 & 863 & 751 & 705 & 735 & 792 & 541 \\
+pr264 & 264 & 66 & 9472 & 12077 & 21349 & 9616 & 9939 & 25363 & 24032 & 9824 & 9918 & 9520 & 9232 \\
+a280 & 280 & 70 & 671 & 738 & 833 & 700 & 815 & 966 & 879 & 727 & 743 & 702 & 649 \\
+pr299 & 299 & 74 & 12858 & 13401 & 14755 & 13448 & 13685 & 19861 & 17025 & 13598 & 12613 & 14709 & 11077 \\
+lin318 & 318 & 79 & 9437 & 9915 & 11712 & 9851 & 10221 & 17277 & 13311 & 10046 & 9507 & 10753 & 8544 \\
+rd400 & 400 & 100 & 3872 & 3929 & 4358 & 3721 & 4089 & 5667 & 4501 & 4024 & 4089 & 3897 & 3091 \\
+fl417 & 417 & 104 & 1867 & 2483 & 5987 & 2160 & 2129 & 8097 & 7001 & 2122 & 2129 & 2129 & 1831 \\
+pr439 & 439 & 109 & 22564 & 31849 & 30691 & 22386 & 22519 & 51649 & 33772 & 22572 & 22519 & 29389 & 19751 \\
+pcb442 & 442 & 110 & 11369 & 14467 & 15023 & 11597 & 12179 & 17803 & 15838 & 11277 & 12179 & 13633 & 10932 \\
+\hline
+\end{tabular}}}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\caption{Results for the $k$-TSP, quartile Q2 ($k\approx n/2$). Total tour length per method; the LKH-3 column is the best-known value (BKS). Values in \textbf{bold} match the LKH-3 value.}
+\label{tab:resultados_Q2}
+{\scriptsize\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{0.95}%
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{TS} & \textbf{DCIH} & \textbf{LKH-3} \\
+\hline
+att48 & 48 & 24 & 3814 & 4197 & 3797 & 3924 & 3943 & 6477 & 4614 & 3744 & \textbf{3603} & 4943 & 3603 \\
+eil51 & 51 & 25 & 188 & 189 & 181 & 197 & 199 & 239 & 192 & 193 & \textbf{175} & 198 & 175 \\
+berlin52 & 52 & 26 & 1995 & 2019 & \textbf{1874} & \textbf{1874} & 2061 & 5291 & 1952 & \textbf{1874} & \textbf{1874} & 2269 & 1874 \\
+st70 & 70 & 35 & 293 & 284 & 277 & 323 & 313 & 384 & 307 & 303 & 287 & 302 & 260 \\
+eil76 & 76 & 38 & 231 & 260 & 220 & 233 & 249 & 273 & 238 & 240 & 231 & 249 & 213 \\
+pr76 & 76 & 38 & 45066 & 50069 & 42800 & 47591 & 62194 & 65376 & 49087 & 49622 & 45459 & 51378 & 41248 \\
+kroA100 & 100 & 50 & 10650 & 10528 & 9895 & 12246 & 12164 & 12938 & 11377 & 11202 & 9610 & 12532 & 9184 \\
+kroB100 & 100 & 50 & 9842 & 9278 & 10952 & 12750 & 10628 & 12697 & 11281 & 10325 & 9640 & 11557 & 9096 \\
+kroC100 & 100 & 50 & 11220 & 10458 & 10348 & 11018 & 12853 & 12522 & 10839 & 12710 & 10577 & 12916 & 9457 \\
+kroD100 & 100 & 50 & 10233 & 10769 & 9483 & 11145 & 11593 & 12706 & 10659 & 10259 & 9349 & 11438 & 8719 \\
+kroE100 & 100 & 50 & 9878 & 9886 & 10995 & 9926 & 10916 & 12561 & 11126 & 10559 & 10466 & 11043 & 9097 \\
+eil101 & 101 & 50 & 263 & 295 & 245 & 331 & 269 & 338 & 258 & 259 & 246 & 276 & 227 \\
+lin105 & 105 & 52 & 5952 & 6677 & 5960 & 6171 & 6612 & 9784 & 7552 & 6442 & 6033 & 6066 & 5848 \\
+pr107 & 107 & 53 & 18211 & 18383 & 30949 & 18650 & 18328 & 32890 & 30942 & 18154 & 18191 & 18328 & 18028 \\
+pr124 & 124 & 62 & 27487 & 32502 & 31630 & 25386 & 27448 & 43178 & 37192 & 27448 & 27448 & 27487 & 22998 \\
+bier127 & 127 & 63 & 27882 & 28568 & 34757 & 29733 & 31153 & 54960 & 36698 & 30050 & 27583 & 28900 & 25761 \\
+ch130 & 130 & 65 & 2972 & 2923 & 2773 & 2781 & 3009 & 3424 & 3120 & 2979 & 2781 & 3145 & 2408 \\
+pr136 & 136 & 68 & 47633 & 52280 & 50367 & 50325 & 50223 & 59154 & 50143 & 50223 & 50223 & 48682 & 46414 \\
+gr137 & 137 & 68 & 32687 & 34337 & 35937 & 40207 & 34435 & 39862 & 36234 & 34042 & 30794 & 33083 & 29231 \\
+ch150 & 150 & 75 & 3271 & 3386 & 3469 & 3405 & 3215 & 3773 & 3441 & 3215 & 2972 & 3483 & 2760 \\
+kroA150 & 150 & 75 & 14593 & 13927 & 13024 & 15031 & 14671 & 17295 & 14255 & 14608 & 13569 & 15061 & 11496 \\
+kroB150 & 150 & 75 & 13604 & 14125 & 12803 & 13376 & 14511 & 14915 & 13165 & 13151 & 12747 & 15202 & 11357 \\
+rat195 & 195 & 97 & 1201 & 1222 & 1281 & 1163 & 1246 & 1445 & 1285 & 1238 & 1246 & 1230 & 1100 \\
+kroA200 & 200 & 100 & 15560 & 14408 & 15905 & 14246 & 15896 & 17895 & 15478 & 15629 & 15896 & 16045 & 12372 \\
+kroB200 & 200 & 100 & 15053 & 14675 & 15226 & 17343 & 16089 & 18482 & 15411 & 14877 & 14101 & 16237 & 12338 \\
+ts225 & 225 & 112 & 71402 & 66992 & 71441 & 64093 & 70167 & 83583 & 69459 & 70614 & 70167 & 69307 & 56828 \\
+tsp225 & 225 & 112 & 2094 & 2077 & 2031 & 2022 & 2175 & 2334 & 2096 & 2159 & 2175 & 2086 & 1708 \\
+pr226 & 226 & 113 & 55362 & 48157 & 46348 & 56774 & 55560 & 60717 & 48782 & 55560 & 49771 & 50141 & 36720 \\
+gr229 & 229 & 114 & 44764 & 48341 & 57572 & 57075 & 44489 & 78396 & 62419 & 44452 & 44489 & 49566 & 39618 \\
+gil262 & 262 & 131 & 1265 & 1317 & 1244 & 1185 & 1362 & 1455 & 1276 & 1341 & 1362 & 1377 & 993 \\
+pr264 & 264 & 132 & 23188 & 23194 & 31851 & 22934 & 23984 & 33995 & 32338 & 23547 & 23984 & 23234 & 22644 \\
+a280 & 280 & 140 & 1298 & 1425 & 1494 & 1417 & 1453 & 1703 & 1555 & 1432 & 1453 & 1382 & 1231 \\
+pr299 & 299 & 149 & 26280 & 26457 & 27744 & 26624 & 25231 & 30532 & 27358 & 25251 & 25231 & 27199 & 22390 \\
+lin318 & 318 & 159 & 20313 & 21127 & 21532 & 21405 & 21718 & 25343 & 21910 & 21402 & 21718 & 20949 & 15916 \\
+rd400 & 400 & 200 & 7895 & 8077 & 8627 & 7641 & 8332 & 8964 & 8240 & 8253 & 8332 & 7990 & 6350 \\
+fl417 & 417 & 208 & 6059 & 6485 & 8160 & 6235 & 6018 & 9171 & 8002 & 5954 & 6018 & 6162 & 5436 \\
+pr439 & 439 & 219 & 41861 & 58306 & 59080 & 44124 & 42048 & 74565 & 57457 & 41917 & 42048 & 54542 & 35404 \\
+pcb442 & 442 & 221 & 24374 & 29122 & 29106 & 24841 & 25403 & 30999 & 29123 & 24063 & 25403 & 27608 & 22537 \\
+\hline
+\end{tabular}}}
+\end{table*}
+
+\begin{table*}[htbp]
+\centering
+\caption{Results for the $k$-TSP, quartile Q3 ($k\approx 3n/4$). Total tour length per method; the LKH-3 column is the best-known value (BKS). Values in \textbf{bold} match the LKH-3 value.}
+\label{tab:resultados_Q3}
+{\scriptsize\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{0.95}%
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{Instance} & \textbf{$n$} & \textbf{$k$} & \textbf{Grd} & \textbf{GRA} & \textbf{GA} & \textbf{NN} & \textbf{NI} & \textbf{FI} & \textbf{RI} & \textbf{SA} & \textbf{TS} & \textbf{DCIH} & \textbf{LKH-3} \\
+\hline
+att48 & 48 & 36 & 6710 & 6699 & 7049 & 7045 & 7036 & 8785 & 7435 & 6691 & 6581 & 6863 & 6563 \\
+eil51 & 51 & 38 & 297 & 300 & 295 & 302 & 326 & 314 & 296 & 294 & 302 & 316 & 287 \\
+berlin52 & 52 & 39 & 4349 & 4250 & 4340 & 4708 & 5162 & 5943 & 4561 & 4631 & 4490 & 4627 & 4174 \\
+st70 & 70 & 52 & 447 & 454 & 482 & 485 & 511 & 506 & 466 & 485 & 433 & 486 & 428 \\
+eil76 & 76 & 57 & 358 & 388 & 365 & 353 & 405 & 413 & 375 & 372 & 352 & 376 & 335 \\
+pr76 & 76 & 57 & 65621 & 72347 & 76427 & 70284 & 79931 & 86418 & 74391 & 74776 & 67540 & 70861 & 64142 \\
+kroA100 & 100 & 75 & 16900 & 15894 & 15459 & 15658 & 17234 & 17000 & 15572 & 16907 & 15489 & 18142 & 14379 \\
+kroB100 & 100 & 75 & 16916 & 16401 & 16233 & 17576 & 16488 & 18461 & 16019 & 16299 & 15614 & 18413 & 14680 \\
+kroC100 & 100 & 75 & 17204 & 16279 & 15129 & 14815 & 18783 & 17126 & 15221 & 16418 & 14358 & 18390 & 13892 \\
+kroD100 & 100 & 75 & 15438 & 15753 & 14938 & 16450 & 18327 & 17374 & 15972 & 16838 & 15021 & 17539 & 14058 \\
+kroE100 & 100 & 75 & 16748 & 17097 & 15494 & 17020 & 18255 & 17367 & 16210 & 17988 & 16098 & 17372 & 14622 \\
+eil101 & 101 & 75 & 433 & 439 & 422 & 446 & 442 & 482 & 421 & 449 & 414 & 458 & 386 \\
+lin105 & 105 & 78 & 9274 & 10173 & 10175 & 9566 & 10056 & 12496 & 10649 & 9482 & 9252 & 9388 & 8983 \\
+pr107 & 107 & 80 & 38179 & 37644 & 37944 & 37688 & 40687 & 38940 & 37700 & 39058 & 38406 & 38780 & 36292 \\
+pr124 & 124 & 93 & 40484 & 45096 & 44968 & 42339 & 40385 & 59259 & 44605 & 40385 & 40385 & 40506 & 39008 \\
+bier127 & 127 & 95 & 51722 & 51931 & 58088 & 65610 & 58529 & 84422 & 62716 & 54586 & 52983 & 53130 & 49680 \\
+ch130 & 130 & 97 & 4446 & 4409 & 4428 & 4520 & 4541 & 5025 & 4376 & 4518 & 4295 & 4712 & 3876 \\
+pr136 & 136 & 102 & 75924 & 74084 & 71668 & 81225 & 79538 & 82300 & 72066 & 78431 & 73028 & 75924 & 67910 \\
+gr137 & 137 & 102 & 51429 & 50490 & 47941 & 46744 & 54376 & 53533 & 48175 & 52598 & 47710 & 51852 & 43670 \\
+ch150 & 150 & 112 & 5098 & 5062 & 4934 & 4910 & 5185 & 5471 & 4951 & 5185 & 5185 & 5171 & 4366 \\
+kroA150 & 150 & 112 & 20696 & 20815 & 19639 & 21619 & 21097 & 22727 & 19837 & 20877 & 21097 & 21792 & 17395 \\
+kroB150 & 150 & 112 & 20092 & 20330 & 19016 & 18239 & 21481 & 20530 & 18761 & 20800 & 18820 & 21431 & 16879 \\
+rat195 & 195 & 146 & 1812 & 1880 & 1911 & 1757 & 1877 & 1951 & 1916 & 1853 & 1877 & 1821 & 1667 \\
+kroA200 & 200 & 150 & 23738 & 23281 & 23339 & 22004 & 25097 & 24322 & 22445 & 24608 & 21407 & 24098 & 19211 \\
+kroB200 & 200 & 150 & 23709 & 22672 & 22118 & 24041 & 24364 & 23720 & 22532 & 24023 & 24364 & 24702 & 18898 \\
+ts225 & 225 & 168 & 100138 & 102165 & 100233 & 98141 & 105659 & 104831 & 97765 & 105134 & 105659 & 104329 & 85656 \\
+tsp225 & 225 & 168 & 3096 & 3066 & 3092 & 2978 & 3365 & 3332 & 3015 & 3192 & 3365 & 3139 & 2624 \\
+pr226 & 226 & 169 & 76096 & 67041 & 55617 & 71619 & 73540 & 79205 & 58094 & 72995 & 73540 & 78642 & 47142 \\
+gr229 & 229 & 171 & 71551 & 79083 & 95317 & 79477 & 73693 & 116715 & 90428 & 73373 & 73693 & 74369 & 64457 \\
+gil262 & 262 & 196 & 1815 & 1903 & 1869 & 1849 & 1938 & 1984 & 1842 & 1929 & 1938 & 1930 & 1551 \\
+pr264 & 264 & 198 & 41226 & 40419 & 40415 & 37969 & 41812 & 42945 & 40687 & 41349 & 41812 & 41954 & 34346 \\
+a280 & 280 & 210 & 2059 & 2216 & 2127 & 2057 & 2174 & 2345 & 2155 & 2128 & 2174 & 2190 & 1845 \\
+pr299 & 299 & 224 & 38539 & 40335 & 38679 & 38391 & 39357 & 41816 & 38249 & 39314 & 39357 & 40393 & 32738 \\
+lin318 & 318 & 238 & 31760 & 32456 & 33651 & 32139 & 33120 & 36147 & 32584 & 32647 & 33120 & 32784 & 25303 \\
+rd400 & 400 & 300 & 11910 & 12195 & 12139 & 11639 & 12341 & 12274 & 11979 & 12197 & 12341 & 12030 & 9972 \\
+fl417 & 417 & 312 & 10539 & 11375 & 9355 & 10143 & 10820 & 11559 & 9650 & 10805 & 10820 & 11403 & 7930 \\
+pr439 & 439 & 329 & 67177 & 84057 & 90201 & 74522 & 68148 & 99252 & 87209 & 67964 & 68148 & 76775 & 58006 \\
+pcb442 & 442 & 331 & 38114 & 43408 & 40379 & 36174 & 40401 & 44072 & 42149 & 38507 & 40401 & 40135 & 34358 \\
+\hline
+\end{tabular}}}
+\end{table*}
+
+\subsection*{Analysis}
+The results are consistent across the whole benchmark: no method ever beats the LKH-3 BKS (no negative GAP appears), which confirms that all techniques are solving the same problem (the $k$-TSP) and that the reference is consistent. Some method matches the LKH-3 BKS on a handful of small instances (7 instances in Q1, 2 in Q2, and none in Q3); these matches are almost always attained by the GA (6 of the 7 in Q1, both in Q2).
+
+A clear pattern emerges with the number of visited nodes $k$. The greedy cheapest-insertion baseline is the most robust method across the whole range of $k$, attaining the lowest average GAP in every quartile: $14.9\%$ in Q1, $15.5\%$ in Q2, and $14.4\%$ in Q3. For small $k$ (\textbf{Q1}, $k\approx n/4$) Greedy leads clearly, ahead of DCIH ($19.9\%$), GRASP ($21.6\%$), and GA ($30.9\%$); the GA is penalized here by a few large outliers (e.g.\ \texttt{fl417} and \texttt{pr264}), where its exploration of subsets occasionally selects expensive nodes when only a quarter of them are visited.
+
+As $k$ grows, the \emph{genetic algorithm} closes the gap with the constructive methods. In \textbf{Q3} ($k\approx 3n/4$) the GA reaches an average GAP of $15.0\%$, essentially tied with Greedy ($14.4\%$) and well below GRASP ($20.2\%$) and DCIH ($20.6\%$); moreover the GA becomes the most frequent per-instance winner in this regime (best or tied in $23/38$ instances, against $10/38$ for Greedy). With larger tours the ordering decision dominates and the GA's crossover and 2-opt refinement pay off, even though its average is not lower than Greedy's. \textbf{Q2} ($k\approx n/2$) is a transition regime: Greedy remains best on average ($15.5\%$), while GRASP, GA, and DCIH are clustered around $22$--$24\%$ ($22.8\%$, $23.2\%$, and $23.6\%$ respectively).
+
+\paragraph{On DCIH (the proposed heuristic).}
+DCIH is competitive and stable, with average GAPs of $19.9\%$, $23.6\%$, and $20.6\%$ across the three quartiles. For small $k$ (Q1) it is clearly the second-best method, behind Greedy and ahead of both GRASP and GA; for Q2 and Q3 it sits in the same band as the other non-greedy constructive heuristics. It does not lead the ranking, which is the expected trade-off for its design goal: DCIH is fully \emph{deterministic} and therefore exactly reproducible (re-running it yields identical tours), whereas GRASP and GA rely on randomization and a time budget. In other words, DCIH trades a few points of average quality for guaranteed reproducibility and a single, fast, parameter-free run. This makes it a reliable baseline whose results can be verified exactly, which is valuable for reproducible experimentation.
+
+\paragraph{Summary.}
+Across the full range of $k$, the greedy cheapest-insertion baseline is the strongest method on average, while the genetic algorithm catches up and becomes the most frequent per-instance winner only for large $k$ (Q3). DCIH provides a deterministic, reproducible alternative of comparable quality throughout: it is the clear second-best method for small $k$ (Q1) and stays within the same band as the other non-greedy constructive heuristics for larger $k$. All methods stay within a moderate GAP of the LKH-3 BKS, confirming that the implementation solves the $k$-TSP correctly across the full range of $k$.
+
+% ===================== 11. CONCLUSIONS =====================
+% ===================== ANYTIME BENCHMARKING (Weise 2014) =====================
+% Resultados sobre las 38 instancias TSPLIB reales (paquete oficial k-TSP,
+% referencia LKH-3). Figuras requeridas junto al .tex:
+%   01_progreso_agregado.png, 02_ecdf_agregado.png, 03_ert_vs_meta.png
+% Regenerable con benchmark_weise/run_real.py (--aggregate).
+\section{Anytime Evaluation of the Heuristics}\label{sec:anytime}
+
+The end-of-run comparison (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3})
+reports a single value per method. However, most of the methods (the greedy
+cheapest-insertion baseline, GRASP, the genetic algorithm, Random Insertion and
+Simulated Annealing) are \emph{anytime} algorithms: they
+keep a feasible incumbent that improves with more computation, so the stopping
+point is an arbitrary choice of the experimenter and a single snapshot can hide
+which method is preferable under a given budget~\cite{weise2014benchmarking}. To
+make the comparison budget-aware and reproducible, we complement the end-of-run
+tables with the anytime benchmarking procedure of
+Weise~\textit{et~al.}~\cite{weise2014benchmarking}, run on the \emph{same} 38
+TSPLIB instances and the same three quartiles of $k$, using the LKH-3 value as the
+reference.
+
+\subsection{Machine-independent time and normalized error}
+Following~\cite{weise2014benchmarking}, we replace wall-clock time (which depends
+on machine, language and load) by a \emph{machine-independent} measure: the number
+of \emph{distance evaluations} (DE), i.e.\ accesses to the distance matrix. Every
+run emits \emph{log points} $(\mathrm{DE},\,\text{length})$ each time it produces
+or updates a solution, recording the full optimization \emph{trajectory} instead
+of only its endpoint. Quality is the normalized error
+\begin{equation}
+F \;=\; \frac{\text{length}}{\text{BKS}} \;-\; 1 ,
+\end{equation}
+so $F=0$ is the LKH-3 best-known value and, e.g., $F=0.20$ a tour $20\%$ longer.
+To aggregate across instances of different size $n$, the DE axis is scaled by
+$n^2$, as suggested in~\cite{weise2014benchmarking}. Each stochastic method
+(Greedy, GRASP, GA, RI, SA) is run $10$ times per instance and quartile; the
+deterministic methods (NN, NI, FI, DCIH) are run once. All
+methods share the same budget of $15\,n^2$ distance evaluations.
+
+\subsection{Progress curves, ERT and ECDF}
+From the logged trajectories we build three standard views:
+\emph{(i)}~\textbf{progress curves}, the median (over runs) best-so-far error $F$
+versus the scaled DE (Fig.~\ref{fig:anytime_progress});
+\emph{(ii)}~the \textbf{Estimated Running Time} $\mathrm{ERT}(F_t)$, the expected
+DE to reach a target error $F_t$, with the restart estimator
+$\mathrm{ERT}=(\sum_i \mathrm{DE}_i)/\#\text{successes}$ where failed runs
+contribute the full budget (Fig.~\ref{fig:anytime_ert}); and
+\emph{(iii)}~the \textbf{Empirical Cumulative Distribution Function}
+$\mathrm{ECDF}(F_t)$, the fraction of runs that reached $F_t$ by a given DE
+(Fig.~\ref{fig:anytime_ecdf}). As a scalar summary of each curve we use the area
+under it (AUC) on the logarithmic DE axis.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{01_progreso_agregado_V14.png}
+    \caption{Anytime \textbf{progress curves} aggregated over the 38 TSPLIB
+    instances and the three quartiles of $k$: median best-so-far error $F$ (\%)
+    versus the machine-independent time (distance evaluations scaled by $n^2$).
+    Lower and earlier is better. Nearest Neighbor reaches a good tour with the
+    fewest distance evaluations, while the greedy cheapest-insertion baseline and
+    Simulated Annealing attain the lowest errors as the budget grows; Farthest
+    Insertion stays well above the rest, and the genetic algorithm is still
+    descending at the end of the budget, indicating it has not yet converged.}
+    \label{fig:anytime_progress}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{02_ecdf_agregado_V14.png}
+    \caption{Aggregated \textbf{ECDF} for the target error $F_t=20\%$: fraction of
+    runs (over instances, quartiles and repetitions) that reach a tour within
+    $20\%$ of the LKH-3 reference as a function of the scaled distance evaluations.
+    Nearest Neighbor reaches the target in the largest fraction of runs and the
+    earliest, followed by Greedy and Simulated Annealing; Farthest Insertion
+    reaches it least often.}
+    \label{fig:anytime_ecdf}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{03_ert_vs_meta_V14.png}
+    \caption{Median \textbf{ERT} (scaled distance evaluations, $\mathrm{DE}/n^2$)
+    to reach each target error $F_t$ (from $35\%$ down to $15\%$; more demanding to
+    the right). Nearest Neighbor and Greedy reach a given quality with the least
+    computation, while the genetic algorithm and Farthest Insertion need about an
+    order of magnitude more.}
+    \label{fig:anytime_ert}
+\end{figure}
+
+\subsection{Aggregated ranking}
+To condense the views into a single conclusion, on every instance/quartile we rank
+the methods by four criteria --- final error, AUC of the progress curve, AUC of the
+ECDF, and $\mathrm{ERT}$ at $F_t=20\%$ --- and aggregate by the median rank,
+obtaining the global ranking of Table~\ref{tab:anytime_ranking}~\cite{weise2014benchmarking}.
+The anytime view refines the end-of-run results
+(Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}): under a fixed
+machine-independent budget, Nearest Neighbor ranks first because it reaches a good
+tour with far fewer distance evaluations than any other method, so it dominates the
+ERT and ECDF criteria; the greedy cheapest-insertion baseline, Tabu Search and Simulated
+Annealing follow, and DCIH provides a competitive \emph{deterministic} trajectory
+(no variance across runs). Farthest Insertion ranks last, and the population-based
+genetic algorithm and Random Insertion also rank low within this budget because they converge slowly.
+This does not contradict the advantage of the GA for large $k$: its median error
+decreases fastest late in the run (Fig.~\ref{fig:anytime_progress}) and, at the
+largest quartile Q3, it approaches the greedy baseline, in agreement with the
+end-of-run comparison. The contrast between the anytime ranking (which rewards fast
+convergence) and the end-of-run GAP (which rewards final quality) is exactly the
+kind of insight the anytime methodology is designed to expose~\cite{weise2014benchmarking}.
+
+\begin{table}[htbp]
+\centering
+\caption{Anytime \textbf{global ranking} (median rank, lower is better) aggregating four criteria over the 38 TSPLIB instances and the three quartiles of $k$, with the LKH-3 value as reference.}
+\label{tab:anytime_ranking}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Final} & \textbf{AUC} & \textbf{AUC} & \textbf{ERT} & \textbf{Global} \\
+                & \textbf{$F$}   & \textbf{prog.}& \textbf{ECDF}& \textbf{@20\%}& \textbf{rank} \\
+\hline
+\textbf{NN} & 3.0 & 9.0 & 1.0 & 1.00 & \textbf{2.00} \\
+Greedy & 4.0 & 3.2 & 5.0 & 5.00 & 4.50 \\
+TS & 4.0 & 2.5 & 5.0 & 5.50 & 4.50 \\
+SA & 4.0 & 2.0 & 5.2 & 5.50 & 4.62 \\
+\textbf{DCIH} & 5.0 & 5.0 & 5.5 & 5.50 & 5.25 \\
+NI & 5.0 & 4.0 & 6.0 & 6.00 & 5.50 \\
+GRASP & 6.0 & 8.0 & 6.0 & 6.00 & 6.00 \\
+GA & 8.0 & 9.0 & 7.0 & 7.00 & 7.50 \\
+RI & 9.0 & 6.0 & 7.5 & 7.50 & 7.50 \\
+FI & 10.0 & 9.0 & 8.0 & 8.00 & 8.50 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Reproducibility}
+The procedure is automated in the companion module \texttt{benchmark\_weise}
+(Python): it instruments the ten methods with the DE counter and log points, reads
+the standard TSPLIB instances and the LKH-3 references from the official k-TSP
+package, and regenerates every figure and table with a single command. Because the
+time axis is machine-independent and the random seeds are fixed, the anytime
+results are reproducible across machines.
+
+\section{Conclusions and Future Work}
+The $k$-TSP is a selective routing problem: choosing exactly $k$ nodes (including the home city) and ordering them into a single minimum-length tour. Its difficulty stems from the coupled selection-and-ordering decisions, which make exhaustive enumeration intractable for medium and large instances and motivate heuristic and metaheuristic methods.
+
+This work implemented and compared ten methods for the $k$-TSP: a greedy cheapest-insertion heuristic, a GRASP/multi-start scheme, a genetic algorithm over the subset-and-order encoding, the classical Nearest Neighbor and Nearest, Farthest, and Random Insertion construction heuristics, a Simulated Annealing metaheuristic, a Tabu Search metaheuristic, and the proposed deterministic heuristic \textbf{DCIH}, evaluated on 38 TSPLIB instances across three values of $k$ and compared against the best-known values obtained by LKH-3~\cite{Helsgaun} on the benchmark instances of Pandiri \& Singh~\cite{pandiri2020} (Tables~\ref{tab:resumen_gap}--\ref{tab:resultados_Q3}). The experiments show that the greedy cheapest-insertion baseline is the most robust method on average across the whole range of $k$, that Tabu Search is the best of the added metaheuristics (essentially tying the greedy baseline), with Simulated Annealing close behind, that the genetic algorithm matches the baseline and becomes the most frequent per-instance winner only for large $k$ (Q3), that Farthest Insertion is the weakest because selecting distant nodes conflicts with the node-selection objective, and that DCIH provides a deterministic, reproducible alternative of comparable quality throughout.
+
+The proposed \textbf{DCIH} heuristic is intentionally simple and \emph{fully deterministic}: it selects nodes by minimum marginal insertion cost and refines the tour with 2-opt and an in/out exchange, breaking ties by node index. This guarantees that re-running it produces identical tours, prioritizing correctness and reproducibility.
+
+Several directions remain for future work. For DCIH, a natural next step is a deterministic multi-start over several fixed starting nodes, which would broaden the explored subsets without sacrificing reproducibility, together with a study of the effect of the candidate window $w$ on quality and runtime for large instances. For the genetic algorithm, calibrating its operators and parameters on larger instances and seeding it with the DCIH tour (hybrid initialization) could reduce total length and accelerate convergence. On the reference side, the LKH-3 baseline can be extended beyond the current TSPLIB benchmark to additional and synthetic instances, so that GAPs are reported on a broader set; selection hyper-heuristics~\cite{drake2020hyper} that adaptively choose among the constructive and population-based operators per instance and value of $k$ are also a promising avenue. Finally, we plan to explore $k$-TSP variants (e.g., budget or time constraints) that remain faithful to the single-tour, node-selection definition.
+
+% ===================== 12. REFERENCIAS =====================
+
+\begin{thebibliography}{00}
+\bibitem{ene2017} A. Ene, V. Nagarajan, R. Saket, 
+``Approximation Algorithms for Stochastic $k$-TSP,'' 2017.
+
+\bibitem{venkatesh2018} P. Venkatesh, G. Srivastava, A. Singh, 
+``A GVNS heuristic for $k$-TSP,'' 
+\textit{Procedia Computer Science}, vol. 143, pp. 189--196, 2018.
+
+\bibitem{pandiri2020} V. Pandiri and A. Singh, 
+``Two multi-start heuristics for the $k$-traveling salesman problem,'' 
+\textit{OPSEARCH}, vol. 57, pp. 1164--1204, 2020.
+
+\bibitem{blanchard2023} M. Blanchard, A. Jacquillat, P. Jaillet, 
+``Probabilistic bounds on $k$-TSP,'' 
+\textit{arXiv:2211.11063}, 2023.
+
+\bibitem{Helsgaun} K. Helsgaun, 
+``An effective implementation of the Lin-Kernighan traveling salesman heuristic,'' 
+\textit{European Journal of Operational Research}, vol. 126, no. 1, pp. 106--130, 2000.
+
+\bibitem{helsgaun2017lkh3} K. Helsgaun, 
+``An extension of the Lin-Kernighan-Helsgaun TSP solver for constrained traveling salesman and vehicle routing problems,'' 
+Technical Report, Roskilde University, Denmark, 2017.
+
+\bibitem{vansteenwegen2011top} P. Vansteenwegen, W. Souffriau, and D. Van Oudheusden, 
+``The Orienteering Problem: A survey,'' 
+\textit{European Journal of Operational Research}, vol. 209, no. 1, pp. 1--10, 2011.
+
+\bibitem{feo1995grasp} T. A. Feo and M. G. C. Resende, 
+``Greedy Randomized Adaptive Search Procedures,'' 
+\textit{Journal of Global Optimization}, vol. 6, no. 2, pp. 109--133, 1995.
+
+\bibitem{holland1975adaptation} J. H. Holland, 
+\textit{Adaptation in Natural and Artificial Systems}. University of Michigan Press, 1975.
+
+\bibitem{lawler1985} E. L. Lawler, J. K. Lenstra, A. H. G. Rinnooy Kan, and D. B. Shmoys, 
+``The Traveling Salesman Problem: A Guided Tour of Combinatorial Optimization,'' 
+\textit{Wiley}, 1985.
+
+\bibitem{miller1960mtz} C. E. Miller, A. W. Tucker, y R. A. Zemlin, 
+``Integer programming formulation of traveling salesman problems,'' 
+\textit{Journal of the ACM}, vol. 7, no. 4, pp. 326--329, 1960.
+
+\bibitem{lin1973} S. Lin y B. W. Kernighan, 
+``An effective heuristic algorithm for the traveling-salesman problem,'' 
+\textit{Operations Research}, vol. 21, no. 2, pp. 498--516, 1973.
+
+\bibitem{croes1958} G. A. Croes, 
+``A method for solving traveling-salesman problems,'' 
+\textit{Operations Research}, vol. 6, no. 6, pp. 791--812, 1958.
+
+\bibitem{TSPLIB} G. Reinelt,
+``TSPLIB—A traveling salesman problem library,''
+\textit{ORSA Journal on Computing}, vol. 3, no. 4, pp. 376--384, 1991.
+Disponible en: \url{https://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/}
+
+\bibitem{rego2011tsp} C. Rego, D. Gamboa, F. Glover, and C. Osterman,
+``Traveling salesman problem heuristics: Leading methods, implementations and latest advances,''
+\textit{European Journal of Operational Research}, vol. 211, no. 3, pp. 427--441, 2011.
+
+\bibitem{brodowsky2023kopt} U. A. Brodowsky, S. Hougardy, and X. Zhong,
+``The approximation ratio of the $k$-Opt heuristic for the Euclidean traveling salesman problem,''
+\textit{SIAM Journal on Computing}, vol. 52, no. 4, pp. 841--864, 2023.
+
+\bibitem{heimann2025kopt} S. Heimann, H. P. Hoang, and S. Hougardy,
+``A near-complete resolution of the exponential-time complexity of $k$-opt for the traveling salesman problem,''
+\textit{arXiv:2507.12304}, 2025.
+
+\bibitem{gutin2002greedy} G. Gutin, A. Yeo, and A. Zverovich,
+``Traveling salesman should not be greedy: domination analysis of greedy-type heuristics for the TSP,''
+\textit{Discrete Applied Mathematics}, vol. 117, no. 1--3, pp. 81--86, 2002.
+
+\bibitem{balas1989pctsp} E. Balas,
+``The prize collecting traveling salesman problem,''
+\textit{Networks}, vol. 19, no. 6, pp. 621--636, 1989.
+
+\bibitem{bienstock1993pctsp} D. Bienstock, M. X. Goemans, D. Simchi-Levi, and D. Williamson,
+``A note on the prize collecting traveling salesman problem,''
+\textit{Mathematical Programming}, vol. 59, no. 1--3, pp. 413--420, 1993.
+
+\bibitem{feillet2005profits} D. Feillet, P. Dejax, and M. Gendreau,
+``Traveling salesman problems with profits,''
+\textit{Transportation Science}, vol. 39, no. 2, pp. 188--205, 2005.
+
+\bibitem{gunawan2016op} A. Gunawan, H. C. Lau, and P. Vansteenwegen,
+``Orienteering problem: A survey of recent variants, solution approaches and applications,''
+\textit{European Journal of Operational Research}, vol. 255, no. 2, pp. 315--332, 2016.
+
+\bibitem{tspt3co2025} S. Hougardy and X. Zhong,
+``A survey on approximability of traveling salesman problems using the TSP-T3CO definition scheme,''
+\textit{Annals of Operations Research}, 2025. doi:10.1007/s10479-025-06641-5
+
+\bibitem{drake2020hyper} J. H. Drake, A. Kheiri, E. \"Ozcan, and E. K. Burke,
+``Recent advances in selection hyper-heuristics,''
+\textit{European Journal of Operational Research}, vol. 285, no. 2, pp. 405--428, 2020.
+
+\bibitem{applegate2006concorde} D. L. Applegate, R. E. Bixby, V. Chv\'atal, and W. J. Cook,
+\textit{The Traveling Salesman Problem: A Computational Study}.
+Princeton, NJ: Princeton University Press, 2006.
+
+\bibitem{weise2014benchmarking} T. Weise, R. Chiong, J. L\"assig, K. Tang, S. Tsutsui, W. Chen, Z. Michalewicz, and X. Yao,
+``Benchmarking optimization algorithms: An open source framework for the traveling salesman problem,''
+\textit{IEEE Computational Intelligence Magazine}, vol. 9, no. 3, pp. 40--52, 2014.
+
+\bibitem{rosenkrantz1977} D. J. Rosenkrantz, R. E. Stearns, and P. M. Lewis II,
+``An analysis of several heuristics for the traveling salesman problem,''
+\textit{SIAM Journal on Computing}, vol. 6, no. 3, pp. 563--581, 1977.
+
+\bibitem{kirkpatrick1983} S. Kirkpatrick, C. D. Gelatt, and M. P. Vecchi,
+``Optimization by simulated annealing,''
+\textit{Science}, vol. 220, no. 4598, pp. 671--680, 1983.
+
+\bibitem{dantzig1954} G. Dantzig, R. Fulkerson, and S. Johnson,
+``Solution of a large-scale traveling-salesman problem,''
+\textit{Operations Research}, vol. 2, no. 4, pp. 393--410, 1954.
+
+\bibitem{bellman1962} R. Bellman,
+``Dynamic programming treatment of the travelling salesman problem,''
+\textit{Journal of the ACM}, vol. 9, no. 1, pp. 61--63, 1962.
+
+\bibitem{heldkarp1962} M. Held and R. M. Karp,
+``A dynamic programming approach to sequencing problems,''
+\textit{Journal of the SIAM}, vol. 10, no. 1, pp. 196--210, 1962.
+
+\bibitem{karp1972} R. M. Karp,
+``Reducibility among combinatorial problems,''
+in \textit{Complexity of Computer Computations}, R. E. Miller and J. W. Thatcher, Eds.
+New York: Plenum Press, 1972, pp. 85--103.
+
+\bibitem{lin1965} S. Lin,
+``Computer solutions of the traveling salesman problem,''
+\textit{Bell System Technical Journal}, vol. 44, no. 10, pp. 2245--2269, 1965.
+
+\bibitem{christofides1976} N. Christofides,
+``Worst-case analysis of a new heuristic for the travelling salesman problem,''
+Graduate School of Industrial Administration, Carnegie Mellon University,
+Report 388, 1976.
+
+\bibitem{bentley1992} J. L. Bentley,
+``Fast algorithms for geometric traveling salesman problems,''
+\textit{ORSA Journal on Computing}, vol. 4, no. 4, pp. 387--411, 1992.
+
+\bibitem{johnson1997} D. S. Johnson and L. A. McGeoch,
+``The traveling salesman problem: A case study in local optimization,''
+in \textit{Local Search in Combinatorial Optimization}, E. Aarts and J. K. Lenstra, Eds.
+Chichester: Wiley, 1997, pp. 215--310.
+
+\bibitem{laporte1992} G. Laporte,
+``The traveling salesman problem: An overview of exact and approximate algorithms,''
+\textit{European Journal of Operational Research}, vol. 59, no. 2, pp. 231--247, 1992.
+
+\bibitem{arora1998} S. Arora,
+``Polynomial time approximation schemes for Euclidean traveling salesman and other geometric problems,''
+\textit{Journal of the ACM}, vol. 45, no. 5, pp. 753--782, 1998.
+
+\bibitem{glover1986} F. Glover,
+``Future paths for integer programming and links to artificial intelligence,''
+\textit{Computers \& Operations Research}, vol. 13, no. 5, pp. 533--549, 1986.
+
+\bibitem{cerny1985} V. \v{C}ern\'y,
+``Thermodynamical approach to the traveling salesman problem: An efficient simulation algorithm,''
+\textit{Journal of Optimization Theory and Applications}, vol. 45, no. 1, pp. 41--51, 1985.
+
+\bibitem{dorigo1997acs} M. Dorigo and L. M. Gambardella,
+``Ant colony system: A cooperative learning approach to the traveling salesman problem,''
+\textit{IEEE Transactions on Evolutionary Computation}, vol. 1, no. 1, pp. 53--66, 1997.
+
+\bibitem{mladenovic1997vns} N. Mladenovi\'c and P. Hansen,
+``Variable neighborhood search,''
+\textit{Computers \& Operations Research}, vol. 24, no. 11, pp. 1097--1100, 1997.
+
+\bibitem{martin1991} O. Martin, S. W. Otto, and E. W. Felten,
+``Large-step Markov chains for the traveling salesman problem,''
+\textit{Complex Systems}, vol. 5, no. 3, pp. 299--326, 1991.
+
+\bibitem{potvin1996} J.-Y. Potvin,
+``Genetic algorithms for the traveling salesman problem,''
+\textit{Annals of Operations Research}, vol. 63, no. 3, pp. 337--370, 1996.
+
+\bibitem{blumroli2003} C. Blum and A. Roli,
+``Metaheuristics in combinatorial optimization: Overview and conceptual comparison,''
+\textit{ACM Computing Surveys}, vol. 35, no. 3, pp. 268--308, 2003.
+
+\bibitem{talbi2009} E.-G. Talbi,
+\textit{Metaheuristics: From Design to Implementation}.
+Hoboken, NJ: Wiley, 2009.
+
+\bibitem{gutin2007book} G. Gutin and A. P. Punnen, Eds.,
+\textit{The Traveling Salesman Problem and Its Variations}.
+New York: Springer, 2007.
+
+\bibitem{gloverlaguna1997} F. Glover and M. Laguna,
+\textit{Tabu Search}.
+Boston, MA: Kluwer Academic Publishers, 1997.
+
+\bibitem{knox1994} J. Knox,
+``Tabu search performance on the symmetric traveling salesman problem,
+\textit{Computers \& Operations Research}, vol. 21, no. 8, pp. 867--876, 1994.
+
+\bibitem{bektas2006} T. Bekta\c{s},
+``The multiple traveling salesman problem: An overview of formulations and solution procedures,''
+\textit{Omega}, vol. 34, no. 3, pp. 209--219, 2006.
+
+\end{thebibliography}
+
+
+\end{document}
+

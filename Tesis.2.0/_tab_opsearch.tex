@@ -1,0 +1,26 @@
+\begin{table}[t]
+\centering\small
+\caption{Mean relative gap (\%) to the LKH-3 best-known solution, averaged over the 76 TSPLIB instances, for each termination criterion (SR $=0.05n$ s, LR $=0.2n$ s) and $k$ scenario. Methods marked with * are the published results of Pandiri \& Singh~\cite{pandiri2020}. Lower is better; the best value in each column is in bold}
+\label{tab:gap}
+\begin{tabular}{l rrr rrr}
+\hline
+ & \multicolumn{3}{c}{Short run (SR)} & \multicolumn{3}{c}{Long run (LR)} \\
+\cline{2-4}\cline{5-7}
+Method & Small & Medium & Large & Small & Medium & Large \\
+\hline
+Greedy & 4.73 & \textbf{9.11} & 11.59 & 4.46 & 8.43 & 10.41 \\
+GRASP & 14.26 & 14.72 & 13.34 & 13.12 & 13.80 & 12.43 \\
+GA & 18.46 & 14.42 & 11.05 & 13.82 & 10.49 & 8.70 \\
+NN & 19.48 & 20.54 & 15.46 & 19.48 & 20.54 & 15.46 \\
+NI & 16.82 & 19.38 & 18.78 & 16.82 & 19.38 & 18.78 \\
+FI & 102.34 & 57.52 & 34.05 & 102.34 & 57.52 & 34.05 \\
+RI & 42.57 & 23.26 & 13.47 & 38.48 & 21.94 & 12.25 \\
+SA & 10.06 & 12.80 & 13.19 & 9.79 & 12.42 & 12.86 \\
+TS & 7.04 & 10.13 & \textbf{11.00} & 6.23 & 9.08 & 9.42 \\
+DCIH & 15.45 & 20.11 & 17.06 & 15.45 & 20.11 & 17.06 \\
+GVNS* & 12.97 & 24.96 & 23.03 & 6.51 & 14.07 & 15.71 \\
+HH\_RAND* & \textbf{3.09} & 9.56 & 11.55 & \textbf{2.42} & \textbf{4.50} & \textbf{6.22} \\
+HH\_GREEDY* & 3.87 & 11.29 & 13.21 & 2.97 & 5.22 & 7.07 \\
+\hline
+\end{tabular}
+\end{table}
